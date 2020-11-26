@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <Synapse.h>
+#include "src/SynapseMain.h"
 
 
 class layer : public Syn::Layer

@@ -1,8 +1,7 @@
 
 #include "fluids.h"
 
-#include "src/Core.h"
-#include "src/renderer/Renderer.h"
+#include <Synapse.h>
 
 
 // -- FLUID SPECIFIC FUNCTIONS : defined in fluids.h --
