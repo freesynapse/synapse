@@ -8,7 +8,7 @@
 #include "src/Types.h"
 #include "src/Layer.h"
 #include "src/LayerStack.h"
-#include "src/SynapseMain.h"
+//#include "src/SynapseMain.h"
 
 #include "src/API/Window.h"
 
