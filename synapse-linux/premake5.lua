@@ -40,7 +40,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 
 -- Library specific functions, called by projects as needed to 
--- setup correct compilation.
+-- setup correct linking.
 
 -- static library inclusions
 IncludeDirs = {}

@@ -4,8 +4,8 @@ rm -r ./build/obj
 rm ./build/*.make
 rm ./build/Makefile
 
-clang -c -std=c++17 -I./include/glm -I./libraries/glad/include ./synapse-core/pch.hpp
-./premake5 --cc=clang --verbose gmake2
+clang -c -std=c++17 -I./include/boost -I./include/glm -I./libraries/glad/include ./synapse-core/pch.hpp
+./premake5/premake5 --cc=clang --verbose gmake2
 
 cd build
 make

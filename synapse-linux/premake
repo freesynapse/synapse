@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./premake5 --cc=clang --verbose gmake2
+./premake5/premake5 --cc=clang --verbose gmake2
 

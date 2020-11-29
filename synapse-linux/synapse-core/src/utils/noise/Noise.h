@@ -55,7 +55,7 @@ namespace Syn {
 		inline static float fract(float f) { return f - floor(f); }
 
 		// hashes / random-number gens
-		inline static float frand() { return (float)rand() / (RAND_MAX + 1.0f); }
+		inline static float frand() { return static_cast<float>(rand()) / (static_cast<float>(INT_MAX) + 1.0f); }
 
 
 		// instance of FastNoise
@@ -157,7 +157,7 @@ namespace Syn {
 	public:
 		static void set_seed(uint32_t _seed) { srand(_seed); }
 		static int rand_int(int _low=0, int _high=std::numeric_limits<int>::max()) { return (rand() % (_high - _low)) + _low; }
-		static float rand_float(float _low = 0.0f, float _high = std::numeric_limits<float>::max()) { return (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) / (_high - _low))) + _low; }
+		static float rand_float(float _low = 0.0f, float _high = std::numeric_limits<float>::max()) { return (static_cast<float>(rand()) / (static_cast<float>(INT_MAX) / (_high - _low))) + _low; }
 
 		static char* get_random_string(size_t len)
 		{
