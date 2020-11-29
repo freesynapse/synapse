@@ -26,6 +26,7 @@ project "fluid-sim"
 
         -- header-only inclusions
         "%{IncludeDirs.glm}",
+        "%{IncludeDirs.boost}",
 
         -- synapse inclusion
         "../synapse-core/",

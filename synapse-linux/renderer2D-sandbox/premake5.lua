@@ -26,6 +26,7 @@ project "renderer2D-sandbox"
 
         -- header-only inclusions
         "%{IncludeDirs.glm}",
+        "%{IncludeDirs.boost}",
 
         -- synapse inclusion
         "../synapse-core/",
