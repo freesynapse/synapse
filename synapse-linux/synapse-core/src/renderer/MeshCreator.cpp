@@ -231,6 +231,30 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	Ref<MeshShape> MeshCreator::createShapeViewportQuad()
+	{
+		uint32_t flags = MESH_ATTRIB_POSITION | MESH_ATTRIB_UV;
+		
+		struct vdata
+		{
+			glm::vec3 position;
+			glm::vec2 uv;
+		};
+		vdata vertices[4] =
+		{
+			glm::vec3(-1.0f, -1.0f,  0.0f), glm::vec2(0.0f, 0.0f),
+			glm::vec3( 1.0f, -1.0f,  0.0f), glm::vec2(1.0f, 0.0f),
+			glm::vec3( 1.0f,  1.0f,  0.0f), glm::vec2(1.0f, 1.0f),
+			glm::vec3(-1.0f,  1.0f,  0.0f), glm::vec2(0.0f, 1.0f),
+		};
+
+		uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
+
+		return createMeshShape(vertices, sizeof(vertices), indices, 6, flags);
+	}
+
+
+	//-----------------------------------------------------------------------------------
 	Ref<MeshShape> MeshCreator::createShapeSphere(const glm::vec3& _center, float _radius, uint32_t _stack_count, uint32_t _sector_count, uint32_t _mesh_attrib_flags)
 	{
 		// remove unsupported vertex attributes (for now)

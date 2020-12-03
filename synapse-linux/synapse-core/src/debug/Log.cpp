@@ -39,7 +39,7 @@ namespace Syn
 		m_logFile = new std::fstream;
 		m_logFile->open(_file_name.c_str(), std::ofstream::out);
 
-		*m_logFile << ">>>> " << Time::current_date() << " : synapse-dev-v0.1 <<<<" << std::endl;
+		*m_logFile << ">>>> " << Time::current_date() << " : SYNAPSE-CORE <<<<" << std::endl;
 		m_bInitialized = true;
 
 		// initialize colors
@@ -56,7 +56,7 @@ namespace Syn
 	//-----------------------------------------------------------------------------------
 	void Log::close()
 	{
-		*m_logFile << ">>>> " << Time::current_time() << " - APPLICATION TERMINATED. <<<<" << std::endl;
+		*m_logFile << ">>>> " << Time::current_date() << " - APPLICATION TERMINATED <<<<" << std::endl;
 		m_logFile->flush();
 		m_logFile->close();
 	}

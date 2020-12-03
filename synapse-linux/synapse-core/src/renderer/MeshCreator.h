@@ -42,6 +42,17 @@ namespace Syn {
 			float _side=1.0f,
 			uint32_t _mesh_attrib_flags=MESH_ATTRIB_POSITION|MESH_ATTRIB_NORMAL|MESH_ATTRIB_UV);
 
+		/*
+		A quad spanning the viewport, in screen coordinates. Requires a shader that can handle
+		this (i.e. outputting un-transformed vertex positions). Typically used for rendering
+		whole screen framebuffer textures.
+		*/
+		static Ref<MeshShape> createShapeViewportQuad();
+
+		/*
+		Sphere, defined in polar coordinates; vertex positions calculated through number of
+		stacks (vertical) and sectors (horizontal) specified.
+		*/
 		static Ref<MeshShape> createShapeSphere(
 			const glm::vec3& _center=glm::vec3(0.0f),
 			float _radius=10.0f,

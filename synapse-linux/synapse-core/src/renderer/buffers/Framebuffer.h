@@ -11,15 +11,30 @@ namespace Syn {
 	{
 		NONE	= 0,
 		RGBA8	= 1,
-		RGBA16F = 2,
+		R16F	= 2,
+		RG16F	= 3,
+		RGB16F	= 4,
+		RGBA16F = 5,
+		R32F	= 6,
+		RG32F	= 7,
+		RGB32F	= 8,
+		RGBA32F	= 9,
 	};
+
+	
+	typedef struct pixel_format_
+	{
+		GLint f;	// interal format
+		GLenum e;	// format
+		GLenum t;	// type
+	} PixelFormat;
 
 
 	//--------------------------------------------------------------------------------------
 	class Framebuffer
 	{
 	public:
-		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format = FramebufferFormat::RGBA8);
+		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8);
 		~Framebuffer();
 
 		void bind() const;
@@ -32,8 +47,6 @@ namespace Syn {
 		void onResizeEvent(Event* _e);
 
 		void bindTexture(uint32_t _tex_slot) const;
-
-
 
 		// accessors
 		GLuint getFramebufferID() { return m_framebufferID; }
@@ -54,6 +67,7 @@ namespace Syn {
 		uint32_t m_height = 0;
 
 		FramebufferFormat m_format = FramebufferFormat::NONE;
+		PixelFormat m_pxFmt;
 
 	};
 

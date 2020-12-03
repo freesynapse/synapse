@@ -2,41 +2,24 @@
 #pragma once
 
 #include "glad/glad.h"
+#include <glm/glm.hpp>
+#include <src/renderer/buffers/Framebuffer.h>
 
-
-typedef struct surface_descriptor_
-{
-	uint32_t width;
-	uint32_t height;
-	uint32_t numComponents;
-	bool useHalfFloats;
-	
-} SurfaceDesc;
-
-typedef struct surface_
-{
-	GLuint fboID;
-	GLuint textureID;
-	SurfaceDesc desc;
-
-} Surface;
 
 typedef struct slab_
 {
-	Surface frontSurface;
-	Surface backSurface;
-
+	Syn::Ref<Syn::Framebuffer> frontSurface;
+	Syn::Ref<Syn::Framebuffer> backSurface;
 } Slab;
-
 
 
 class Fluid
 {
 public:
-	static Slab createSlab(uint32_t _width, uint32_t _height, uint32_t _num_compononents);
-	static Surface createSurface(uint32_t _width, uint32_t _height, uint32_t _num_compononents, bool _use_half_floats=true);
+	static Slab createSlab(uint32_t _width, uint32_t _height, const Syn::FramebufferFormat& _fmt);
+	static Syn::Ref<Syn::Framebuffer> createSurface(uint32_t _width, uint32_t _height, const Syn::FramebufferFormat& _fmt);
 
-
-
+	static void clearSurface(const Syn::Framebuffer& _frame_buffer, const glm::vec4& _color=glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	static void swapSurfaces(Slab* _slab);
 
 };
