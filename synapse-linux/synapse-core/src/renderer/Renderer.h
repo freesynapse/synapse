@@ -21,6 +21,7 @@ namespace Syn {
 		std::string renderer;
 		std::string version;
 
+		int maxTextureUnits = 0;
 		int maxSamples = 0;
 		float maxAnisotropy = 0.0f;
 	};

@@ -22,12 +22,13 @@ namespace Syn {
 	};
 
 	
-	typedef struct pixel_format_
+	typedef struct framebuffer_pixel_format_
 	{
 		GLint f;	// interal format
 		GLenum e;	// format
 		GLenum t;	// type
-	} PixelFormat;
+		
+	} FramebufferPixelFormat;
 
 
 	//--------------------------------------------------------------------------------------
@@ -70,7 +71,7 @@ namespace Syn {
 		uint32_t m_height = 0;
 
 		FramebufferFormat m_format = FramebufferFormat::NONE;
-		PixelFormat m_pxFmt;
+		FramebufferPixelFormat m_pxFmt;
 
 	};
 

@@ -80,6 +80,7 @@ namespace Syn {
 		caps.renderer = (const char*)glGetString(GL_RENDERER);
 		caps.version = (const char*)glGetString(GL_VERSION);
 
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.maxTextureUnits);
 		glGetIntegerv(GL_MAX_SAMPLES, &caps.maxSamples);
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.maxAnisotropy);
 
