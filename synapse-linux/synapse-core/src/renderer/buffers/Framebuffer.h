@@ -48,6 +48,9 @@ namespace Syn {
 
 		void bindTexture(uint32_t _tex_slot) const;
 
+		void clearFramebuffer(const glm::vec4& _clear_color, uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT) const;
+
+
 		// accessors
 		GLuint getFramebufferID() { return m_framebufferID; }
 		GLuint getColorAttachmentID() { return m_colorAttachmentID; }

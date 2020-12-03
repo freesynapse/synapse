@@ -36,7 +36,8 @@ public:
 	Syn::Ref<Syn::Texture2D> m_texture = nullptr;
 
 	Syn::Ref<Syn::MeshShape> m_screenQuad = nullptr;
-	Surface m_surface;
+
+	Syn::Ref<Syn::Framebuffer> m_surface = nullptr;
 
 	// flags
 	bool m_wireframeMode = false;
@@ -93,7 +94,7 @@ void layer::onAttach()
 
 	// test fbo setup
 	//Slab slab = Fluid::createSlab(100, 100, 3);
-	m_surface = Fluid::createSurface(100, 100, 3);
+	m_surface = Fluid::createSurface(100, 100, Syn::FramebufferFormat::RGBA16F);
 	
 	
 	// framebuffer, whole screen quad
