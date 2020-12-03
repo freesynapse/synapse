@@ -194,5 +194,15 @@ namespace Syn {
 		});
 	}
 
+	
+	//-----------------------------------------------------------------------------------
+	void Framebuffer::clearFramebuffer(const glm::vec4& _clear_color, uint32_t _buffer_mask) const
+	{
+		SYN_RENDER_S2(_clear_color, _buffer_mask, {
+			glBindFramebuffer(GL_FRAMEBUFFER, self->m_framebufferID);
+			glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, _clear_color.a);
+			glClear(_buffer_mask);
+		});
+	}
 
 }

@@ -21,11 +21,8 @@ Syn::Ref<Syn::Framebuffer> Fluid::createSurface(uint32_t _width, uint32_t _heigh
 	Syn::Ref<Syn::Framebuffer> frameBuffer = Syn::MakeRef<Syn::Framebuffer>(_width, _height, _fmt);
 	Syn::Renderer::executeRenderCommands();
 
-	SYN_RENDER_1(frameBuffer, {
-		glBindFramebuffer(frameBuffer->getFramebufferID());
-		glClearColor(0, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-	});
+	frameBuffer->clearFramebuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), GL_COLOR_BUFFER_BIT);
+
 	Syn::Renderer::executeRenderCommands();
 
 	return frameBuffer;
