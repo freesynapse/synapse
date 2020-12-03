@@ -12,7 +12,22 @@
 #endif
 #define __func__ __FUNCSIG__
 
+#define PASTE2(a, b) a ## b
+#define PASTE(a, b) PASTE2(a, b)
+#define UNIQUE(x) PASTE(x, PASTE(__LINE__, __COUNTER__))
 
+int main(int argc, char* argv[])
+{
+	printf("%d\n", UNIQUE(2));
+
+
+	return 0;
+}
+
+
+
+
+/*
 const long long n = 5000000000;
 
 inline float idiot_work(int _i)
@@ -122,7 +137,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-
+*/
 
 
 

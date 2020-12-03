@@ -24,7 +24,9 @@ out vec4 frag_color;
 void main()
 {
     //frag_color = texture(u_screen_texture_sampler, v_uv);
-    frag_color = vec4(0.1, 0.23, 0.65, 1.0);
+    
+    // dark blue
+    frag_color = vec4(0.062745098f, 0.168627451f, 0.341176471f, 1.0f);
 }
 
 

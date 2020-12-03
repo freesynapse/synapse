@@ -22,19 +22,20 @@ namespace Syn {
 	};
 
 	
-	typedef struct pixel_format_
+	typedef struct framebuffer_pixel_format_
 	{
 		GLint f;	// interal format
 		GLenum e;	// format
 		GLenum t;	// type
-	} PixelFormat;
+		
+	} FramebufferPixelFormat;
 
 
 	//--------------------------------------------------------------------------------------
 	class Framebuffer
 	{
 	public:
-		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8);
+		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8, bool _update_on_resize=true);
 		~Framebuffer();
 
 		void bind() const;
@@ -70,7 +71,7 @@ namespace Syn {
 		uint32_t m_height = 0;
 
 		FramebufferFormat m_format = FramebufferFormat::NONE;
-		PixelFormat m_pxFmt;
+		FramebufferPixelFormat m_pxFmt;
 
 	};
 

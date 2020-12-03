@@ -13,8 +13,8 @@
 namespace Syn {
 
 	
-	Framebuffer::Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format) :
-		m_width(_width), m_height(_height), m_format(_format)
+	Framebuffer::Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format, bool _update_on_resize) :
+		m_format(_format)
 	{
 		switch (m_format)
 		{
@@ -33,7 +33,9 @@ namespace Syn {
 		resize(_width, _height);
 
 		// register function for handling resize events
-		EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
+		if (_update_on_resize)
+			EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
+			
 	}
 
 
@@ -169,7 +171,7 @@ namespace Syn {
 			}
 
 			#ifdef DEBUG_FRAMEBUFFER
-				SYN_CORE_TRACE("Framebuffer [ ", self->m_width, "x", self->m_height, " ] created.");
+				SYN_CORE_TRACE("Framebuffer [ ", self->m_width, "x", self->m_height, " ] created/resized.");
 			#endif
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);

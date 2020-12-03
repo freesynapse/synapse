@@ -6,7 +6,7 @@
 #include <Synapse.h>
 #include "src/SynapseMain.h"
 
-#include "fluids.h"
+#include "Fluids.h"
 
 
 //
@@ -30,12 +30,15 @@ public:
 	Syn::Ref<Syn::Framebuffer> m_finalFramebuffer = nullptr;
 	
 	Syn::Ref<Syn::OrthographicCamera> m_camera = nullptr;
-	bool m_bCameraMode = true;	// if true, starts in camera move mode, contrasted to edit mode
+	bool m_bCameraMode = false;	// if true, starts in camera move mode, contrasted to edit mode
 	
-	Syn::Ref<Syn::Shader> m_screenShader = nullptr;
 	Syn::Ref<Syn::Texture2D> m_texture = nullptr;
+	Syn::Ref<Syn::Texture2D> m_whiteTexture = nullptr;
+	Syn::Ref<Syn::Shader> m_shader2D = nullptr;
 
+	Syn::Ref<Syn::Shader> m_screenShader = nullptr;
 	Syn::Ref<Syn::MeshShape> m_screenQuad = nullptr;
+
 
 	Syn::Ref<Syn::Framebuffer> m_surface = nullptr;
 
@@ -68,6 +71,7 @@ void layer::onAttach()
 	Syn::ShaderLibrary::load("../assets/shaders/debugShader.glsl");
 	Syn::ShaderLibrary::load("../assets/shaders/debugPointShader.glsl");
 	Syn::ShaderLibrary::load("../assets/shaders/simple2DShader.glsl");
+	m_shader2D = Syn::ShaderLibrary::get("simple2DShader");
 
 
 	// load font
@@ -80,9 +84,8 @@ void layer::onAttach()
 	//
 
 	// shader
-	Syn::ShaderLibrary::load("/home/iomanip/source/repos/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
+	Syn::ShaderLibrary::load("/home/iomanip/source/synapse/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
 	m_screenShader = Syn::ShaderLibrary::get("fluidDensityShader");
-
 	// texture
 	m_texture = Syn::MakeRef<Syn::Texture2D>("../assets/textures/uv_grid.jpg");
 	// load camera
@@ -91,14 +94,19 @@ void layer::onAttach()
 	// set camera to edit mode
 	Syn::EventHandler::push_event(new Syn::WindowToggleFrozenCursorEvent(m_bCameraMode));
 	Syn::EventHandler::push_event(new Syn::WindowToggleCursorEvent(!m_bCameraMode));
-
 	// test fbo setup
-	//Slab slab = Fluid::createSlab(100, 100, 3);
 	m_surface = Fluid::createSurface(100, 100, Syn::FramebufferFormat::RGBA16F);
-	
-	
-	// framebuffer, whole screen quad
+	// whole screen quad, used to show rendering target framebuffer.
 	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
+	
+
+	m_whiteTexture = Syn::MakeRef<Syn::Texture2D>(100, 100, Syn::TextureFormat::RGBA8);
+	unsigned char data[40000];
+	memset(data, 128, sizeof(data));
+	m_whiteTexture->setData(data, sizeof(data));
+
+
+	Syn::Renderer2D::init();
 
 
 	// --------------- Renderer2D tests ---------------
@@ -107,11 +115,6 @@ void layer::onAttach()
 	// framebuffer
 	// the final, rendered scene framebuffer, for hand-off to ImGui for rendering
 	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::FramebufferFormat::RGBA8);
-
-
-	// misc setup
-
-	Syn::Renderer::setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 	// execute pending rendering commands
@@ -149,10 +152,14 @@ void layer::onUpdate(float _dt)
 	// -- BEGINNING OF SCENE -- //
 	Syn::Renderer2D::beginScene(m_camera);
 	{
-		// render
-		m_screenShader->enable();
-		m_screenQuad->render(m_screenShader);
+		// render to buffer
+		//m_screenShader->enable();
+		//m_screenQuad->render(m_screenShader);
 
+		Syn::Renderer2D::setShader(m_shader2D);
+		m_texture->bind();
+		//m_whiteTexture->bind();
+		Syn::Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	Syn::Renderer2D::endScene();
 	// -- END OF SCENE -- //
@@ -344,7 +351,7 @@ void layer::onImGuiRender()
 
 	// set the 'rest' of the window as the viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("synapse-core::renderer");
+	ImGui::Begin("synapse-core::Renderer");
 	static ImVec2 oldSize;
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
