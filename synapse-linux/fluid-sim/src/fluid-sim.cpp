@@ -38,6 +38,7 @@ public:
 	Syn::Ref<Syn::MeshShape> m_screenQuad = nullptr;
 
 	Syn::Ref<Syn::Framebuffer> m_surface = nullptr;
+	Slab m_testSlab;
 
 	// flags
 	bool m_wireframeMode = false;
@@ -80,7 +81,7 @@ void layer::onAttach()
 	//
 
 	// shader
-	Syn::ShaderLibrary::load("/home/iomanip/source/repos/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
+	Syn::ShaderLibrary::load("/home/iomanip/source/synapse/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
 	m_screenShader = Syn::ShaderLibrary::get("fluidDensityShader");
 
 	// texture
@@ -93,9 +94,8 @@ void layer::onAttach()
 	Syn::EventHandler::push_event(new Syn::WindowToggleCursorEvent(!m_bCameraMode));
 
 	// test fbo setup
-	//Slab slab = Fluid::createSlab(100, 100, 3);
 	m_surface = Fluid::createSurface(100, 100, Syn::FramebufferFormat::RGBA16F);
-	
+	m_testSlab = Fluid::createSlab(300, 300, Syn::FramebufferFormat::RGBA16F);
 	
 	// framebuffer, whole screen quad
 	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
@@ -107,11 +107,6 @@ void layer::onAttach()
 	// framebuffer
 	// the final, rendered scene framebuffer, for hand-off to ImGui for rendering
 	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::FramebufferFormat::RGBA8);
-
-
-	// misc setup
-
-	Syn::Renderer::setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 	// execute pending rendering commands
@@ -150,8 +145,8 @@ void layer::onUpdate(float _dt)
 	Syn::Renderer2D::beginScene(m_camera);
 	{
 		// render
-		m_screenShader->enable();
-		m_screenQuad->render(m_screenShader);
+		//m_screenShader->enable();
+		//m_screenQuad->render(m_screenShader);
 
 	}
 	Syn::Renderer2D::endScene();

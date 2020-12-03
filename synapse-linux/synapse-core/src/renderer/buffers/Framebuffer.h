@@ -34,7 +34,7 @@ namespace Syn {
 	class Framebuffer
 	{
 	public:
-		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8);
+		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8, bool _update_on_resize=true);
 		~Framebuffer();
 
 		void bind() const;

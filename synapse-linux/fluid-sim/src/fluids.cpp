@@ -18,11 +18,10 @@ Slab Fluid::createSlab(uint32_t _width, uint32_t _height, const Syn::Framebuffer
 Syn::Ref<Syn::Framebuffer> Fluid::createSurface(uint32_t _width, uint32_t _height, const Syn::FramebufferFormat& _fmt)
 {
 
-	Syn::Ref<Syn::Framebuffer> frameBuffer = Syn::MakeRef<Syn::Framebuffer>(_width, _height, _fmt);
+	Syn::Ref<Syn::Framebuffer> frameBuffer = Syn::MakeRef<Syn::Framebuffer>(_width, _height, _fmt, false);
 	Syn::Renderer::executeRenderCommands();
 
 	frameBuffer->clearFramebuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), GL_COLOR_BUFFER_BIT);
-
 	Syn::Renderer::executeRenderCommands();
 
 	return frameBuffer;
@@ -31,13 +30,10 @@ Syn::Ref<Syn::Framebuffer> Fluid::createSurface(uint32_t _width, uint32_t _heigh
 
 
 //-----------------------------------------------------------------------------------
-void Fluid::clearSurface(const Syn::Framebuffer& _buffer, const glm::vec4& _color)
+void Fluid::clearSurface(const Syn::Ref<Syn::Framebuffer>& _buffer, const glm::vec4& _color)
 {
-	SYN_RENDER_2(_buffer, _color, {
-		glBindFramebuffer(GL_FRAMEBUFFER, _buffer.getFramebufferID());
-		glClearColor(_color.r, _color.g, _color.b, _color.a);
-		glClear(GL_COLOR_BUFFER_BIT);
-	});
+	_buffer->clearFramebuffer(_color, GL_COLOR_BUFFER_BIT);
+
 }
 
 

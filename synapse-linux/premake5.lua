@@ -65,5 +65,5 @@ LibDirs["libpng"] = "%{wks.location}/../libraries/libpng/lib"
 -- projects included in this workspace -- inheriting globals from this file
 include "synapse-core"
 include "renderer2D-sandbox"
---include "misc-tests"
 include "fluid-sim"
+--include "misc-tests"
