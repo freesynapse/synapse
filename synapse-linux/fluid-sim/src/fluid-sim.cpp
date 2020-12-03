@@ -31,8 +31,12 @@ public:
 	
 	Syn::Ref<Syn::OrthographicCamera> m_camera = nullptr;
 	bool m_bCameraMode = true;	// if true, starts in camera move mode, contrasted to edit mode
-	Syn::Ref<Syn::Shader> m_shader2D = nullptr;
+	
+	Syn::Ref<Syn::Shader> m_screenShader = nullptr;
 	Syn::Ref<Syn::Texture2D> m_texture = nullptr;
+
+	Syn::Ref<Syn::MeshShape> m_screenQuad = nullptr;
+	Surface m_surface;
 
 	// flags
 	bool m_wireframeMode = false;
@@ -60,8 +64,9 @@ void layer::onAttach()
 
 	// load shaders
 
-	//Syn::ShaderLibrary::load("../assets/shaders/debugShader.glsl");
-	m_shader2D = Syn::ShaderLibrary::get("simple2DShader");
+	Syn::ShaderLibrary::load("../assets/shaders/debugShader.glsl");
+	Syn::ShaderLibrary::load("../assets/shaders/debugPointShader.glsl");
+	Syn::ShaderLibrary::load("../assets/shaders/simple2DShader.glsl");
 
 
 	// load font
@@ -71,6 +76,12 @@ void layer::onAttach()
 
 
 	// Fluid surfaces initialization
+	//
+
+	// shader
+	Syn::ShaderLibrary::load("/home/iomanip/source/repos/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
+	m_screenShader = Syn::ShaderLibrary::get("fluidDensityShader");
+
 	// texture
 	m_texture = Syn::MakeRef<Syn::Texture2D>("../assets/textures/uv_grid.jpg");
 	// load camera
@@ -80,8 +91,13 @@ void layer::onAttach()
 	Syn::EventHandler::push_event(new Syn::WindowToggleFrozenCursorEvent(m_bCameraMode));
 	Syn::EventHandler::push_event(new Syn::WindowToggleCursorEvent(!m_bCameraMode));
 
+	// test fbo setup
+	//Slab slab = Fluid::createSlab(100, 100, 3);
+	m_surface = Fluid::createSurface(100, 100, 3);
 	
-	Surface surface = Fluid::createSurface(100, 100, 3, true);
+	
+	// framebuffer, whole screen quad
+	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
 
 
 	// --------------- Renderer2D tests ---------------
@@ -129,9 +145,15 @@ void layer::onUpdate(float _dt)
 	Syn::Renderer::setClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	Syn::Renderer::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 	// -- BEGINNING OF SCENE -- //
+	Syn::Renderer2D::beginScene(m_camera);
+	{
+		// render
+		m_screenShader->enable();
+		m_screenQuad->render(m_screenShader);
 
+	}
+	Syn::Renderer2D::endScene();
 	// -- END OF SCENE -- //
 
 

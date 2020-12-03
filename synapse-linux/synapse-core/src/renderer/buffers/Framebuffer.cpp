@@ -16,6 +16,20 @@ namespace Syn {
 	Framebuffer::Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format) :
 		m_width(_width), m_height(_height), m_format(_format)
 	{
+		switch (m_format)
+		{
+			case FramebufferFormat::RGBA8:	 m_pxFmt.f = GL_RGBA8;		m_pxFmt.e = GL_RGBA;	m_pxFmt.t = GL_UNSIGNED_BYTE; break;
+			case FramebufferFormat::R16F: 	 m_pxFmt.f = GL_R16F; 		m_pxFmt.e = GL_RED; 	m_pxFmt.t = GL_HALF_FLOAT; break;
+			case FramebufferFormat::RG16F: 	 m_pxFmt.f = GL_RG16F; 		m_pxFmt.e = GL_RG; 		m_pxFmt.t = GL_HALF_FLOAT; break;
+			case FramebufferFormat::RGB16F:  m_pxFmt.f = GL_RGB16F; 	m_pxFmt.e = GL_RGB; 	m_pxFmt.t = GL_HALF_FLOAT; break;
+			case FramebufferFormat::RGBA16F: m_pxFmt.f = GL_RGBA16F;	m_pxFmt.e = GL_RGBA;	m_pxFmt.t = GL_HALF_FLOAT; break;
+			case FramebufferFormat::R32F: 	 m_pxFmt.f = GL_R32F; 		m_pxFmt.e = GL_RED; 	m_pxFmt.t = GL_FLOAT; break;
+			case FramebufferFormat::RG32F: 	 m_pxFmt.f = GL_RG32F; 		m_pxFmt.e = GL_RG; 		m_pxFmt.t = GL_FLOAT; break;
+			case FramebufferFormat::RGB32F:  m_pxFmt.f = GL_RGB32F; 	m_pxFmt.e = GL_RGB; 	m_pxFmt.t = GL_FLOAT; break;
+			case FramebufferFormat::RGBA32F: m_pxFmt.f = GL_RGBA32F;	m_pxFmt.e = GL_RGBA;	m_pxFmt.t = GL_FLOAT; break;
+			case FramebufferFormat::NONE: break;
+		}
+
 		resize(_width, _height);
 
 		// register function for handling resize events
@@ -102,7 +116,7 @@ namespace Syn {
 		m_width = _width;
 		m_height = _height;
 
-		SYN_RENDER_S0({ ;
+		SYN_RENDER_S0({
 			if (self->m_framebufferID)
 			{
 				glDeleteFramebuffers(1, &self->m_framebufferID);
@@ -118,15 +132,22 @@ namespace Syn {
 			glGenTextures(1, &self->m_colorAttachmentID);
 			glBindTexture(GL_TEXTURE_2D, self->m_colorAttachmentID);
 
+
+			// set texture with correct formats and type based on the FramebufferFormat specification.
+			glTexImage2D(GL_TEXTURE_2D, 0, self->m_pxFmt.f, self->m_width, self->m_height, 0, self->m_pxFmt.e, self->m_pxFmt.t, NULL);
+			/*
 			if (self->m_format == FramebufferFormat::RGBA16F)
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, self->m_width, self->m_height, 0, GL_RGB, GL_FLOAT, NULL);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, self->m_width, self->m_height, 0, GL_RGBA, GL_FLOAT, NULL);
 			}
 			else if (self->m_format == FramebufferFormat::RGBA8)
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self->m_width, self->m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self->m_width, self->m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			}
+			*/
 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -144,8 +165,12 @@ namespace Syn {
 			// check for completeness
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			{
-				SYN_CORE_FATAL_ERROR("framebuffer is not complete.");
+				SYN_CORE_FATAL_ERROR("Framebuffer not complete.");
 			}
+
+			#ifdef DEBUG_FRAMEBUFFER
+				SYN_CORE_TRACE("Framebuffer [ ", self->m_width, "x", self->m_height, " ] created.");
+			#endif
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		});
