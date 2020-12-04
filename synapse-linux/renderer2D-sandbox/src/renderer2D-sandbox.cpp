@@ -3,8 +3,8 @@
 #include <fstream>
 #include <glm/glm.hpp>
 
-#include <Synapse.h>
-#include "src/SynapseMain.h"
+#include <Synapse.hpp>
+#include <Synapse/SynapseMain.hpp>
 
 
 class layer : public Syn::Layer
@@ -65,6 +65,7 @@ void layer::onAttach()
 	// load font
 
 	m_font = Syn::MakeRef<Syn::Font>("../assets/ttf/ubuntu.mono.ttf", 16.0f);
+
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
@@ -111,8 +112,8 @@ void layer::onUpdate(float _dt)
 
 
 	// update camera
-	if (m_bCameraMode)
-		m_camera->onUpdate(_dt);
+	m_camera->setUpdateMode(m_bCameraMode);
+	m_camera->onUpdate(_dt);
 
 	// bind presenting framebuffer
 	m_finalFramebuffer->bind();

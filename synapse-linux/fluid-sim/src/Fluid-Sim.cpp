@@ -3,10 +3,11 @@
 #include <fstream>
 #include <glm/glm.hpp>
 
-#include <Synapse.h>
-#include "src/SynapseMain.h"
+#include <Synapse.hpp>
+#include <Synapse/SynapseMain.hpp>
+#include <Synapse/API/SynapseOpenGLBindings.hpp>
 
-#include "Fluids.h"
+#include "Fluids.hpp"
 
 
 //
@@ -86,7 +87,8 @@ void layer::onAttach()
 
 	// load font
 
-	m_font = Syn::MakeRef<Syn::Font>("../assets/ttf/ubuntu.mono.ttf", 16.0f);
+	//m_font = Syn::MakeRef<Syn::Font>("../assets/ttf/ubuntu.mono.ttf", 16.0f);
+	m_font = Syn::API::newFont("../assets/ttf/ubuntu.mono.ttf", 16.0f);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
@@ -97,30 +99,34 @@ void layer::onAttach()
 	Syn::ShaderLibrary::load("/home/iomanip/source/synapse/synapse-linux/fluid-sim/shaders/fluidDensityShader.glsl");
 	m_screenShader = Syn::ShaderLibrary::get("fluidDensityShader");
 	// texture
-	m_texture = Syn::MakeRef<Syn::Texture2D>("../assets/textures/uv_grid.jpg");
+	m_texture = Syn::API::newTexture2D("../assets/textures/uv_grid.jpg");
 	// load camera
 	// initialization with aspect ratio and zoom level (default = 1.0f)
-	m_camera = Syn::MakeRef<Syn::OrthographicCamera>(SCREEN_WIDTH_F / SCREEN_WIDTH_F, 1.0f);
+	m_camera = Syn::API::newOrthographicCamera(SCREEN_WIDTH_F / SCREEN_WIDTH_F, 1.0f);
 	// set camera to edit mode
 	Syn::EventHandler::push_event(new Syn::WindowToggleFrozenCursorEvent(m_bCameraMode));
 	Syn::EventHandler::push_event(new Syn::WindowToggleCursorEvent(!m_bCameraMode));
 	// test fbo setup
-	m_surface = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
+	m_surface = Syn::API::newFramebuffer(32, 32, Syn::ColorFormat::RGBA8, false);
 	// whole screen quad, used to show rendering target framebuffer.
 	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
 	
 	// test of Texture2D() (new constructor) and Texture2D::setData().
-	m_whiteTexture = Syn::MakeRef<Syn::Texture2D>(100, 100, Syn::ColorFormat::RGBA8);
+	m_whiteTexture = Syn::API::newTexture2D(100, 100, Syn::ColorFormat::RGBA8);
 	unsigned char data[40000];
 	memset(data, 128, sizeof(data));
 	m_whiteTexture->setData(data, sizeof(data));
+
+
+	Syn::Renderer2D::init();
+
 
 	// --------------- Renderer2D tests ---------------
 
 
 	// framebuffer
 	// the final, rendered scene framebuffer, for hand-off to ImGui for rendering
-	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
+	m_finalFramebuffer = Syn::API::newFramebuffer(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
 
 
 	// execute pending rendering commands
@@ -140,10 +146,9 @@ void layer::onUpdate(float _dt)
 	// handle input
 	handleInput(_dt);
 
-
 	// update camera
-	if (m_bCameraMode)
-		m_camera->onUpdate(_dt);
+	m_camera->setUpdateMode(m_bCameraMode);
+	m_camera->onUpdate(_dt);
 
 	// bind presenting framebuffer
 	m_finalFramebuffer->bind();
@@ -170,7 +175,7 @@ void layer::onUpdate(float _dt)
 			Syn::Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 			// unbind the rendering target framebuffer: the m_colorAttachmentID SHOULD correspond 
 			// a texture of the rendered quad
-			m_surface->unbind();
+			//m_surface->unbind();
 		}
 		
 		// bind screen framebuffer again
@@ -178,12 +183,13 @@ void layer::onUpdate(float _dt)
 		// set a shader that's using textures 
 		m_screenShader->enable();
 		// bind the texture of the surface (ie Framebuffer::m_colorAttachmentID) on slot 0 (default).
-		Syn::Renderer::enableTexture2D(m_surface->getColorAttachmentID(), 0);
+		m_surface->bindTexture();
 		// set sampler to sample from slot 0 (GL_TEXTURE0).
-		m_screenShader->setUniform1i("u_screen_texture_sampler", 0);
+		//m_screenShader->setUniform1i("u_screen_texture_sampler", 0);
 		// draw arrays screen sized quad -- checked - works with color
 		m_screenQuad->getVertexArray()->bind();
-		Syn::Renderer::drawIndexed(m_screenQuad->getIndexCount(), true, GL_TRIANGLES);
+		//Syn::Renderer::drawIndexedFlat(m_screenQuad->getVertexArray());
+		Syn::Renderer::drawIndexed(m_screenQuad->getVertexArray());
 	}
 	Syn::Renderer2D::endScene();
 	// -- END OF SCENE -- //
