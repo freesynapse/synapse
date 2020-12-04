@@ -1,7 +1,7 @@
 
-#include "Fluids.h"
+#include "Fluids.hpp"
 
-#include <Synapse.h>
+#include <Synapse.hpp>
 
 
 // -- FLUID SPECIFIC FUNCTIONS : defined in fluids.h --

@@ -21,8 +21,10 @@ project "synapse-core"
     {
         "Synapse.h",
 
-        "src/**.cpp",
-        "src/**.h",
+        "Synapse/**.c",
+        "Synapse/**.cpp",
+        "Synapse/**.h",
+        "Synapse/**.hpp",
 
         "external/FastNoise/**.cpp",
         "external/FastNoise/**.h",
