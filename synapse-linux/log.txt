@@ -1,0 +1,46 @@
+>>>> 2020-12-04 : SYNAPSE-CORE <<<<
+[12:35:38] int main(int, char **): logging enabled.
+[12:35:38] static void Syn::EventHandler::init(): listening.
+[12:35:39] int Syn::Window::init(): GLFW window (1440x960) created.
+[12:35:39] int Syn::Window::init(): [glad] initialized.
+[12:35:39] int Syn::Window::init(): OpenGL vendor: Intel
+[12:35:39] int Syn::Window::init(): OpenGL renderer: Mesa Intel(R) UHD Graphics 620 (KBL GT2)
+[12:35:39] int Syn::Window::init(): OpenGL version: 4.6 (Compatibility Profile) Mesa 20.0.8
+[12:35:39] Syn::Window::Window(const int &, const int &, const char *): Window initialization complete.
+[12:35:39] static void Syn::InputManager::init(): ok.
+[12:35:39] static int Syn::FileIOHandler::read_file_to_buffer(const std::string &, std::string &): >>> ERROR: File '../assets/shaders/debugShader.glsl' could not be opened.
+[12:35:39] void Syn::Shader::reload(): >>> WARNING: shader not loaded, could not open file '../assets/shaders/debugShader.glsl'.
+[12:35:39] static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'debugShader' added to library (compilation failed).
+[12:35:39] static int Syn::FileIOHandler::read_file_to_buffer(const std::string &, std::string &): >>> ERROR: File '../assets/shaders/debugPointShader.glsl' could not be opened.
+[12:35:39] void Syn::Shader::reload(): >>> WARNING: shader not loaded, could not open file '../assets/shaders/debugPointShader.glsl'.
+[12:35:39] static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'debugPointShader' added to library (compilation failed).
+[12:35:39] static int Syn::FileIOHandler::read_file_to_buffer(const std::string &, std::string &): >>> ERROR: File '../assets/shaders/simple2DShader.glsl' could not be opened.
+[12:35:39] void Syn::Shader::reload(): >>> WARNING: shader not loaded, could not open file '../assets/shaders/simple2DShader.glsl'.
+[12:35:39] static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'simple2DShader' added to library (compilation failed).
+[12:35:39] static Ref<Syn::Shader> Syn::ShaderLibrary::createDefaultShader(): >>> WARNING: creating static default shader.
+[12:35:39] Syn::Font::Font(const char *, const int &, Ref<Syn::Shader>): using static shaders.
+[12:35:39] static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'static_font_shader' added to library.
+[12:35:39] int Syn::Font::initAtlas(const char *, const int &): FreeType successfully initialized.
+[12:35:39] int Syn::Font::initAtlas(const char *, const int &): loading atlas from '../assets/ttf/ubuntu.mono.ttf'.
+[12:35:39] int Syn::Font::initAtlas(const char *, const int &): >>> ERROR: could not load atlas.
+[12:35:39] static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'fluidDensityShader' added to library.
+[12:35:39] Syn::Texture2D::Texture2D(const std::string &): >>> WARNING: Couldn't load file '../assets/textures/uv_grid.jpg'.
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1024x768 ] created/resized.
+[12:35:39] static void Syn::Texture2D::setData(void *, size_t)::RenderCommand144::execute(void *): Texture data uploaded (40000 bytes).
+[12:35:39] static void Syn::Renderer2D::init(): Renderer2D ready.
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1440x960 ] created/resized.
+[12:35:39] virtual void layer::onImGuiRender(): viewport [ 1350, 922 ]
+[12:35:39] virtual void Syn::OrthographicCamera::onEvent(Syn::Event *): called
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1350x922 ] created/resized.
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1350x922 ] created/resized.
+[12:35:39] virtual void layer::onImGuiRender(): viewport [ 1784, 978 ]
+[12:35:39] virtual void Syn::OrthographicCamera::onEvent(Syn::Event *): called
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1784x978 ] created/resized.
+[12:35:39] static void Syn::Framebuffer::resize(uint32_t, uint32_t)::RenderCommand167::execute(void *): Framebuffer [ 1784x978 ] created/resized.
+[12:35:47] void Syn::Application::onEvent(Syn::Event *): WINDOW_CLOSE event recieved. Exit.
+[12:35:47] Syn::Window::~Window(): terminating GLFW.
+[12:35:47] static void Syn::EventHandler::release(): clearing event queue.
+[12:35:47] static void Syn::FileIOHandler::close(): deleting file './static_default_shader.glsl'.
+[12:35:47] static void Syn::FileIOHandler::close(): deleting file './static_font_shader.glsl'.
+[12:35:47] int main(int, char **): closing log.
+>>>> 2020-12-04 - APPLICATION TERMINATED <<<<

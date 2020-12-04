@@ -2,40 +2,16 @@
 
 
 #include "src/event/EventTypes.h"
+#include "src/renderer/material/Texture.h"
 
 
 namespace Syn {
 
 
-	enum class FramebufferFormat
-	{
-		NONE	= 0,
-		RGBA8	= 1,
-		R16F	= 2,
-		RG16F	= 3,
-		RGB16F	= 4,
-		RGBA16F = 5,
-		R32F	= 6,
-		RG32F	= 7,
-		RGB32F	= 8,
-		RGBA32F	= 9,
-	};
-
-	
-	typedef struct framebuffer_pixel_format_
-	{
-		GLint f;	// interal format
-		GLenum e;	// format
-		GLenum t;	// type
-		
-	} FramebufferPixelFormat;
-
-
-	//--------------------------------------------------------------------------------------
 	class Framebuffer
 	{
 	public:
-		Framebuffer(uint32_t _width, uint32_t _height, FramebufferFormat _format=FramebufferFormat::RGBA8, bool _update_on_resize=true);
+		Framebuffer(uint32_t _width, uint32_t _height, ColorFormat _format=ColorFormat::RGBA8, bool _update_on_resize=true);
 		~Framebuffer();
 
 		void bind() const;
@@ -47,7 +23,7 @@ namespace Syn {
 		void resize(uint32_t _width, uint32_t _height);
 		void onResizeEvent(Event* _e);
 
-		void bindTexture(uint32_t _tex_slot) const;
+		void bindTexture(uint32_t _tex_slot=0) const;
 
 		void clearFramebuffer(const glm::vec4& _clear_color, uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT) const;
 
@@ -59,7 +35,7 @@ namespace Syn {
 
 		uint32_t getWidth() { return m_width; }
 		uint32_t getHeight() { return m_height; }
-		FramebufferFormat getFormat() { return m_format; }
+		ColorFormat getFormat() { return m_format; }
 
 
 	private:
@@ -70,8 +46,8 @@ namespace Syn {
 		uint32_t m_width = 0;
 		uint32_t m_height = 0;
 
-		FramebufferFormat m_format = FramebufferFormat::NONE;
-		FramebufferPixelFormat m_pxFmt;
+		ColorFormat m_format = ColorFormat::NONE;
+		OpenGLPixelFormat m_pxFmt;
 
 	};
 

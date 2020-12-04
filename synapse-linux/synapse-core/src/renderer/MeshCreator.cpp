@@ -240,7 +240,7 @@ namespace Syn {
 			glm::vec3 position;
 			glm::vec2 uv;
 		};
-		vdata vertices[4] =
+		vdata vertexData[] =
 		{
 			glm::vec3(-1.0f, -1.0f,  0.0f), glm::vec2(0.0f, 0.0f),
 			glm::vec3( 1.0f, -1.0f,  0.0f), glm::vec2(1.0f, 0.0f),
@@ -250,7 +250,7 @@ namespace Syn {
 
 		uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
 
-		return createMeshShape(vertices, sizeof(vertices), indices, 6, flags);
+		return createMeshShape(vertexData, sizeof(vertexData), indices, 6, flags);
 	}
 
 

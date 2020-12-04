@@ -38,9 +38,19 @@ public:
 
 	Syn::Ref<Syn::Shader> m_screenShader = nullptr;
 	Syn::Ref<Syn::MeshShape> m_screenQuad = nullptr;
+	Syn::Ref<Syn::Texture2D> m_screenTexture = nullptr;
 
 
 	Syn::Ref<Syn::Framebuffer> m_surface = nullptr;
+
+
+
+	Syn::Ref<Syn::VertexArray> debugArray = nullptr;
+
+
+
+
+
 
 	// flags
 	bool m_wireframeMode = false;
@@ -95,26 +105,22 @@ void layer::onAttach()
 	Syn::EventHandler::push_event(new Syn::WindowToggleFrozenCursorEvent(m_bCameraMode));
 	Syn::EventHandler::push_event(new Syn::WindowToggleCursorEvent(!m_bCameraMode));
 	// test fbo setup
-	m_surface = Fluid::createSurface(100, 100, Syn::FramebufferFormat::RGBA16F);
+	m_surface = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
 	// whole screen quad, used to show rendering target framebuffer.
 	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
 	
-
-	m_whiteTexture = Syn::MakeRef<Syn::Texture2D>(100, 100, Syn::TextureFormat::RGBA8);
+	// test of Texture2D() (new constructor) and Texture2D::setData().
+	m_whiteTexture = Syn::MakeRef<Syn::Texture2D>(100, 100, Syn::ColorFormat::RGBA8);
 	unsigned char data[40000];
 	memset(data, 128, sizeof(data));
 	m_whiteTexture->setData(data, sizeof(data));
-
-
-	Syn::Renderer2D::init();
-
 
 	// --------------- Renderer2D tests ---------------
 
 
 	// framebuffer
 	// the final, rendered scene framebuffer, for hand-off to ImGui for rendering
-	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::FramebufferFormat::RGBA8);
+	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
 
 
 	// execute pending rendering commands
@@ -152,14 +158,32 @@ void layer::onUpdate(float _dt)
 	// -- BEGINNING OF SCENE -- //
 	Syn::Renderer2D::beginScene(m_camera);
 	{
-		// render to buffer
-		//m_screenShader->enable();
-		//m_screenQuad->render(m_screenShader);
-
-		Syn::Renderer2D::setShader(m_shader2D);
-		m_texture->bind();
-		//m_whiteTexture->bind();
-		Syn::Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		// render to surface
+		{
+			// bind rendering target frambuffer
+			m_surface->bind();
+			// set a shader that's using textures
+			Syn::Renderer2D::setShader(m_shader2D);
+			// bind a texture
+			m_texture->bind();
+			// render a quad
+			Syn::Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+			// unbind the rendering target framebuffer: the m_colorAttachmentID SHOULD correspond 
+			// a texture of the rendered quad
+			m_surface->unbind();
+		}
+		
+		// bind screen framebuffer again
+		m_finalFramebuffer->bind();
+		// set a shader that's using textures 
+		m_screenShader->enable();
+		// bind the texture of the surface (ie Framebuffer::m_colorAttachmentID) on slot 0 (default).
+		Syn::Renderer::enableTexture2D(m_surface->getColorAttachmentID(), 0);
+		// set sampler to sample from slot 0 (GL_TEXTURE0).
+		m_screenShader->setUniform1i("u_screen_texture_sampler", 0);
+		// draw arrays screen sized quad -- checked - works with color
+		m_screenQuad->getVertexArray()->bind();
+		Syn::Renderer::drawIndexed(m_screenQuad->getIndexCount(), true, GL_TRIANGLES);
 	}
 	Syn::Renderer2D::endScene();
 	// -- END OF SCENE -- //
