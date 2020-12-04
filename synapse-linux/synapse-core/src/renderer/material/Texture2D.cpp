@@ -37,13 +37,13 @@ namespace Syn {
 			// hack number of channels in
 			if (c == 3)
 			{
-				m_fmt = TextureFormat::RGB8;
-				m_pxFmt = TexturePixelFormat(GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
+				m_fmt = ColorFormat::RGB8;
+				m_pxFmt = OpenGLPixelFormat(GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
 			}
 			else // assume 4 channels
 			{
-				m_fmt = TextureFormat::RGBA8;
-				m_pxFmt = TexturePixelFormat(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
+				m_fmt = ColorFormat::RGBA8;
+				m_pxFmt = OpenGLPixelFormat(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
 			}
 			//GLenum storageChannels = (c == 3 ? GL_RGB8 : GL_RGBA8);
 			//GLenum uploadChannels = (c == 3 ? GL_RGB : GL_RGBA);
@@ -78,28 +78,16 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	Texture2D::Texture2D(uint32_t _width, uint32_t _height, TextureFormat _texure_format)
+	Texture2D::Texture2D(uint32_t _width, uint32_t _height, ColorFormat _color_format)
 	{
 		SYN_PROFILE_FUNCTION();
 
 		m_width = _width;
 		m_height = _height;
-		m_fmt = _texure_format;
+		m_fmt = _color_format;
+		m_pxFmt = getOpenGLPixelFormat(_color_format);
 
 		// set storage, upload and type from format
-		switch (m_fmt)
-		{
-			case TextureFormat::R8:		m_pxFmt = TexturePixelFormat(GL_R8,    GL_RED,  GL_UNSIGNED_BYTE);	break;
-			case TextureFormat::RG8:	m_pxFmt = TexturePixelFormat(GL_RG8,   GL_RG,   GL_UNSIGNED_BYTE);	break;
-			case TextureFormat::RGB8:	m_pxFmt = TexturePixelFormat(GL_RGB8,  GL_RGB,  GL_UNSIGNED_BYTE);	break;
-			case TextureFormat::RGBA8:	m_pxFmt = TexturePixelFormat(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);	break;
-
-			case TextureFormat::R32F:		m_pxFmt = TexturePixelFormat(GL_R16F,    GL_RED,  GL_FLOAT);	break;
-			case TextureFormat::RG32F:		m_pxFmt = TexturePixelFormat(GL_RG16F,   GL_RG,   GL_FLOAT);	break;
-			case TextureFormat::RGB32F:		m_pxFmt = TexturePixelFormat(GL_RGB16F,  GL_RGB,  GL_FLOAT);	break;
-			case TextureFormat::RGBA32F:	m_pxFmt = TexturePixelFormat(GL_RGBA16F, GL_RGBA, GL_FLOAT);	break;
-		}
-
 		SYN_RENDER_S0({
 			glCreateTextures(GL_TEXTURE_2D, 1, &self->m_textureID);
 			glTextureStorage2D(self->m_textureID, 1, self->m_pxFmt.internalFormat, self->m_width, self->m_height);
@@ -139,7 +127,7 @@ namespace Syn {
 		SYN_PROFILE_FUNCTION();
 
 		// assert full texture
-		uint32_t sz = m_width * m_height * getTextureFmtChannels(m_fmt) * getTextureFmtTypeSize(m_fmt);
+		uint32_t sz = m_width * m_height * getPixelFmtChannels(m_fmt) * getPixelFmtTypeSize(m_fmt);
 		if (_size_in_bytes != sz)
 		{
 			SYN_CORE_WARNING("size mismatch: _data: ", _size_in_bytes, " != ", sz, ". Only full texture upload permitted");

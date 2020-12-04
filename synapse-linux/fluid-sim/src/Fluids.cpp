@@ -5,7 +5,7 @@
 
 
 // -- FLUID SPECIFIC FUNCTIONS : defined in fluids.h --
-Slab Fluid::createSlab(uint32_t _width, uint32_t _height, const Syn::FramebufferFormat& _fmt)
+Slab Fluid::createSlab(uint32_t _width, uint32_t _height, const Syn::ColorFormat& _fmt)
 {
 	Slab slab;
 	slab.frontSurface = createSurface(_width, _height, _fmt);
@@ -15,7 +15,7 @@ Slab Fluid::createSlab(uint32_t _width, uint32_t _height, const Syn::Framebuffer
 
 
 //-----------------------------------------------------------------------------------
-Syn::Ref<Syn::Framebuffer> Fluid::createSurface(uint32_t _width, uint32_t _height, const Syn::FramebufferFormat& _fmt)
+Syn::Ref<Syn::Framebuffer> Fluid::createSurface(uint32_t _width, uint32_t _height, const Syn::ColorFormat& _fmt)
 {
 
 	Syn::Ref<Syn::Framebuffer> frameBuffer = Syn::MakeRef<Syn::Framebuffer>(_width, _height, _fmt, false);

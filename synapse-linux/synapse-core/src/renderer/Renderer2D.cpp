@@ -76,8 +76,6 @@ namespace Syn {
     void Renderer2D::init()
     {
         SYN_PROFILE_FUNCTION();
-        
-        SYN_CORE_TRACE("Renderer2D ready.");
 
         // vertex buffer
         s_data.spriteVertexBuffer = MakeRef<VertexBuffer>(GL_DYNAMIC_DRAW);
@@ -97,6 +95,8 @@ namespace Syn {
 
         //
         Renderer::executeRenderCommands();
+
+        SYN_CORE_TRACE("Renderer2D ready.");
 
     }
 

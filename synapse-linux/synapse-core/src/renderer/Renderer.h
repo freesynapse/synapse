@@ -98,6 +98,7 @@ namespace Syn {
 		static void setGLenum(GLenum _gl_enum, bool _b);
 
 		// rendering
+		static void enableTexture2D(uint32_t _tex_id, uint32_t _tex_slot=0);
 		static void drawIndexed(uint32_t _count, bool _depth_test=true, GLenum _primitive=GL_TRIANGLES);
 		static void drawArrays(uint32_t _count, uint32_t _first=0, bool _depth_test=true, GLenum _primitive=GL_TRIANGLES);
 		static void setLineWidth(float _width);

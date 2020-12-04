@@ -126,8 +126,8 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_MESH
 //#define DEBUG_MESH_TERRAIN
 #define DEBUG_FRAMEBUFFER
-//#define DEBUG_VERTEX_ARRAY
-//#define DEBUG_VERTEX_BUFFER
+#define DEBUG_VERTEX_ARRAY
+#define DEBUG_VERTEX_BUFFER
 
 // shaders
 //#define DEBUG_SHADER_SETUP

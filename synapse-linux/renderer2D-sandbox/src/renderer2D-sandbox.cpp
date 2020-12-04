@@ -84,7 +84,7 @@ void layer::onAttach()
 
 	// framebuffer
 	// the final, rendered scene framebuffer, for hand-off to ImGui for rendering
-	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::FramebufferFormat::RGBA8);
+	m_finalFramebuffer = Syn::MakeRef<Syn::Framebuffer>(SCREEN_WIDTH, SCREEN_HEIGHT, Syn::ColorFormat::RGBA8);
 
 
 	// misc setup

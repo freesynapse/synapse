@@ -361,6 +361,14 @@ namespace Syn {
 
 	//-----------------------------------------------------------------------------------
 	// rendering
+	void Renderer::enableTexture2D(uint32_t _tex_id, uint32_t _tex_slot)
+	{
+		SYN_RENDER_2(_tex_id, _tex_slot, {
+			glActiveTexture(GL_TEXTURE0 + _tex_slot);
+			glBindTexture(GL_TEXTURE_2D, _tex_id);
+		});
+	}
+
 	void Renderer::drawIndexed(uint32_t _count, bool _depth_test, GLenum _primitive)
 	{
 		SYN_RENDER_3(_count, _depth_test, _primitive, {
