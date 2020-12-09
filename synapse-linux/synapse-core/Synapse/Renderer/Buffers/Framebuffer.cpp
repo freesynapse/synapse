@@ -37,11 +37,12 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::bind() const
+	void Framebuffer::bind(bool _set_viewport) const
 	{
-		SYN_RENDER_S0({
+		SYN_RENDER_S1(_set_viewport, {
+			if (_set_viewport)
+				glViewport(0, 0, self->m_width, self->m_height);
 			glBindFramebuffer(GL_FRAMEBUFFER, self->m_framebufferID);
-			glViewport(0, 0, self->m_width, self->m_height);
 		});
 	}
 
@@ -185,7 +186,7 @@ namespace Syn {
 
 	
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::clearFramebuffer(const glm::vec4& _clear_color, uint32_t _buffer_mask) const
+	void Framebuffer::clear(const glm::vec4& _clear_color, uint32_t _buffer_mask) const
 	{
 		SYN_RENDER_S2(_clear_color, _buffer_mask, {
 			glBindFramebuffer(GL_FRAMEBUFFER, self->m_framebufferID);

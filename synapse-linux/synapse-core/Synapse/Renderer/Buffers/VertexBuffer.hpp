@@ -142,6 +142,11 @@ namespace Syn {
 
 		inline const GLuint& getBufferID() { return m_bufferID; }
 		inline const BufferLayout& getBufferLayout() { return m_bufferLayout; }
+		/*
+		Initializer lists are recommended, with BufferElements according to
+		{ shaderLocation, type, name, (normalized=false) }, e.g.
+		{ VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float4, "a_position" }
+		*/
 		inline void setBufferLayout(const BufferLayout& _layout) { m_bufferLayout = _layout; }
 
 

@@ -7,6 +7,7 @@
 #include "Synapse/Core.hpp"
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Event/EventHandler.hpp"
+#include "Synapse/Debug/Profiler.hpp"
 
 
 namespace Syn { 
@@ -42,7 +43,7 @@ namespace Syn {
 				out vec4 out_color;
 
 				uniform sampler2D u_texture_sampler;
-				uniform vec4 u_color;// = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				uniform vec4 u_color;
 
 				void main()
 				{
@@ -102,6 +103,7 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	int Font::initAtlas(const char* _filename, const int& _pixel_size)
 	{
+		SYN_PROFILE_FUNCTION();
 
 		// Use program for initiation of shader attributes
 		auto shader = m_shader->getShaderID();
@@ -273,6 +275,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void Font::endRenderBlock()
 	{
+		SYN_PROFILE_FUNCTION();
+		
 		m_shader->enable();
 		//auto self = this;
 		//glUseProgram(m_shader->getShaderID());

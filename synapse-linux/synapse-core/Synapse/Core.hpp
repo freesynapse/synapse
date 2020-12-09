@@ -75,7 +75,7 @@ static constexpr int RETURN_FAILURE = -1;
 // RENDERER //
 //
 
-// screen size, temporarily as a definition
+// screen size, temporarily as a definition -- set by ImGui
 //#define SCREEN_WIDTH	1920
 //#define SCREEN_HEIGHT	1080
 #define SCREEN_WIDTH	1440
@@ -100,6 +100,13 @@ static constexpr int RETURN_FAILURE = -1;
 
 // DEBUG //
 //
+
+/* 
+Only run one frame of rendering, then quit (through Application::run()).
+Also turns on all debugging features, including parsing of the rendering
+command queue.
+*/
+//#define DEBUG_ONE_FRAME
 
 // memory tracking
 //#define DEBUG_MEMORY_ALLOCATION
@@ -142,6 +149,29 @@ static constexpr int RETURN_FAILURE = -1;
 
 // MuParser
 //#define DEBUG_MUPARSER
+
+#ifdef DEBUG_ONE_FRAME
+	#define DEBUG_MEMORY_ALLOCATION
+	#define DEBUG_PROFILING
+	#define DEBUG_IMGUI_LOG
+	#define DEBUG_KEYS_BUTTONS
+	#define DEBUG_CURSOR_MOVE
+	#define DEBUG_EVENTS
+	#define DEBUG_RENDERER_2D
+	#define DEBUG_MESH_NORMAL_SHADER
+	#define DEBUG_MESH_TANGENT_SHADER
+	#define DEBUG_MESH_BITANGENT_SHADER
+	#define DEBUG_MESH
+	#define DEBUG_MESH_TERRAIN
+	#define DEBUG_FRAMEBUFFER
+	#define DEBUG_VERTEX_ARRAY
+	#define DEBUG_VERTEX_BUFFER
+	#define DEBUG_SHADER_SETUP
+	#define DEBUG_UNIFORMS
+	#define DEBUG_TEXTURES
+	#define DEBUG_MATERIALS
+	#define DEBUG_OPENGL_API
+#endif
 
 
 #define SYNAPSE_DEBUG

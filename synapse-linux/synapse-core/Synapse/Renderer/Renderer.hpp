@@ -76,6 +76,9 @@ namespace Syn {
 		static void setViewport(const glm::ivec2& _position, const glm::ivec2& _size);
 		static void resetViewport();
 
+		// blending
+		static void setBlendingEq(GLenum _src_factor, GLenum _dest_factor);
+
 		// states
 		static void enableWireFrame();
 		static void disableWireFrame();
@@ -100,6 +103,8 @@ namespace Syn {
 		// rendering
 		/* activate and bind texture */
 		static void enableTexture2D(uint32_t _tex_id, uint32_t _tex_slot=0);
+		/* reset texture to 0 */
+		static void resetTexture2D(uint32_t _tex_slot=0);
 		/* depth testing allowed */
 		static void drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test=true);
 		static void drawIndexed(uint32_t _count, bool _depth_test=true, GLenum _primitive=GL_TRIANGLES);

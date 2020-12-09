@@ -14,7 +14,7 @@ namespace Syn {
 		Framebuffer(uint32_t _width, uint32_t _height, ColorFormat _format=ColorFormat::RGBA8, bool _update_on_resize=true);
 		~Framebuffer();
 
-		void bind() const;
+		void bind(bool _set_viewport=true) const;
 		inline void bindDefaultFramebuffer() { unbind(); }
 		void unbind() const;
 
@@ -25,7 +25,7 @@ namespace Syn {
 
 		void bindTexture(uint32_t _tex_slot=0) const;
 
-		void clearFramebuffer(const glm::vec4& _clear_color, uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT) const;
+		void clear(const glm::vec4& _clear_color, uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT) const;
 
 
 		// accessors
