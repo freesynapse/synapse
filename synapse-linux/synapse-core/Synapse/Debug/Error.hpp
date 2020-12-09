@@ -22,13 +22,14 @@ namespace Syn {
 				// default to crash!
 				callback = Error::error_exit;
 			
-			Log::log_no_func(_func, ">>> FATAL ERROR (callback 0x" + std::to_string(*(long*)(char*)& callback) + "): ", _output_item, args...);
+			Log::log_no_func(">>> FATAL ERROR (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")", _func, ": ", _output_item, args...);
 
 			callback();
 
 		}
 
 
+		
 		template<typename T, typename ...Args>
 		static void raise_error(std::function<void()> _callback, const char* _func, const T& _output_item, Args ...args)
 		{
@@ -37,15 +38,14 @@ namespace Syn {
 				callback = _callback;
 			else
 				callback = nullptr;
-			
-			std::string errorMsg = ">>> ERROR";
-			errorMsg += (callback == nullptr ? ": " : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + "): "));
-
-			Log::log(_func, errorMsg, _output_item, args...);
+			std::string errorMsg = (callback == nullptr ? "" : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")"));
+			//std::cout << "errorMsg: " << errorMsg << '\n' << "_func: " << _func << '\n' << "_output_item: " << _output_item << '\n';
+			Log::log_no_func(">>> ERROR", errorMsg, _func, ": ", _output_item, args...);
 
 		}
 
 
+		//
 		template<typename T, typename ...Args>
 		static void raise_warning(std::function<void()> _callback, const char* _func, const T& _output_item, Args ...args)
 		{
@@ -55,10 +55,8 @@ namespace Syn {
 			else
 				callback = nullptr;
 
-			std::string errorMsg = ">>> WARNING";
-			errorMsg += (callback == nullptr ? ": " : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + "): "));
-
-			Log::log(_func, errorMsg, _output_item, args...);
+			std::string errorMsg = (callback == nullptr ? "" : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")"));
+			Log::log_no_func(">>> WARNING", errorMsg, _func, ": ", _output_item, args...);
 		}
 
 
@@ -69,7 +67,7 @@ namespace Syn {
 
 	private:
 		// default shutdown method
-		static void error_exit() { exit(-1); }
+		static inline void error_exit() { exit(-1); }
 
 
 	};

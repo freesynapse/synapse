@@ -227,6 +227,16 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	// blending equation
+	void Renderer::setBlendingEq(GLenum _src_factor, GLenum _dest_factor)
+	{
+		SYN_RENDER_2(_src_factor, _dest_factor, {
+			glBlendFunc(_src_factor, _dest_factor);
+		});
+	}
+
+
+	//-----------------------------------------------------------------------------------
 	// states
 	void Renderer::enableWireFrame()
 	{
@@ -369,6 +379,14 @@ namespace Syn {
 		});
 	}
 
+	void Renderer::resetTexture2D(uint32_t _tex_slot)
+	{
+		SYN_RENDER_1(_tex_slot, {
+			glActiveTexture(GL_TEXTURE0 + _tex_slot);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		});
+	}
+
 	void Renderer::drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test)
 	{
 		SYN_RENDER_2(_vertex_array, _depth_test, {
@@ -418,7 +436,7 @@ namespace Syn {
 	}
 
 
-	void Renderer::drawArrays(/*GLenim _primitive_mode, */uint32_t _count, uint32_t _first, bool _depth_test, GLenum _primitive)
+	void Renderer::drawArrays(/*GLenum _primitive_mode, */uint32_t _count, uint32_t _first, bool _depth_test, GLenum _primitive)
 	{
 		SYN_RENDER_4(_first, _count, _depth_test, _primitive, {
 			if (!_depth_test)

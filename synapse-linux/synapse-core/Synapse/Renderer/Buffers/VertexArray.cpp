@@ -8,7 +8,7 @@
 #include "Synapse/Renderer/Renderer.hpp"
 
 
-/* Suppression of casting errors from GLuint to void *. */
+/* Suppression of casting errors from GLuint to void*. */
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
 #elif defined(__GNUC__)

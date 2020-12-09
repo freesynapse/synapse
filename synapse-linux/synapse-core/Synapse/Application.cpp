@@ -117,6 +117,11 @@ namespace Syn {
 			// update GLFW
 			m_window->onUpdate();
 
+			#ifdef DEBUG_ONE_FRAME
+				SYN_CORE_TRACE("DEBUG_ONE_FRAME defined. Exit.");
+				m_bRunning = false;
+			#endif
+
 		}
 
 	}

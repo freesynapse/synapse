@@ -29,8 +29,10 @@ namespace Syn {
 		static inline Ref<Shader> get(const std::string& _name)
 		{
 			if (!exists(_name) || !s_shaders[_name]->isLoaded())
+			{
+				SYN_CORE_WARNING("shader '", _name, "' not found, returning defualt static shader instance.");
 				return getDefaultInstance();
-
+			}
 			return s_shaders[_name];
 		}
 		

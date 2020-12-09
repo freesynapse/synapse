@@ -11,7 +11,7 @@
 
 namespace Syn {	
 
-
+	//
 	class Shader
 	{
 	public:

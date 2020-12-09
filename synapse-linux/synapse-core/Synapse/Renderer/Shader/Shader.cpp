@@ -22,6 +22,128 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	static std::string shader_str_from_type(GLenum _type)
+	{
+		std::string ret;
+		switch (_type)
+		{
+			case GL_VERTEX_SHADER: 		ret = "VERTEX_SHADER"; 		break;
+			case GL_FRAGMENT_SHADER:	ret = "FRAGMENT_SHADER";	break;
+			case GL_GEOMETRY_SHADER:	ret = "GEOMETRY_SHADER";	break;
+			default:					ret = "GL_NONE";			break;
+		};
+
+		return ret;
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	static std::string g_str;
+	inline const char* leading_blank_spaces(int _line_num, int _error_code=0)
+	{
+		/* error code 1 = error, 2 = warning */
+		
+		// obs: max 10000 lines of shader code permitted
+		int n = 0;
+		// get number of digits in _line_num
+		int numChars = _line_num > 0 ? (int)log10((double)_line_num) + 1 : 1;
+		switch (_error_code)
+		{
+			case 0: g_str = "   "; break;
+			case 1: g_str = "  E"; break;
+			case 2: g_str = "  W"; break;
+		}
+		
+		for (int i = numChars; i < 5; i++)
+			g_str.append(" ");
+
+		return g_str.c_str();
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	/* 
+	Function for parsing the error message for an erronous shader source (failed
+	compilation). The source is outputted and the lines raising errors are marked.
+	*/
+	void annotateShaderErrorMsg(const std::string& _source, const std::string& _error_msg)
+	{
+		// error messages line number are given as 0:line_number(character_number). 
+		// First, let's find that line number.
+		// Example:
+		// 0:19(2): error: value of type vec4 cannot be assigned to variable of type vec2
+		
+		// map of the line number and the error code (0 = error, 1 = warning)
+		std::map<int, int> errorLinesMap;
+		std::istringstream errorLineStream(_error_msg);
+		std::string line;
+		// split error message into lines and parse each line for 
+		// erronous line and error code (warning or error).
+		while (std::getline(errorLineStream, line, '\n'))
+		{
+			size_t lineNumStart = line.find('(');
+			size_t lineNumEnd =  line.find(':') - 1;
+			if (lineNumStart == std::string::npos || lineNumEnd == std::string::npos)
+				continue;
+			
+			// extract the line number
+			std::string s = line.substr(line.find(':')+1, lineNumEnd - lineNumStart);
+			int errLineNumber = atoi(s.c_str());
+			
+			// find if warning or error
+			int errCode;
+			if (line.find("error") != std::string::npos)
+				errCode = 1;
+			else if (line.find("warning") != std::string::npos)
+				errCode = 2;
+			else
+				errCode = 0;
+
+			errorLinesMap.insert(std::pair<int, int>(errLineNumber, errCode));
+		}
+
+		// read the source line by line
+		std::vector<std::string> srcLines;
+		std::istringstream sstream(_source);
+		int lineNumber = 1;
+		
+		while (std::getline(sstream, line, '\n'))
+		{
+			// add leading blanks and the line number to each line.
+			// the erronous line will be marked with 'E' or 'W'.
+
+			// scan the marked errors for the current line number
+			int errCode = 0;
+			for (auto& item : errorLinesMap)
+			{
+				if (item.first == lineNumber)
+					errCode = item.second;
+			}
+
+			// create a line prefix with line number and optional 'E' or 'W'
+			std::string linePrefix = std::string(leading_blank_spaces(lineNumber, errCode));
+			linePrefix += std::to_string(lineNumber);
+			linePrefix += ": ";
+
+			line.insert(0, linePrefix);
+			srcLines.push_back(line);
+			lineNumber++;
+			
+		}
+
+		// concatenate message for logging
+		std::string logMsg = "";
+		for (auto& line : srcLines)
+			logMsg = logMsg + line + '\n';
+
+		Log::log_msg(logMsg);
+
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	// Shader class functions
+	//-----------------------------------------------------------------------------------
 	Shader::Shader(const std::string& _shader_file_path) : 
 		m_assetPath(_shader_file_path)
 	{
@@ -222,7 +344,9 @@ namespace Syn {
 					msg += c;
 				SYN_CORE_ERROR(msg);
 
-				SYN_CORE_ERROR("source\n", srcCstr);
+				SYN_CORE_ERROR("Annotated source '", m_shaderName, "' (", shader_str_from_type(type) ,"): ");
+				annotateShaderErrorMsg(src, msg);
+
 				// prevent mem leak
 				glDeleteShader(shaderID);
 

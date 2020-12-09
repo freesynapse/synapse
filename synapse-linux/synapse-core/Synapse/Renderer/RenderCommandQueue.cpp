@@ -3,6 +3,8 @@
 
 #include "Synapse/Renderer/RenderCommandQueue.hpp"
 
+#include "Synapse/Debug/Profiler.hpp"
+
 
 namespace Syn {
 
@@ -43,7 +45,12 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void RenderCommandQueue::execute()
 	{
-		//SYN_CORE_TRACE("RenderCommandQueue::execute -- ", m_commandCount, " commands, ", m_commandBufferPtr - m_commandBuffer, " bytes.");
+		SYN_PROFILE_FUNCTION();
+
+		#if (defined DEBUG_ONE_FRAME) || (defined DEBUG_RENDER_COMMAND_QUEUE)		
+			SYN_CORE_TRACE("RenderCommandQueue::execute -- ", m_commandCount, " commands, ", m_commandBufferPtr - m_commandBuffer, " bytes.");
+		#endif
+
 		unsigned char* buffer = m_commandBuffer;
 
 		for (size_t i = 0; i < m_commandCount; i++)
