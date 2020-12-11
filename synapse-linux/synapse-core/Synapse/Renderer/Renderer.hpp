@@ -105,15 +105,29 @@ namespace Syn {
 		static void enableTexture2D(uint32_t _tex_id, uint32_t _tex_slot=0);
 		/* reset texture to 0 */
 		static void resetTexture2D(uint32_t _tex_slot=0);
-		/* depth testing allowed */
+
+		// rendering of vertex arrays
+		//
 		static void drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test=true);
 		static void drawIndexed(uint32_t _count, bool _depth_test=true, GLenum _primitive=GL_TRIANGLES);
-		/* no depth testing */
-		static void drawIndexedFlat(const Ref<VertexArray>& _vertex_array);
-		static void drawIndexedFlat(uint32_t _count, GLenum _primitive=GL_TRIANGLES);
-		/* draw arrays without indexing */
+
+		static void drawIndexedNoDepth(const Ref<VertexArray>& _vertex_array);
+		static void drawIndexedNoDepth(uint32_t _count, GLenum _primitive=GL_TRIANGLES);
+
+		static void drawArrays(const Ref<VertexArray>& _vertex_array, 
+							   uint32_t _count, 
+							   uint32_t _first=0, 
+							   bool _depth_test=false, 
+							   GLenum _primitive=GL_TRIANGLES);
 		static void drawArrays(uint32_t _count, uint32_t _first=0, bool _depth_test=true, GLenum _primitive=GL_TRIANGLES);
-		/* */
+
+		static void drawArraysNoDepth(const Ref<VertexArray>& _vertex_array, 
+									  uint32_t _count, 
+									  uint32_t _first=0, 
+									  GLenum _primitive=GL_TRIANGLES);
+		static void drawArraysNoDepth(uint32_t _count, uint32_t _first=0, GLenum _primitive=GL_TRIANGLES);
+
+		//
 		static void setLineWidth(float _width);
 
 	private:

@@ -3,6 +3,7 @@
 
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Core.hpp"
+#include "Synapse/Debug/Profiler.hpp"
 
 
 namespace Syn { 
@@ -113,6 +114,8 @@ namespace Syn {
 	*/
 	void EventHandler::process_events()
 	{
+		SYN_PROFILE_FUNCTION();
+
 		Event *e;
 		while ((e = EventHandler::next_event()))
 		{

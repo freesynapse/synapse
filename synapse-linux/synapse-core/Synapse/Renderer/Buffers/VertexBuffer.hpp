@@ -113,7 +113,6 @@ namespace Syn {
 			}
 		}
 
-
 	private:
 		std::vector<BufferElement> m_elements;
 		uint32_t m_stride = 0;
@@ -151,8 +150,9 @@ namespace Syn {
 
 
 	protected:
-		GLuint m_bufferID = 0;
 		BufferLayout m_bufferLayout;
+		
+		GLuint m_bufferID = 0;
 		GLenum m_usage = GL_STATIC_DRAW;
 
 	};

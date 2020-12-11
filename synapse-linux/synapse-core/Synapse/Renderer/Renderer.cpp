@@ -371,6 +371,10 @@ namespace Syn {
 
 	//-----------------------------------------------------------------------------------
 	// rendering
+	//-----------------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------------
+	// textures
 	void Renderer::enableTexture2D(uint32_t _tex_id, uint32_t _tex_slot)
 	{
 		SYN_RENDER_2(_tex_id, _tex_slot, {
@@ -387,8 +391,13 @@ namespace Syn {
 		});
 	}
 
+	//-----------------------------------------------------------------------------------
+	// rendering indexed vertex data
 	void Renderer::drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test)
 	{
+		/* 
+		Binds vertex array before issuing draw call. 
+		*/
 		SYN_RENDER_2(_vertex_array, _depth_test, {
 			if (!_depth_test)
 				glDisable(GL_DEPTH_TEST);
@@ -405,6 +414,9 @@ namespace Syn {
 
 	void Renderer::drawIndexed(uint32_t _count, bool _depth_test, GLenum _primitive)
 	{
+		/* 
+		Vertex array has to be bound before calling this. 
+		*/
 		SYN_RENDER_3(_count, _depth_test, _primitive, {
 			if (!_depth_test)
 				glDisable(GL_DEPTH_TEST);
@@ -417,9 +429,13 @@ namespace Syn {
 
 	}
 
-	void Renderer::drawIndexedFlat(const Ref<VertexArray>& _vertex_array)
+	void Renderer::drawIndexedNoDepth(const Ref<VertexArray>& _vertex_array)
 	{
+		/*
+		Binds vertex array before issuing draw call.
+		*/
 		SYN_RENDER_1(_vertex_array, {
+			glBindVertexArray(_vertex_array->getArrayID());
 			glDrawElements(_vertex_array->getIndexBuffer()->getPrimitiveType(), 
 						   _vertex_array->getIndexCount(), 
 						   GL_UNSIGNED_INT, 
@@ -428,16 +444,43 @@ namespace Syn {
 
 	}
 
-	void Renderer::drawIndexedFlat(uint32_t _count, GLenum _primitive)
+	void Renderer::drawIndexedNoDepth(uint32_t _count, GLenum _primitive)
 	{
+		/* 
+		Vertex array has to be bound before calling this. 
+		*/
 		SYN_RENDER_2(_count, _primitive, {
 			glDrawElements(_primitive, _count, GL_UNSIGNED_INT, nullptr); 
 		});
 	}
 
-
-	void Renderer::drawArrays(/*GLenum _primitive_mode, */uint32_t _count, uint32_t _first, bool _depth_test, GLenum _primitive)
+	void Renderer::drawArrays(const Ref<VertexArray>& _vertex_array, 
+							  uint32_t _count, 
+							  uint32_t _first, 
+							  bool _depth_test, 
+							  GLenum _primitive)
 	{
+		/*
+		Binds vertex array before issuing draw call.
+		*/
+		SYN_RENDER_5(_vertex_array, _count, _first, _depth_test, _primitive, {
+			if (!_depth_test)
+				glDisable(GL_DEPTH_TEST);
+			
+			glBindVertexArray(_vertex_array->getArrayID());
+			glDrawArrays(_primitive, _first, _count);
+			
+			if (!_depth_test)
+				glEnable(GL_DEPTH_TEST);
+		});
+
+	}
+
+	void Renderer::drawArrays(uint32_t _count, uint32_t _first, bool _depth_test, GLenum _primitive)
+	{
+		/* 
+		Vertex array has to be bound before calling this. 
+		*/
 		SYN_RENDER_4(_first, _count, _depth_test, _primitive, {
 			if (!_depth_test)
 				glDisable(GL_DEPTH_TEST);
@@ -449,6 +492,32 @@ namespace Syn {
 		});
 	}
 
+	void Renderer::drawArraysNoDepth(const Ref<VertexArray>& _vertex_array, 
+									 uint32_t _count, 
+									 uint32_t _first, 
+									 GLenum _primitive)
+	{
+		/*
+		Binds vertex array before issuing draw call.
+		*/
+		SYN_RENDER_4(_vertex_array, _count, _first, _primitive, {
+			glBindVertexArray(_vertex_array->getArrayID());
+			glDrawArrays(_primitive, _first, _count);
+		});
+	}
+
+	void Renderer::drawArraysNoDepth(uint32_t _count, uint32_t _first, GLenum _primitive)
+	{
+		/* 
+		Vertex array has to be bound before calling this. 
+		*/
+		SYN_RENDER_3(_count, _first, _primitive, {
+			glDrawArrays(_primitive, _first, _count);
+		});
+
+	}
+
+	//-----------------------------------------------------------------------------------
 	void Renderer::setLineWidth(float _width)
 	{
 		SYN_RENDER_1(_width, {

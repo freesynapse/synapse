@@ -54,7 +54,7 @@ namespace Syn {
 
 			// add new lines in output file to log
 			static void imgui_log_update()
-			{
+			{				
 				std::ifstream file(m_filename, std::ios::in | std::ios::binary);
 				int old_buffer_size = m_imgui_textbuffer.size();
 
@@ -103,7 +103,26 @@ namespace Syn {
 		template<typename T, typename ...Args>
 		static void log(const char *_func, const T &_output_item, Args ...args)
 		{
-			std::string out = "[" + Time::current_time() + "] " + _func;
+			std::string fnc(_func);
+
+			#ifndef _WIN_32
+			//
+			// format func for Linux output, examples:
+			// "static void FluidFramebuffer::resize(uint32_t, uint32_t)::RenderCommand89::execute(void *): Framebuffer 'front_velocity'..."
+			// "static void Syn::ShaderLibrary::add(const std::string &, const Ref<Syn::Shader> &): shader 'fluidJacobi' added to library."
+			// "int Syn::Window::init(bool): OpenGL renderer: Mesa Intel(R) UHD Graphics 620 (KBL GT2)"
+			// "Syn::Font::Font(const char *, const int &, const Ref<Syn::Shader> &): using static shaders."
+			//
+			size_t firstParanthesis = fnc.find('(');
+			// reverse find 1) the start of the fnc, or 2) the space before the fnc name
+			size_t lastSpace = fnc.substr(0, firstParanthesis).rfind(' ');
+			// use the substring leading up to first paranthesis (since this has shifted, adjustment by lastSpace).
+			std::string fncName = lastSpace == std::string::npos ? fnc.substr(0, firstParanthesis) : fnc.substr(lastSpace+1, firstParanthesis-lastSpace-1);
+			// remove argument types, replace with '()'.
+			fnc = fncName.substr(0, firstParanthesis) + "()";
+			#endif
+
+			std::string out = "[" + Time::current_time() + "] " + fnc;
 			out.append(": ");
 
 			*m_logFile << out;
@@ -171,6 +190,14 @@ namespace Syn {
 				std::cout << _output_item;
 		}
 
+
+		// accessors
+		static uint32_t getErrorCount() { return s_errorCount; }
+		static uint32_t getWarningCount() { return s_warningCount; }
+		static void increaseErrorCount() { s_errorCount++; }
+		static void increaseWarningCount() { s_warningCount++; }
+
+
 		#ifdef _WIN64
 			inline static const void setErrorColor() 	{ SetConsoleTextAttribute(m_consoleHandle, m_colorError); }
 			inline static const void setWarningColor() 	{ SetConsoleTextAttribute(m_consoleHandle, m_colorWarning); }
@@ -215,7 +242,10 @@ namespace Syn {
 			static const char* m_terminalStartToken;
 			static const char* m_terminalEndToken;	// reset color
 		#endif
-		
+
+		// warning / error counters
+		static uint32_t s_errorCount;
+		static uint32_t s_warningCount;		
 
 		// helper function for matrix and vector debug
 		static inline const char* ff(float _f) { return (_f < 0.0f ? "-" : " "); }

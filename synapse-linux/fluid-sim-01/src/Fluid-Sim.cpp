@@ -5,7 +5,7 @@
 
 #include <Synapse.hpp>
 #include <Synapse/SynapseMain.hpp>
-#include <Synapse/API/SynapseOpenGLBindings.hpp>
+
 
 #include "Fluids.hpp"
 
@@ -78,7 +78,7 @@ void layer::onAttach()
 	// load font
 
 	//m_font = Syn::MakeRef<Syn::Font>("../assets/ttf/ubuntu.mono.ttf", 16.0f);
-	m_font = Syn::API::newFont("../assets/ttf/ubuntu.mono.ttf", 16.0f);
+	m_font = Syn::API::newFont("../assets/ttf/ubuntu.mono.ttf", 18.0f);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
@@ -101,7 +101,6 @@ void layer::onAttach()
 	// whole screen quad, used to show rendering target framebuffer.
 	m_screenQuad = Syn::MeshCreator::createShapeViewportQuad();
 	
-
 	Syn::Renderer2D::init();
 
 	// initialize the fluid class
@@ -146,7 +145,7 @@ void layer::onUpdate(float _dt)
 	if (m_wireframeMode) Syn::Renderer::enableWireFrame();
 
 	// clear the screen
-	m_finalFramebuffer->clear(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	m_finalFramebuffer->clear(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	// -- BEGINNING OF SCENE -- //
 	Syn::Renderer2D::beginScene(m_camera);
@@ -155,54 +154,15 @@ void layer::onUpdate(float _dt)
 		//
 
 		// update state -- compute the next time step
-		//Fluid::update(_dt);
+		bool mousePressed = InputManager::is_button_pressed(SYN_MOUSE_BUTTON_1);
+		Fluid::update(_dt, mousePressed);
 
-		// render Fluid
-		static float w = (float)m_finalFramebuffer->getWidth();
-		static float h = (float)m_finalFramebuffer->getHeight();
-		//Fluid::render(w, h, _dt);
-
-		/*
-		// render to surface
-		{
-			// bind rendering target frambuffer
-			m_surface->bind();
-
-			// set a shader that's using textures -- the setShader()-function sets the VP-matrix.
-			Syn::Renderer2D::setShader(m_shader2D);
-
-			// bind a texture
-			m_texture->bind();
-			
-			// render a quad
-			Syn::Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-			//static bool first = false;
-			//if (!first)
-			//{
-			//	m_surface->saveAsPNG("../screenshots/___surface.png");
-			//	first = true;
-			//}
-		}
-
-		// bind screen framebuffer again
 		m_finalFramebuffer->bind();
+		// render Fluid
+		float w = (float)m_finalFramebuffer->getWidth();
+		float h = (float)m_finalFramebuffer->getHeight();
+		Fluid::render(w, h, _dt);
 		
-		// set a basic texture shader (no camera or transform since a_position
-		// corresponds to screen coordinates.
-		m_screenShader->enable();
-		
-		// bind the texture of the surface (ie Framebuffer::m_colorAttachmentID) on slot 0 (default).
-		m_surface->bindTexture();
-		
-		// set sampler to sample from slot 0 (GL_TEXTURE0).
-		//m_screenShader->setUniform1i("u_screen_texture_sampler", 0);
-		
-		// draw arrays screen sized quad
-		m_screenQuad->getVertexArray()->bind();
-		Syn::Renderer::drawIndexedFlat(m_screenQuad->getVertexArray());
-		//Syn::Renderer::drawIndexed(m_screenQuad->getVertexArray());
-		*/
 
 	}
 	Syn::Renderer2D::endScene();
@@ -215,11 +175,12 @@ void layer::onUpdate(float _dt)
 	// TODO: all text rendering should go into an overlay layer.
 	m_font->beginRenderBlock();
 	m_font->addString(2.0f, fontHeight * 1, "fps=%.0f  VSYNC=%s", Syn::TimeStep::getFPS(), Syn::Application::get().getWindow().isVSYNCenabled() ? "ON" : "OFF");
+	/*
 	glm::vec3 camPos = m_camera->getPosition();
 	float camTheta = m_camera->getTheta();
 	m_font->addString(2.0f, fontHeight * 2, "camera [ %.1f  %.1f ], theta [ %.1f ]", camPos.x, camPos.y, camTheta);
+	*/
 	m_font->endRenderBlock();
-
 
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
 	m_finalFramebuffer->bindDefaultFramebuffer();
@@ -242,7 +203,6 @@ void layer::onKeyDownEvent(Syn::Event* _e)
 		switch (e->getKey())
 		{
 		case SYN_KEY_R:
-			//Syn::ShaderLibrary::reload("textureShader");
 			break;
 
 		case SYN_KEY_Z:

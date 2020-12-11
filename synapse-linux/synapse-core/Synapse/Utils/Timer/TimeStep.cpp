@@ -2,6 +2,7 @@
 #include "pch.hpp"
 
 #include "Synapse/Utils/Timer/TimeStep.hpp"
+#include "Synapse/Debug/Profiler.hpp"
 
 
 namespace Syn {
@@ -20,6 +21,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void TimeStep::update()
 	{
+		SYN_PROFILE_FUNCTION();
+
 		s_currentTime = (float)glfwGetTime();
 		s_deltaTimeMs = (s_currentTime - s_lastFrameTime) * 1000.0f;
 

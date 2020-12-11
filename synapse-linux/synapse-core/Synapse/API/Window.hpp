@@ -13,7 +13,7 @@ namespace Syn {
 	class Window
 	{
 	public:
-		Window(const int& _width, const int& _height, const char* _name);
+		Window(const char* _name, const int& _width, const int& _height, bool _fixed_size=false);
 		~Window();
 
 		void onUpdate();
@@ -35,7 +35,7 @@ namespace Syn {
 		inline void setCursorPos(const glm::vec2& _pos) { glfwSetCursorPos(m_window, _pos.x, _pos.y); }
 
 	private:
-		int init();
+		int init(bool _fixed_size);
 		void setFullscreen(const bool& _fullscreen);
 
 

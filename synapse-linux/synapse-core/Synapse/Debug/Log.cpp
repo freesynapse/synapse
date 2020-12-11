@@ -15,6 +15,9 @@ namespace Syn
 	bool Log::m_bInitialized = false;
 	bool Log::m_buse_stdout = false;
 
+	uint32_t Log::s_errorCount = 0;
+	uint32_t Log::s_warningCount = 0;
+
 	#ifdef DEBUG_IMGUI_LOG
 		uint32_t Log::m_imgui_log_last_size = 0;
 		ImGuiTextBuffer Log::m_imgui_textbuffer;
@@ -56,7 +59,9 @@ namespace Syn
 	//-----------------------------------------------------------------------------------
 	void Log::close()
 	{
-		*m_logFile << ">>>> " << Time::current_date() << " - APPLICATION TERMINATED <<<<" << std::endl;
+		*m_logFile << "[" << Time::current_time() << "] " << "application terminated : " 
+				   << s_errorCount << " error(s); " << s_warningCount << " warning(s)." 
+				   << std::endl;
 		m_logFile->flush();
 		m_logFile->close();
 	}

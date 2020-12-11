@@ -26,7 +26,7 @@ uniform float u_kappa;
 void main()
 {
     ivec2 TC = ivec2(gl_FragCoord.xy);
-    float T = texelFetch(u_temperature_texture_sampler, TC, 0).x;
+    float T = texelFetch(u_temperature_texture_sampler, TC, 0).r;
     vec2 V = texelFetch(u_velocity_texture_sampler, TC, 0).xy;
 
     frag_color = V;

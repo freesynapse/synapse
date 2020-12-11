@@ -4,6 +4,7 @@
 #include "Synapse/Application.hpp"
 #include "Synapse/Core.hpp"
 #include "Synapse/Debug/Error.hpp"
+#include "Synapse/Debug/Profiler.hpp"
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Event/InputEvents.hpp"
 #include "Synapse/Input/InputManager.hpp"
@@ -31,7 +32,7 @@ namespace Syn {
 
 		// pointers
 		s_instance = this;
-		m_window = Scope<Window>(new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Synapse Engine"));
+		m_window = Scope<Window>(new Window("Synapse", SCREEN_WIDTH, SCREEN_HEIGHT, false));
 
 		// initialize the renderer and the render command queue
 		Renderer::create();
@@ -61,6 +62,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void Application::renderImGui()
 	{
+		SYN_PROFILE_FUNCTION();
+		
 		m_imGuiLayer->begin();
 
 		//ImGui::Begin("Renderer");
@@ -81,6 +84,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void Application::run()
 	{
+		SYN_PROFILE_FUNCTION();
+
 		#ifdef DEBUG_IMGUI_LOG
 			Log::imgui_log_update();
 		#endif
