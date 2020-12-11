@@ -12,23 +12,7 @@
 
 namespace Syn {
 
-	
-	Framebuffer::Framebuffer(uint32_t _width, uint32_t _height, ColorFormat _format, bool _update_on_resize) :
-		m_format(_format)
-	{
-		m_pxFmt = getOpenGLPixelFormat(m_format);
-
-		resize(_width, _height);
-
-		// register function for handling resize events
-		if (_update_on_resize)
-			EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
-			
-	}
-
-
-	//-----------------------------------------------------------------------------------
-	Framebuffer::~Framebuffer()
+	FramebufferBase::~FramebufferBase()
 	{
 		SYN_RENDER_S0({
 			glDeleteFramebuffers(1, &self->m_framebufferID);
@@ -36,8 +20,7 @@ namespace Syn {
 	}
 
 
-	//-----------------------------------------------------------------------------------
-	void Framebuffer::bind(bool _set_viewport) const
+	void FramebufferBase::bind(bool _set_viewport) const
 	{
 		SYN_RENDER_S1(_set_viewport, {
 			if (_set_viewport)
@@ -48,7 +31,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::unbind() const
+	void FramebufferBase::unbind() const
 	{
 		SYN_RENDER_S0({
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -57,7 +40,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::saveAsPNG(const std::string& _filename)
+	void FramebufferBase::saveAsPNG(const std::string& _filename)
 	{
 		// size of texture in bytes, using 3 channels (rgb)
 		uint32_t szImage = m_width * m_height * 3;
@@ -99,7 +82,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::resize(uint32_t _width, uint32_t _height)
+	void FramebufferBase::resize(uint32_t _width, uint32_t _height)
 	{
 		if (_width == m_width && _height == m_height)
 			return;
@@ -159,7 +142,7 @@ namespace Syn {
 			}
 
 			#ifdef DEBUG_FRAMEBUFFER
-				SYN_CORE_TRACE("Framebuffer [ ", self->m_width, "x", self->m_height, " ] created/resized.");
+				SYN_CORE_TRACE("Framebuffer '", self->m_name, "' [ ", self->m_width, "x", self->m_height, " ] created/resized.");
 			#endif
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -168,7 +151,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::onResizeEvent(Event* _e)
+	void FramebufferBase::onResizeEvent(Event* _e)
 	{
 		Syn::ViewportResizeEvent* e = dynamic_cast<Syn::ViewportResizeEvent*>(_e);
 		this->resize(e->getViewportX(), e->getViewportY());
@@ -176,7 +159,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::bindTexture(uint32_t _tex_slot) const
+	void FramebufferBase::bindTexture(uint32_t _tex_slot) const
 	{
 		SYN_RENDER_S1(_tex_slot, {
 			glActiveTexture(GL_TEXTURE0 + _tex_slot);
@@ -186,7 +169,7 @@ namespace Syn {
 
 	
 	//-----------------------------------------------------------------------------------
-	void Framebuffer::clear(const glm::vec4& _clear_color, uint32_t _buffer_mask) const
+	void FramebufferBase::clear(const glm::vec4& _clear_color, uint32_t _buffer_mask) const
 	{
 		SYN_RENDER_S2(_clear_color, _buffer_mask, {
 			glBindFramebuffer(GL_FRAMEBUFFER, self->m_framebufferID);

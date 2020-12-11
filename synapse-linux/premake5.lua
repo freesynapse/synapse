@@ -23,13 +23,14 @@ workspace "Synapse"
     -- enable symbols for Debug builds
     filter "configurations:Debug"
         defines "DEBUG"
-        buildoptions { "-g" }
+        optimize "Debug"
         symbols "On"
 
     -- enable optimization for Release builds
     filter "configurations:Release"
         defines "NDEBUG"
-        optimize "On"
+        --optimize "On" --> -O2
+        optimize "Speed"
 
     -- reset filter
     filter { }
@@ -65,5 +66,5 @@ LibDirs["libpng"] = "%{wks.location}/../libraries/libpng/lib"
 -- projects included in this workspace -- inheriting globals from this file
 include "synapse-core"
 include "renderer2D-sandbox"
-include "fluid-sim"
+include "fluid-sim-01"
 --include "misc-tests"

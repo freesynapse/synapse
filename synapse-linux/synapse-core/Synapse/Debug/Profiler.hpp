@@ -16,7 +16,7 @@
 	#endif
 #else
 	#define PROFILE_SCOPE(_name)
-	#define PROFILE_FUNCTION()
+	#define SYN_PROFILE_FUNCTION()
 #endif
 
 

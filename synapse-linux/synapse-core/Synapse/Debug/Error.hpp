@@ -23,6 +23,7 @@ namespace Syn {
 				callback = Error::error_exit;
 			
 			Log::log_no_func(">>> FATAL ERROR (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")", _func, ": ", _output_item, args...);
+			Log::increaseErrorCount();
 
 			callback();
 
@@ -41,6 +42,7 @@ namespace Syn {
 			std::string errorMsg = (callback == nullptr ? "" : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")"));
 			//std::cout << "errorMsg: " << errorMsg << '\n' << "_func: " << _func << '\n' << "_output_item: " << _output_item << '\n';
 			Log::log_no_func(">>> ERROR", errorMsg, _func, ": ", _output_item, args...);
+			Log::increaseErrorCount();
 
 		}
 
@@ -57,6 +59,7 @@ namespace Syn {
 
 			std::string errorMsg = (callback == nullptr ? "" : (" (callback 0x" + std::to_string(*(long*)(char*)& callback) + ")"));
 			Log::log_no_func(">>> WARNING", errorMsg, _func, ": ", _output_item, args...);
+			Log::increaseWarningCount();
 		}
 
 
@@ -68,7 +71,6 @@ namespace Syn {
 	private:
 		// default shutdown method
 		static inline void error_exit() { exit(-1); }
-
 
 	};
 

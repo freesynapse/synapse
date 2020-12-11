@@ -28,7 +28,7 @@ namespace Syn {
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-		ImFont* pFont = io.Fonts->AddFontFromFileTTF("../assets/ttf/ubuntu.mono.ttf", 14.0f);
+		ImFont* pFont = io.Fonts->AddFontFromFileTTF("../assets/ttf/ubuntu.mono.ttf", 16.0f);
 		#ifdef _MSV_VER
 			io.FontDefault = io.Fonts->Fonts.back();
 		#else

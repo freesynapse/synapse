@@ -51,8 +51,9 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEG_TO_RAD(x)	(float)x * PI_OVER_180
 #define RAD_TO_DEG(x)	(float)x * _180_OVER_PI
 
-#define MIN(a, b) ((a)<(b) ? (a):(b))
-#define MAX(a, b) ((a)>(b) ? (a):(b))
+#define MIN(a, b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a)>(b)?(a):(b))
+#define CLAMP(x, lo, hi) MIN(MAX(x, lo), hi)
 
 #define BIT_SHIFT(x) (1 << (x))
 

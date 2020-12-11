@@ -2,13 +2,9 @@
 #version 330 core
 
 layout(location = 0) in vec4 a_position;
-layout(location = 4) in vec2 a_uv;
-
-out vec2 v_uv;
 
 void main()
 {
-	v_uv = a_uv;
     gl_Position = a_position;
 }
 
@@ -18,12 +14,10 @@ void main()
 
 layout(location = 0) out vec4 frag_color;
 
-in vec2 v_uv;
-
 uniform sampler2D u_texture_sampler;
 
-uniform vec3 u_fill_color;
-uniform vec2 u_scale;
+uniform vec3 u_fill_color = vec3(1.0f, 1.0f, 0.0f);
+uniform vec2 u_scale = vec2(0.0013947f, 0.00204918f);
 
 void main()
 {

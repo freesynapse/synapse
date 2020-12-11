@@ -1,4 +1,4 @@
-project "fluid-sim"
+project "fluid-sim-01"
 
     kind "ConsoleApp"
 

@@ -20,7 +20,7 @@ uniform vec3 u_fill_color;
 
 void main()
 {
-    // adds a 'splat' of u_radius at u_point with u_fill_color.
+    // adds a 'splat' of dye with u_radius at u_point with u_fill_color.
     float d = distance(u_point, gl_FragCoord.xy);
     if (d < u_radius)
     {

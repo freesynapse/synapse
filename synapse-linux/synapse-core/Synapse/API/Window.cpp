@@ -5,6 +5,7 @@
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
+#include "Synapse/Debug/Profiler.hpp"
 
 #include "Synapse/Core.hpp"
 
@@ -16,15 +17,17 @@
 
 #include "Synapse/Renderer/Renderer.hpp"
 
+#include "Synapse/Utils/Timer/Timer.hpp"
+
 
 namespace Syn { 
 
 
 	//-----------------------------------------------------------------------------------
-	Window::Window(const int& _width, const int& _height, const char* _name) :
+	Window::Window(const char* _name, const int& _width, const int& _height, bool _fixed_size) :
 		m_width(_width), m_height(_height), m_title(_name)
 	{
-		if (init() == RETURN_FAILURE)
+		if (init(_fixed_size) == RETURN_FAILURE)
 		{
 			SYN_CORE_ERROR("Window initialization failed. Terminating.");
 			glfwTerminate();
@@ -44,7 +47,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	int Window::init()
+	int Window::init(bool _fixed_size)
 	{
 
 		// init GLFW
@@ -54,7 +57,32 @@ namespace Syn {
 			SYN_CORE_ERROR("glfwInit() failed.");
 			return RETURN_FAILURE;
 		}
+		
+		// desktop resolution (for positioning and size)
+		#ifdef _WIN64
+			RECT desktop;
+			const HWND hDesktop = GetDesktopWindow();
+			GetWindowRect(hDesktop, &desktop);
+			int x_offset = desktop.right;
+		#else
+			const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+			int x_offset = mode->width;
+			/*
+			SYN_CORE_TRACE("Primary monitor statistics:\n\t\t\tdimensions:\t", mode->width, "x", mode->height,
+						    "\n\t\t\trefreshRate:\t", mode->refreshRate, 
+							"\n\t\t\tchannels:\t\t", mode->redBits, "x", mode->greenBits, "x", mode->blueBits);
+			*/
+		#endif
 
+		if (!_fixed_size)
+		{
+			m_width = mode->width;
+			m_height = mode->height;
+		}
+
+		// borderless window
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		// create window
 		m_window = glfwCreateWindow(m_width, m_height, m_title, NULL, NULL);
 		if (m_window)
 		{
@@ -65,27 +93,15 @@ namespace Syn {
 			SYN_CORE_ERROR("GLFW window could not be created.");
 			return RETURN_FAILURE;
 		}
-
-		// set window position upper right
-		//
-
-		// desktop resolution (for positioning)
-		#ifdef _WIN64
-			RECT desktop;
-			const HWND hDesktop = GetDesktopWindow();
-			GetWindowRect(hDesktop, &desktop);
-			int x = desktop.right;
-		#else
-			const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-			int x = mode->width;
-		#endif
 		
+		// set window position upper right
+
 		// get glfw window frame size (i.e. including title bar etc.)
 		int x0, x1, y0, y1;
 		glfwGetWindowFrameSize(m_window, &x0, &y0, &x1, &y1);
 
 		// set the position accordingly
-		glfwSetWindowPos(m_window, x - m_width - x1, y0);
+		glfwSetWindowPos(m_window, x_offset - m_width - x1, y0);
 
 		// pointer storage
 		glfwMakeContextCurrent(m_window);
@@ -164,6 +180,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void Window::onUpdate()
 	{
+		SYN_PROFILE_FUNCTION();
+
 		// handle GLFW events
 		glfwPollEvents();
 		
@@ -171,8 +189,10 @@ namespace Syn {
 		if (m_frozenCursor)
 			centerCursor();
 
+
 		// swap buffers
 		glfwSwapBuffers(m_window);
+
 	}
 
 
