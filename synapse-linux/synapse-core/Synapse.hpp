@@ -8,6 +8,7 @@
 #include "Synapse/Types.hpp"
 #include "Synapse/Layer.hpp"
 #include "Synapse/LayerStack.hpp"
+#include "Synapse/Memory.hpp"
 //#include "Synapse/SynapseMain.hpp"
 
 #include "Synapse/API/Window.hpp"
@@ -29,7 +30,6 @@
 #include "Synapse/Input/InputManager.hpp"
 #include "Synapse/Input/KeyCodes.hpp"
 
-#include "Synapse/Utils/Memory.hpp"
 #include "Synapse/Utils/FileIOHandler.hpp"
 #include "Synapse/Utils/Timer/Timer.hpp"
 #include "Synapse/Utils/Timer/TimeStep.hpp"

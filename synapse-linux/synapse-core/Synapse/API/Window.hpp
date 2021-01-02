@@ -42,7 +42,7 @@ namespace Syn {
 	private:
 		int m_width = 0;
 		int m_height = 0;
-		const char* m_title = "synapse-core development build 0.1";
+		const char* m_title = "SYNAPSE";
 
 		GLFWwindow* m_window = nullptr;
 		GLFWmonitor* m_primaryMonitor = nullptr;

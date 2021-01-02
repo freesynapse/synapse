@@ -26,6 +26,11 @@ project "synapse-core"
         "Synapse/**.h",
         "Synapse/**.hpp",
 
+        "SynapseAddons/**.c",
+        "SynapseAddons/**.cpp",
+        "SynapseAddons/**.h",
+        "SynapseAddons/**.hpp",
+
         "external/FastNoise/**.cpp",
         "external/FastNoise/**.h",
         "external/imgui/**.cpp",
@@ -51,6 +56,7 @@ project "synapse-core"
         ".",    -- to allow orderly structured includes in files
                 -- in the style #include "src/.../file.h" instead
                 -- of #include "./file.h" or #include "../../file.h".
+        
         -- static library inclusions
         "%{IncludeDirs.GLFW}",
         "%{IncludeDirs.glad}",

@@ -1,0 +1,29 @@
+# different branches
+#
+
+nonSynapse-Sandbox/
+FastNoise-build/
+boost/
+synapse-core+branches/
+synapse-win-MSC/
+__BACKUP/
+__documents/
+mc-biomes.png
+
+
+# vscode settings
+#
+synapse-linux/.vscode/
+
+
+# assets, screenshots, library builds in synapse-linux
+#
+synapse-linux/libraries/
+synapse-linux/include/
+synapse-linux/build/
+synapse-linux/assets/
+synapse-linux/screenshots/
+synapse-linux/external/
+
+
+
