@@ -10,6 +10,7 @@
 #include "Synapse/API/Window.hpp"
 #include "Synapse/Utils/Timer/TimeStep.hpp"
 #include "Synapse/Core.hpp"
+#include "Synapse/Memory.hpp"
 
 
 namespace Syn {
@@ -35,7 +36,7 @@ namespace Syn {
 	private:
 		Layerstack m_layerStack;
 		ImGuiLayer* m_imGuiLayer;
-		Scope<Window> m_window = nullptr;
+		Ref<Window> m_window = nullptr;
 		bool m_bRunning = true;
 		
 	private:

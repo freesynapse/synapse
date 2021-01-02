@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Synapse/Core.hpp"
+#include "Synapse/Memory.hpp"
 #include "Synapse/Event/Event.hpp"
 
 

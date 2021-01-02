@@ -3,6 +3,8 @@
 
 #include "pch.hpp"
 
+#include "Synapse/Memory.hpp"
+
 
 namespace Syn {	
 

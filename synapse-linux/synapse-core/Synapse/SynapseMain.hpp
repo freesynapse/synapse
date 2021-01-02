@@ -6,6 +6,7 @@
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Profiler.hpp"
 #include "Synapse/Event/EventHandler.hpp"
+#include "Synapse/Memory.hpp"
 
 
 extern Syn::Application* CreateSynapseApplication();
@@ -64,6 +65,13 @@ int main(int argc, char* argv[])
 	#ifdef DEBUG_PROFILING
 		Syn::Profiler::get().endSession();
 	#endif
+
+
+	#ifdef DEBUG_MEMORY_ALLOC
+		SYN_CORE_TRACE(Syn::memory_log::print_alloc_all(false, false));
+	#endif
+	Syn::memory_log::print_alloc_all(false, true);
+
 
 	SYN_CORE_TRACE("closing log.");
 	Syn::Log::close();

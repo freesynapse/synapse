@@ -2,6 +2,7 @@
 
 
 #include "Synapse/Core.hpp"
+#include "Synapse/Memory.hpp"
 
 
 namespace Syn {	

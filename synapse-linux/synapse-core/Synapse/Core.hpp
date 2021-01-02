@@ -1,7 +1,8 @@
+
 #pragma once
 
 
-#include <memory>
+#include <assert.h>
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
@@ -10,31 +11,6 @@
 
 // UTILITY //
 //
-
-namespace Syn {
-
-	// shared pointer -- reference
-	template<typename T>
-	using Ref = std::shared_ptr<T>;
-
-	template<typename T>
-	inline Ref<T> MakeRef() { return std::make_shared<T>(); }
-
-	template<typename T, typename ...Args>
-	inline Ref<T> MakeRef(Args ...args) { return std::make_shared<T>(args...); }
-
-	// unique pointer -- scoped
-	template<typename T>
-	using Scope = std::unique_ptr<T>;
-
-	template<typename T>
-	inline Scope<T> MakeScope() { return std::make_unique<T>(); }
-
-	template<typename T, typename ...Args>
-	inline Scope<T> MakeScope(Args ...args) { return std::make_unique<T>(args...); }
-
-}
-
 
 static constexpr int RETURN_SUCCESS = 0;
 static constexpr int RETURN_FAILURE = -1;
@@ -64,6 +40,10 @@ static constexpr int RETURN_FAILURE = -1;
 // macros for binding of event handler functions (or methods)
 #define SYN_EVENT_STATIC_FNC(f) std::bind(&f, std::placeholders::_1)
 #define SYN_EVENT_MEMBER_FNC(f) std::bind(&f, this, std::placeholders::_1)
+
+
+// LOG //
+//
 
 // macro for definition of the function signature used in Log::Log.
 #ifdef _MSC_VER
@@ -109,8 +89,10 @@ command queue.
 */
 //#define DEBUG_ONE_FRAME
 
-// memory tracking
-//#define DEBUG_MEMORY_ALLOCATION
+// general memory tracking
+#define DEBUG_MEMORY_ALLOC
+// also track STL container access and reallocation
+#define DEBUG_MEMORY_STL_ALLOC
 
 // profiling debugging
 #define DEBUG_PROFILING
@@ -152,7 +134,8 @@ command queue.
 //#define DEBUG_MUPARSER
 
 #ifdef DEBUG_ONE_FRAME
-	#define DEBUG_MEMORY_ALLOCATION
+	#define DEBUG_MEMORY_ALLOC
+	#define DEBUG_MEMORY_ALLOC_TRACK
 	#define DEBUG_PROFILING
 	#define DEBUG_IMGUI_LOG
 	#define DEBUG_KEYS_BUTTONS
@@ -241,8 +224,8 @@ command queue.
 	#define SYN_CORE_ASSERT(condition, ...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_CORE_ASSERT_MESSAGE, SYN_CORE_ASSERT_NO_MESSAGE)(__VA_ARGS__)
 	#define SYN_ASSERT(condition, ...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_ASSERT_MESSAGE, SYN_ASSERT_NO_MESSAGE)(__VA_ARGS__)
 #else
-	#define SYN_CORE_ASSERT(...)
-	#define SYN_ASSERT(...)
+	#define SYN_CORE_ASSERT(condtion) assert(condition)
+	#define SYN_ASSERT(condtion) assert(condition)
 #endif
 
 

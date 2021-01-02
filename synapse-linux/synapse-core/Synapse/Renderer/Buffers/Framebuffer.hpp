@@ -2,6 +2,7 @@
 
 
 #include "Synapse/Core.hpp"
+#include "Synapse/Memory.hpp"
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Event/EventTypes.hpp"
 #include "Synapse/Renderer/Material/Texture.hpp"

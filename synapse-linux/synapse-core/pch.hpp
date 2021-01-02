@@ -6,7 +6,6 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
-#include <memory>
 #include <thread>
 #include <utility>
 #include <iomanip>
@@ -16,6 +15,14 @@
 #include <chrono>
 #include <ctime>
 #include <future>
+#include <atomic>
+
+// memory
+//
+#include <memory>
+#ifdef __linux__
+#include <malloc.h>
+#endif
 
 // data structures
 //
@@ -28,9 +35,9 @@
 #include <set>
 #include <unordered_set>
 
-// Windows API
+// windows API
 //
-#ifdef _WIN64
+#ifdef _WIN32
 #include <Windows.h>
 #endif
 
@@ -38,7 +45,7 @@
 //
 #include <glm/glm.hpp>
 #include <glad/glad.h>
-#ifdef _WIN64
+#ifdef _WIN32
 #include <GL/glew.h>
 #endif
 

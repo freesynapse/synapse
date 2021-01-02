@@ -32,7 +32,7 @@ namespace Syn {
 
 		// pointers
 		s_instance = this;
-		m_window = Scope<Window>(new Window("Synapse", SCREEN_WIDTH, SCREEN_HEIGHT, false));
+		m_window = MakeRef<Window>("SYNAPSE", SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
 		// initialize the renderer and the render command queue
 		Renderer::create();
