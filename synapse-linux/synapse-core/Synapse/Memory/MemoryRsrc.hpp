@@ -2,17 +2,82 @@
 #pragma once
 
 
-#include <memory_resource>
+#include <memory_resource>		// std::pmr::
+#include <unistd.h>				// sysconf()
+#include <fstream>
 
 #include "Synapse/Memory/MemoryLog.hpp"
+#include "Synapse/Debug/Log.hpp"
 
 
 namespace Syn {
 
-	/*
-	 * Polymorfic resource override, using the global new/delete
-	 * memory resource (i.e. the global heap): new_delete_resource().
-	 */
+
+	// Tracking of total heap usage. Stores the heap break pointer at initialization
+	// and subsequently calculates the offset on request; this ought to correspond to
+	// the total dynamic allocations.
+	//
+	typedef struct proc_mem_info_ proc_mem_info_t;
+	struct proc_mem_info_
+	{
+		// all sizes are in kilobytes
+		uint32_t virtual_size;
+		uint32_t rss_size;
+		uint32_t shared_size;
+	};
+
+	class ProcessInfo
+	{
+	public:
+		static void initialize()	{	m_pageSize_kB = sysconf(_SC_PAGE_SIZE) / 1024;	}
+
+		// accessors (size_t)
+		static uint32_t getSizeVirtual_kB() 	{	_updateProcMemInfo(); return m_procMemInfo.virtual_size; 	}
+		static uint32_t getSizeRSS_kB() 		{	_updateProcMemInfo(); return m_procMemInfo.rss_size; 		}
+		static uint32_t getSizeShared_kB() 		{	_updateProcMemInfo(); return m_procMemInfo.shared_size; 	}
+
+		// accessors (const char*)
+		static const char* getSizeVirtual_cchar() 	{	_updateProcMemInfo(); _sz(m_procMemInfo.virtual_size);	return m_fmtSize;	}
+		static const char* getSizeRSS_cchar() 		{	_updateProcMemInfo(); _sz(m_procMemInfo.rss_size); 	 	return m_fmtSize;	}
+		static const char* getSizeShared_cchar() 	{	_updateProcMemInfo(); _sz(m_procMemInfo.shared_size);  	return m_fmtSize;	}
+
+	private:
+		static void _updateProcMemInfo() 
+		{
+			uint32_t size, rss, shared;
+			{
+				std::ifstream ifs("/proc/self/statm", std::ios_base::in);
+				ifs >> size >> rss >> shared;
+			}
+			// all sizes are in pages, each page is m_pageSize_kB kilobytes
+			// long, hence:
+			m_procMemInfo.virtual_size = size * m_pageSize_kB;
+			m_procMemInfo.rss_size     = rss * m_pageSize_kB;
+			m_procMemInfo.shared_size  = shared * m_pageSize_kB;
+		}
+
+		static void _sz(uint32_t _size_kb)
+		{
+			std::ostringstream ss;
+			if (_size_kb < 1024)		ss << _size_kb << " kB";
+			else						ss << std::fixed << std::setprecision(2) << (float)_size_kb / 1024.0f << " MB";
+			m_fmtSize = ss.str().c_str();
+		}
+
+	private:
+		static proc_mem_info_t m_procMemInfo;
+		static const char* m_fmtSize;
+		static uint32_t m_pageSize_kB;
+	};
+
+
+
+	// Explicit tracking of heap allocations, for STL containers, raw allocations and 
+	// shared pointer allocations. 
+	//
+
+	// Polymorfic resource override, using the global new/delete
+	// memory resource (i.e. the global heap): new_delete_resource().
  	class MemoryResource : public std::pmr::memory_resource
 	{
 	public:
@@ -64,18 +129,17 @@ namespace Syn {
 	};
 
 
-	/* STL memory resource handler:
-	 * Everytime a Syn::vector<> is instantiated, a new MemoryResource is needed to
-	 * track reallocations for that vector. Since the memory is allocated before it's
-	 * copied when the vector is dynamically extended, the previuos address' signature
-	 * is unavailable. To circumvent this, a new MemoryResource is created everytime
-	 * a new vector is requested, a new MemoryResource is created and stored in this
-	 * handler. This will increase the memory footprint of the vector by 16 bytes;
-	 * 8 bytes for the MemoryResource pointer in the vector in the current class and 8
-	 * 8 bytes for the MemoryResource instance itself.
-	 * Upon application shutdown, the destructor handles deallocation of the heap-
-	 * allocated MemoryResource instances.
-	 */
+	// STL memory resource handler:
+	// Everytime a Syn::vector<> is instantiated, a new MemoryResource is needed to
+	// track reallocations for that vector. Since the memory is allocated before it's
+	// copied when the vector is dynamically extended, the previuos address' signature
+	// is unavailable. To circumvent this, a new MemoryResource is created everytime
+	// a new vector is requested, a new MemoryResource is created and stored in this
+	// handler. This will increase the memory footprint of the vector by 16 bytes;
+	// 8 bytes for the MemoryResource pointer in the vector in the current class and 8
+	// 8 bytes for the MemoryResource instance itself.
+	// Upon application shutdown, the destructor handles deallocation of the heap-
+	// allocated MemoryResource instances.
 	class STLMemoryResourceHandler
 	{
 	public:
@@ -85,18 +149,18 @@ namespace Syn {
 			for (auto i : m_rsrcs)
 				delete i;
 		}
-		// return a new MemoryResource and out store address
-		// for deallocation upon destruction of this.
-		MemoryResource* getNewMemoryResource(insert_func _in_fnc=memory_log::insert, 
-											 remove_func _rm_fnc=memory_log::remove, 
+		// Return a new MemoryResource and out store address for 
+		// deallocation upon destruction of this.
+		MemoryResource* getNewMemoryResource(insert_func _in_fnc=MemoryLog::insert, 
+											 remove_func _rm_fnc=MemoryLog::remove, 
 											 AllocType _alloc_type=AllocType::STL)
 		{
 			MemoryResource* ptr = new MemoryResource(_in_fnc, _rm_fnc, _alloc_type);
 			m_rsrcs.push_back(ptr);
 			return ptr;
 		}
-		// return the memory footprint of this class and all
-		// created pointers and the MemoryResource:s they point to.
+		// Return the memory footprint of this class and all created pointers 
+		// and the MemoryResource:s they point to.
 		constexpr std::size_t getMemSize() const
 		{ return sizeof(STLMemoryResourceHandler) + m_rsrcs.size() * (sizeof(MemoryResource*) + sizeof(MemoryResource)); }
 
@@ -104,7 +168,8 @@ namespace Syn {
 		std::vector<MemoryResource*> m_rsrcs;
 
 	};
-	// global handler instance.
+
+	// Global handler instance.
 	extern STLMemoryResourceHandler s_STLMemRsrcHandler;
 
 

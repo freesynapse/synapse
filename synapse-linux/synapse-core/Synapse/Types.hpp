@@ -168,14 +168,14 @@ namespace Syn {
 	//
 	struct Voxel
 	{
-		/* high 3 bits contain ambient occlusion data (0-2)
-		 * next 5 bits are flags (4-8)
-		 * low 8 bits contain type (24-31)
-		 *
-		 * 0b 1111 1111 0000 0000 0000 0000 1111 1111 
-		 *    ---  ------                   ---------
-		 *    AO   flags                      type
-		 */
+		// high 3 bits contain ambient occlusion data (0-2)
+		// next 5 bits are flags (4-8)
+		// low 8 bits contain type (24-31)
+		//
+		// 0b 1111 1111 0000 0000 0000 0000 1111 1111 
+		//    ---  ------                   ---------
+		//    AO   flags                      type
+		// 
 		Voxel() : data(0) {}
 		Voxel(uint32_t _data) : data(_data) {}
 

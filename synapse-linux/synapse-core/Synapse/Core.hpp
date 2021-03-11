@@ -82,20 +82,20 @@ static constexpr int RETURN_FAILURE = -1;
 // DEBUG //
 //
 
-/* 
-Only run one frame of rendering, then quit (through Application::run()).
-Also turns on all debugging features, including parsing of the rendering
-command queue.
-*/
+
+// Only run one frame of rendering, then quit (through Application::run()).
+// Also turns on all debugging features, including parsing of the rendering
+// command queue.
+
 //#define DEBUG_ONE_FRAME
 
-// general memory tracking
-#define DEBUG_MEMORY_ALLOC
-// also track STL container access and reallocation
-#define DEBUG_MEMORY_STL_ALLOC
+// memory
+#define DEBUG_MEMORY_TOTAL				// track total heap usage
+#define DEBUG_MEMORY_ALLOCATION			// general memory tracking
+#define DEBUG_MEMORY_STL_ALLOCATION		// track STL container access and reallocation
 
-// profiling debugging
-#define DEBUG_PROFILING
+// profiling of engine performance
+//#define DEBUG_PROFILING
 
 // log to ImGui instead of stdout
 // N.B.! also #define:d in Log.h due to circular inclusions
@@ -106,7 +106,8 @@ command queue.
 //#define DEBUG_CURSOR_MOVE
 
 // events
-//#define DEBUG_EVENTS
+#define DEBUG_EVENTS
+#undef DEBUG_EVENTS
 
 // rendering
 #define DEBUG_RENDERER_2D
@@ -130,12 +131,11 @@ command queue.
 // OpenGL API
 #define DEBUG_OPENGL_API
 
-// MuParser
-//#define DEBUG_MUPARSER
 
 #ifdef DEBUG_ONE_FRAME
-	#define DEBUG_MEMORY_ALLOC
-	#define DEBUG_MEMORY_ALLOC_TRACK
+	#define DEBUG_MEMORY_TOTAL
+	#define DEBUG_MEMORY_ALLOCATION
+	#define DEBUG_MEMORY_STL_ALLOCATION
 	#define DEBUG_PROFILING
 	#define DEBUG_IMGUI_LOG
 	#define DEBUG_KEYS_BUTTONS

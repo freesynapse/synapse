@@ -30,8 +30,13 @@ private:
 //
 int main(int argc, char* argv[])
 {
+	Syn::Log::open("./log.txt");
+	Syn::Log::output_new_line(true);
+	SYN_CORE_TRACE("logging enabled.");
+
+
 	int* p0 = SYN_ALLOCATE(int, 1000);
-	int* p1 = SYN_ALLOCATE_N(int, 10000000);
+	int* p1 = SYN_ALLOCATE_ARRAY(int, 10000000);
 	std::cout << *p0 << "\n";
 
 	Syn::vector<TClass*> ptr_vec = SYN_VECTOR(TClass*);
@@ -48,18 +53,20 @@ int main(int argc, char* argv[])
 	Syn::vector<int> vec3 = SYN_VECTOR(int); vec3.reserve(1024);
 	Syn::vector<int> vec4 = SYN_VECTOR(int); vec4.reserve(1024);
 	Syn::vector<int> vec5 = SYN_VECTOR(int); vec5.reserve(1024);
-
-
+	
 	Syn::Ref<TClass> p2 = SYN_MAKE_REF(TClass, 10, 1002.3, "test");	
 	p2->print();
 
 	#ifdef DEBUG_MEMORY_ALLOC
-	Syn::memory_log::print_alloc_all(true, true);
+		Syn::MemoryLog::strAllocAll(false, true);
 	#endif
 
+	Syn::ShaderLibrary::load("../assets/shaders/debugShader.glsl");
+
+	SYN_CORE_TRACE("closing log.");
+	Syn::Log::close();
 
 
-	std::cout << "\n\n";
 	return 0;
 }
 

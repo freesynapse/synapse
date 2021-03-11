@@ -96,6 +96,10 @@ namespace Syn {
 		static void disableCulling();
 		static void setCulling(bool _cull);
 
+		static void enableBlending();
+		static void disableBlending();
+		static void setBlending(bool _blending);
+
 		static void enableGLenum(GLenum _gl_enum);
 		static void disableGLenum(GLenum _gl_enum);
 		static void setGLenum(GLenum _gl_enum, bool _b);

@@ -83,7 +83,7 @@ namespace Syn {
 			// check for completeness
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			{
-				SYN_CORE_FATAL_ERROR("Framebuffer not complete.");
+				SYN_CORE_ERROR("Framebuffer '", self->m_name, "' not complete.");
 			}
 
 			#ifdef DEBUG_FRAMEBUFFER

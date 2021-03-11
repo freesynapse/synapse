@@ -59,7 +59,7 @@ Smoke::Smoke(uint32_t _screen_width, uint32_t _screen_height)
 	// initial conditions and model parameters
 	m_ambientTemperature  	 = 0.0f;
 	m_impulseTemperature  	 = 10.0f;
-	m_impulseDensity 	  	 = 1.0f;
+	m_impulseDensity 	  	 = 1.5f;	// 1.0f
 	m_numJacobiIterations 	 = 40;
 	m_timeStep 			  	 = 0.125f;
 	m_smokeBuoyancy 	  	 = 1.5f;
@@ -70,8 +70,8 @@ Smoke::Smoke(uint32_t _screen_width, uint32_t _screen_height)
 	m_densityDissipation 	 = 0.999f;
 	m_impulsePosition 		 = { m_gridWidth / 2.0f, -(int)m_densityRadius / 2.0f };
 
-	#define OBSTACLES_SPHERE 	0
-	#define OBSTACLES_TRIANGLES	1
+	#define OBSTACLES_SPHERE 	1
+	#define OBSTACLES_TRIANGLES	0
 	// --- DEBUG
 	//
 	/*
@@ -120,18 +120,6 @@ void Smoke::update(float _time_step)
 		// update and limit position
 		m_impulsePosition.x = CLAMP(x_pos, x_lo_bound, x_hi_bound);
 	}
-	//else //(!_read_mouse)
-	//{
-	//	static float dx = 0.7f;
-	//	m_impulsePosition.x += dx;
-	//	if ((m_impulsePosition.x >= x_hi_bound) || (m_impulsePosition.x <= x_lo_bound))
-	//		dx = -dx;
-	//}
-
-	// adjust simulation time step, aimed at 60 fps
-	static float fps60 = 1.0f / 60.0f * 1000.0f;
-	static float simTimeStep = 0.125f;
-	//m_timeStep = simTimeStep * _time_step / fps60;
 	
 	Renderer::disableGLenum(GL_BLEND);
 	Renderer::setViewport(glm::ivec2(0, 0), glm::ivec2(m_gridWidth, m_gridHeight));
@@ -149,7 +137,7 @@ void Smoke::update(float _time_step)
 	//
 	applyBuoyancy(m_velocity.frontSurface, m_temperature.frontSurface, m_density.frontSurface, m_velocity.backSurface);
 	swapSurfaces(&m_velocity);
-	//
+	// add density and temperature
 	applyImpulse(m_temperature.frontSurface, m_impulsePosition, m_impulseTemperature);
 	applyImpulse(m_density.frontSurface, m_impulsePosition, m_impulseDensity);
 	//
@@ -184,7 +172,7 @@ void Smoke::render(float _dt, float _width, float _height)
 	m_fluidVisualizationShader->setUniform2fv("u_scale", glm::vec2(1.0f / _width, 1.0f / _height));
 	m_fluidVisualizationShader->setUniform1i("u_texture_sampler", 0);
 
-	// draw scalar field
+	// draw field
 	//
 	//m_velocity.frontSurface->bindTexture(0);
 	//m_temperature.frontSurface->bindTexture(0);
@@ -273,11 +261,13 @@ void Smoke::createObstacles(const Ref<FluidFramebuffer>& _frame_buffer)
 	}
 
 	Ref<VertexBuffer> triangleVertexBuffer = API::newVertexBuffer(GL_STATIC_DRAW);
+	//Ref<VertexBuffer> triangleVertexBuffer = SYN_NEW_VERTEX_BUFFER_REF(GL_STATIC_DRAW);
 	triangleVertexBuffer->setBufferLayout({
 		{ VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float4, "a_position" }
 	});
 	triangleVertexBuffer->setData(triangleVertices, sizeof(triangleVertices));
 	Ref<VertexArray> triangleVertexArray = API::newVertexArray(triangleVertexBuffer);
+	//Ref<VertexArray> triangleVertexArray = SYN_NEW_VERTEX_ARRAY_VBO(triangleVertexBuffer);
 
 	Renderer::executeRenderCommands();
 

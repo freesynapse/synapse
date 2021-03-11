@@ -14,11 +14,10 @@ using namespace Syn;
 namespace Syn {
 
 	//
-	typedef struct slab_
+	typedef struct slab_ 
 	{
 		Ref<FluidFramebuffer> frontSurface;
 		Ref<FluidFramebuffer> backSurface;
-
 	} Slab;
 
 
@@ -49,7 +48,6 @@ namespace Syn {
 		float m_densityRadius;
 
 		Ref<VertexArray> m_quadVAO;
-
 
 	};
 

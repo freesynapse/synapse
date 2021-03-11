@@ -12,7 +12,7 @@
 //#include "Synapse/SynapseMain.hpp"
 
 #include "Synapse/API/Window.hpp"
-#include "Synapse/API/SynapseOpenGLBindings.hpp"
+#include "Synapse/API/OpenGLBindings.hpp"
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"

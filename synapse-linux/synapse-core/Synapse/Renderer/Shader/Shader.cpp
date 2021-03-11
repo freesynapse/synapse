@@ -171,7 +171,11 @@ namespace Syn {
 	Shader::~Shader()
 	{
 		if (m_shaderID)
-			glDeleteProgram(m_shaderID);
+		{
+			SYN_RENDER_S0({
+				glDeleteProgram(self->m_shaderID);
+			});
+		}
 	}
 
 

@@ -342,6 +342,33 @@ namespace Syn {
 		});
 	}
 
+	void Renderer::enableBlending()
+	{
+		SYN_RENDER_0({
+			glEnable(GL_BLEND);
+		});
+	}
+
+	void Renderer::disableBlending()
+	{
+		SYN_RENDER_0({
+			glDisable(GL_BLEND);
+		});
+	}
+
+	void Renderer::setBlending(bool _blending)
+	{
+		SYN_RENDER_1(_blending, {
+			if (_blending)
+			{
+				glEnable(GL_BLEND);
+				return;
+			}
+			glDisable(GL_BLEND);
+		});
+	}
+
+
 	void Renderer::enableGLenum(GLenum _gl_enum)
 	{
 		SYN_RENDER_1(_gl_enum, {

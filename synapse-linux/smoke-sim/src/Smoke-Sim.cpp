@@ -45,7 +45,6 @@ public:
 
 	Syn::Ref<Smoke> m_smoke = nullptr;
 
-
 	// flags
 	bool m_wireframeMode = false;
 	bool m_toggleCulling = true;
@@ -81,7 +80,8 @@ void layer::onAttach()
 	// load font
 
 	//m_font = Syn::MakeRef<Syn::Font>("../assets/ttf/ubuntu.mono.ttf", 16.0f);
-	m_font = Syn::API::newFont("../assets/ttf/ubuntu.mono.ttf", 18.0f);
+	m_font = Syn::API::newFont("../assets/ttf/ubuntu.mono.ttf", 16.0f);
+	//m_font = SYN_NEW_FONT_REF("../assets/ttf/ubuntu.mono.ttf", 18.0f, nullptr);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
@@ -108,9 +108,6 @@ void layer::onAttach()
 
 	// initialize the fluid class
 	m_smoke = Syn::MakeRef<Smoke>();
-
-
-	// --------------- Renderer2D tests ---------------
 
 
 	// framebuffer
@@ -177,11 +174,17 @@ void layer::onUpdate(float _dt)
 	// TODO: all text rendering should go into an overlay layer.
 	m_font->beginRenderBlock();
 	m_font->addString(2.0f, fontHeight * 1, "fps=%.0f  VSYNC=%s", Syn::TimeStep::getFPS(), Syn::Application::get().getWindow().isVSYNCenabled() ? "ON" : "OFF");
-	/*
-	glm::vec3 camPos = m_camera->getPosition();
-	float camTheta = m_camera->getTheta();
-	m_font->addString(2.0f, fontHeight * 2, "camera [ %.1f  %.1f ], theta [ %.1f ]", camPos.x, camPos.y, camTheta);
-	*/
+	
+	m_font->addString(2.0f, fontHeight * 2, "process memory:");
+	m_font->addString(2.0f, fontHeight * 3, "    virtual=%d kB", Syn::ProcessInfo::getSizeVirtual_kB());
+	m_font->addString(2.0f, fontHeight * 4, "    RSS=%d kB", Syn::ProcessInfo::getSizeRSS_kB());
+	m_font->addString(2.0f, fontHeight * 5, "    shared=%d kB", Syn::ProcessInfo::getSizeShared_kB());
+
+	
+	//glm::vec3 camPos = m_camera->getPosition();
+	//float camTheta = m_camera->getTheta();
+	//m_font->addString(2.0f, fontHeight * 2, "camera [ %.1f  %.1f ], theta [ %.1f ]", camPos.x, camPos.y, camTheta);
+	
 	m_font->endRenderBlock();
 
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
