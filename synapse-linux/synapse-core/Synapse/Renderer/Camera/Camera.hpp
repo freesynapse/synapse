@@ -9,11 +9,6 @@
 #include "Synapse/Event/Event.hpp"
 
 
-#define CAMERA_MOVESPEED	0.03f
-#define CAMERA_ZOOMSPEED	0.04f
-#define CAMERA_LOOKAT_SPEED	0.014f
-
-
 namespace Syn {
 
 

@@ -55,6 +55,7 @@ namespace Syn {
 		// accessors -- continued
 		void setUniform1i(const GLint& _location, const int& _i);
 		void setUniform1f(const GLint& _location, const float& _f);
+		void setUniform2iv(const GLint& _location, const glm::ivec2& _v);
 		void setUniform2fv(const GLint& _location, const glm::vec2& _v);
 		void setUniform3fv(const GLint& _location, const glm::vec3& _v);
 		void setUniform4fv(const GLint& _location, const glm::vec4& _v);
@@ -63,6 +64,7 @@ namespace Syn {
 
 		void setUniform1i(const std::string& _name, const int& _i) { setUniform1i(getUniformLocation(_name), _i); }
 		void setUniform1f(const std::string& _name, const float& _f) { setUniform1f(getUniformLocation(_name), _f); }
+		void setUniform2iv(const std::string& _name, const glm::ivec2& _v) { setUniform2iv(getUniformLocation(_name), _v); }
 		void setUniform2fv(const std::string& _name, const glm::vec2& _v) { setUniform2fv(getUniformLocation(_name), _v); }
 		void setUniform3fv(const std::string& _name, const glm::vec3& _v) { setUniform3fv(getUniformLocation(_name), _v); }
 		void setUniform4fv(const std::string& _name, const glm::vec4& _v) { setUniform4fv(getUniformLocation(_name), _v); }

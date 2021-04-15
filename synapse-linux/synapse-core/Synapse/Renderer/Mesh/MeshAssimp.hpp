@@ -24,7 +24,7 @@ namespace Syn {
 		uint32_t m_loadFlags = 0;
 
 		std::vector<Submesh> m_submeshes;
-		std::vector<Vertex> m_vertices;
+		std::vector<VertexBase> m_vertices;
 		std::vector<Index> m_indices;
 
 

@@ -8,6 +8,7 @@
 #include "Synapse/Core.hpp"
 #include "Synapse/Types.hpp"
 #include "Synapse/External/FastNoise/FastNoise.h"
+#include "Synapse/Utils/Random/Random.hpp"
 
 
 // type definitions of member function pointer
@@ -22,7 +23,7 @@ typedef float(FastNoise::* FastNoise3DFncPtr)(float, float, float);
 #define FASTNOISE_MEMBER_FNC_PTR(ptr) ((s_f_noise).*(ptr))
 
 
-	// disable memory allocation warning, I know what I'm doing...
+// disable memory allocation warning, I know what I'm doing...
 #pragma warning(disable : 6011)
 
 
@@ -150,8 +151,9 @@ namespace Syn {
 
 
 	// random generator for incidental use
-
+	// N.B.!! --> replaced by Synapse/Utils/Random/Random.hpp
 	// static
+	/*
 	class Random
 	{
 	public:
@@ -170,6 +172,7 @@ namespace Syn {
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 				"abcdefghijklmnopqrstuvwxyz";
 			static size_t sz = sizeof(alphanum) - 1;
+			
 			for (uint32_t i = 0; i < len; i++)
 				buffer[i] = alphanum[rand() % sz];
 
@@ -177,4 +180,5 @@ namespace Syn {
 		}
 
 	};
+	*/
 }

@@ -18,7 +18,11 @@ namespace Syn {
 	// static declarations
 	std::multimap<MeshDebugType, Ref<MeshDebug>> MeshCreator::s_MeshDebugMap;
 	boost::unordered_map<std::string, Ref<MeshDebug>> MeshCreator::s_MeshDebugSearchMap;
+	glm::vec3 MeshCreator::s_debugRenderColor = glm::vec3(1.0f, 0.0f, 1.0f);
 	bool MeshCreator::s_shadersCreated = false;
+	Ref<Shader> MeshCreator::m_debugGeneralShader = nullptr;
+	Ref<Shader> MeshCreator::m_debugPointShader = nullptr;
+	Ref<Shader> MeshCreator::m_debugGridShader = nullptr;
 	uint32_t MeshCreator::s_meshIndex = 0;
 
 	
@@ -65,6 +69,65 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	void MeshCreator::trimVertexData(vertex_data* _vertex_data, uint32_t _n_vertices, uint32_t _mesh_attrib_flags, float* _raw)
+	{
+		/* Loops the vertex_data and fills the raw pointer with data based on which flags
+		 * are set. This is to permit the vertex buffer layout to point to the correct 
+		 * attributes.
+		 * _n_vertices are the number of sizeof(vertex_data) in the _vertex_data pointer.
+		 * trimming.
+		 * The _raw pointer has to be created and destroyed in the caller function.
+		 */
+
+		// index of the current address in _raw to be written to
+		uint32_t rawIdx = 0;
+
+		for (uint32_t i = 0; i < _n_vertices; i++)
+		{
+			vertex_data v = _vertex_data[i];
+			if (_mesh_attrib_flags & MESH_ATTRIB_POSITION)
+			{
+				// write the data and update the index
+				_raw[rawIdx+0] = v.position.x;
+				_raw[rawIdx+1] = v.position.y;
+				_raw[rawIdx+2] = v.position.z;
+				rawIdx += (sizeof(glm::vec3) / sizeof(float));
+			}
+
+			if (_mesh_attrib_flags & MESH_ATTRIB_NORMAL)
+			{
+				_raw[rawIdx+0] = v.normal.x;
+				_raw[rawIdx+1] = v.normal.y;
+				_raw[rawIdx+2] = v.normal.z;
+				rawIdx += (sizeof(glm::vec3) / sizeof(float));
+			}
+			
+			if (_mesh_attrib_flags & MESH_ATTRIB_UV)
+			{
+				_raw[rawIdx+0] = v.uv.x;
+				_raw[rawIdx+1] = v.uv.y;
+				rawIdx += (sizeof(glm::vec2) / sizeof(float));
+			}
+		}
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	uint32_t MeshCreator::vertexSize(uint32_t _mesh_attrib_flags)
+	{
+		uint32_t vertexSize = 0;
+		if (_mesh_attrib_flags & MESH_ATTRIB_POSITION)	vertexSize += sizeof(glm::vec3);
+		if (_mesh_attrib_flags & MESH_ATTRIB_NORMAL)	vertexSize += sizeof(glm::vec3);
+		if (_mesh_attrib_flags & MESH_ATTRIB_TANGENT)	vertexSize += sizeof(glm::vec3);
+		if (_mesh_attrib_flags & MESH_ATTRIB_BITANGENT)	vertexSize += sizeof(glm::vec3);
+		if (_mesh_attrib_flags & MESH_ATTRIB_UV)		vertexSize += sizeof(glm::vec2);
+		if (_mesh_attrib_flags & MESH_ATTRIB_COLOR)		vertexSize += sizeof(glm::vec4);
+		return vertexSize;
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	/*
 	Ref<MeshShape> MeshCreator::createMeshShape(void* _vertices, uint32_t _vertices_size_bytes, void* _indices, uint32_t _index_count, uint32_t _mesh_attrib_flags)
 	{
 		// create mesh from vertex/index data
@@ -72,24 +135,59 @@ namespace Syn {
 		mesh->setVertexArray(createVertexArray(_vertices, _vertices_size_bytes, _indices, _index_count, _mesh_attrib_flags));
 		return mesh;
 	}
+	*/
+
+	//-----------------------------------------------------------------------------------
+	Ref<MeshShape> MeshCreator::createMeshShape(vertex_data* _vertex_data, 
+												uint32_t _vertices_size_bytes, 
+												uint32_t* _indices, 
+												uint32_t _index_count, 
+												uint32_t _mesh_attrib_flags)
+	{
+		// create mesh for vertex/index data
+		Ref<MeshShape> mesh = MakeRef<MeshShape>();
+		// infer number of vertices in _vertex_data
+		uint32_t vertexCount = _vertices_size_bytes / sizeof(vertex_data);
+		// compute the number of bytes per vertex based on set flags
+		uint32_t trimmedVertexSzBytes = vertexSize(_mesh_attrib_flags);
+		// dimension raw float pointer to store trimmed vertex data
+		float *raw = new float[vertexCount * trimmedVertexSzBytes / sizeof(float)];
+		// check if trimming is necessary
+		if (trimmedVertexSzBytes != sizeof(vertex_data))
+		{
+			// trim the vertex data
+			trimVertexData(_vertex_data, vertexCount, _mesh_attrib_flags, raw);
+			// set vertex array buffer and index buffer accordingly
+			mesh->setVertexArray(createVertexArray((void*)raw, trimmedVertexSzBytes * vertexCount, (void*)_indices, _index_count, _mesh_attrib_flags));
+		}
+		// no trimming needed, we can use the original data
+		else
+			mesh->setVertexArray(createVertexArray((void*)_vertex_data, _vertices_size_bytes, (void*)_indices, _index_count, _mesh_attrib_flags));
+
+		delete[] raw; // clean your room!
+
+		return mesh;
+	}
 
 
 	//-----------------------------------------------------------------------------------
-	Ref<MeshDebug> MeshCreator::createMeshDebug(
-		const std::string& _mesh_name,
-		MeshDebugType _type, 
-		void* _vertices, 
-		uint32_t _vertices_size_bytes, 
-		void* _indices, 
-		uint32_t _index_count
+	Ref<MeshDebug> MeshCreator::createMeshDebug(const std::string& _mesh_name,
+												MeshDebugType _type, 
+												void* _vertices, 
+												uint32_t _vertices_size_bytes, 
+												void* _indices, 
+												uint32_t _index_count
 	)
 	{
 		if (!s_shadersCreated)
-			MeshCreator::createShaders();
+			MeshCreator::createDebugShaders();
 
 		// create mesh from vertex/index data
 		Ref<MeshDebug> mesh = MakeRef<MeshDebug>(_type);
-		mesh->setVertexArray(createVertexArray(_vertices, _vertices_size_bytes, _indices, _index_count, MESH_ATTRIB_POSITION, GL_DYNAMIC_DRAW));
+		if (_type == MeshDebugType::GRID_PLANE_FS)
+			mesh->setVertexArray(createVertexArray(_vertices, _vertices_size_bytes, _indices, _index_count, MESH_ATTRIB_POSITION | MESH_ATTRIB_UV, GL_DYNAMIC_DRAW));
+		else
+			mesh->setVertexArray(createVertexArray(_vertices, _vertices_size_bytes, _indices, _index_count, MESH_ATTRIB_POSITION, GL_DYNAMIC_DRAW));
 
 		// catch-up with the render command queue
 		Renderer::executeRenderCommands();
@@ -111,10 +209,7 @@ namespace Syn {
 		// insert
 		s_MeshDebugSearchMap[meshName] = mesh;
 		
-
-		//#ifdef DEBUG_MESH
 		SYN_CORE_TRACE("created '", meshName, "' : ", _vertices_size_bytes / sizeof(glm::vec3), " vertices, ", _index_count, " indices.");
-		//#endif
 
 		// return ref
 		return mesh;
@@ -136,14 +231,7 @@ namespace Syn {
 		float z0 = _center.z - _diameter;
 		float z1 = _center.z + _diameter;
 
-		struct vdata
-		{
-			glm::vec3 position;
-			glm::vec3 normal;
-			glm::vec2 uv;
-		};
-
-		vdata vertexData[] =
+		vertex_data vertexData[] =
 		{
 			glm::vec3(x1, y0, z1), glm::vec3( 0.0, -1.0,  0.0),	glm::vec2(1.0, 1.0),
 			glm::vec3(x0, y0, z1), glm::vec3( 0.0, -1.0,  0.0),	glm::vec2(0.0, 1.0),
@@ -193,7 +281,12 @@ namespace Syn {
 			30, 31, 32, 33, 34, 35 
 		};
 
-		return createMeshShape(vertexData, sizeof(vertexData), indices, sizeof(indices) / sizeof(uint32_t), _mesh_attrib_flags);
+		Ref<MeshShape> mesh = createMeshShape(vertexData, sizeof(vertexData), indices, sizeof(indices) / sizeof(uint32_t), _mesh_attrib_flags);
+
+		AABB aabb = { { x0, y0, z0 }, { x1, y1, z1 } };
+		mesh->setAABB(aabb);
+
+		return mesh;
 	}
 	
 
@@ -211,23 +304,22 @@ namespace Syn {
 		flags = flags & ~(MESH_ATTRIB_TANGENT | MESH_ATTRIB_BITANGENT | MESH_ATTRIB_COLOR);
 
 		//
-		struct vdata
+		vertex_data vertexData[] =
 		{
-			glm::vec3 position;
-			glm::vec3 normal;
-			glm::vec2 uv;
-		};
-		vdata vertexData[] =
-		{
-			glm::vec3(x0, y0, z0), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f),
-			glm::vec3(x1, y0, z0), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f),
-			glm::vec3(x1, y1, z0), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f),
-			glm::vec3(x0, y1, z0), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f),
+			glm::vec3(x0, y0, z0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f),
+			glm::vec3(x1, y0, z0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f),
+			glm::vec3(x1, y1, z0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+			glm::vec3(x0, y1, z0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f),
 		};
 
 		uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
+	
+		Ref<MeshShape> mesh = createMeshShape(vertexData, sizeof(vertexData), indices, 6, _mesh_attrib_flags);
+		
+		AABB aabb = { { x0, y0, z0 }, { x1, y1, z0 } };
+		mesh->setAABB(aabb);
 
-		return createMeshShape(vertexData, sizeof(vertexData), indices, 6, flags);
+		return mesh;
 	}
 
 
@@ -236,17 +328,12 @@ namespace Syn {
 	{
 		uint32_t flags = MESH_ATTRIB_POSITION | MESH_ATTRIB_UV;
 		
-		struct vdata
+		vertex_data vertexData[] =
 		{
-			glm::vec3 position;
-			glm::vec2 uv;
-		};
-		vdata vertexData[] =
-		{
-			glm::vec3(-1.0f, -1.0f,  0.0f), glm::vec2(0.0f, 0.0f),
-			glm::vec3( 1.0f, -1.0f,  0.0f), glm::vec2(1.0f, 0.0f),
-			glm::vec3( 1.0f,  1.0f,  0.0f), glm::vec2(1.0f, 1.0f),
-			glm::vec3(-1.0f,  1.0f,  0.0f), glm::vec2(0.0f, 1.0f),
+			glm::vec3(-1.0f, -1.0f,  0.0f), glm::vec3(0.0), glm::vec2(0.0f, 0.0f),
+			glm::vec3( 1.0f, -1.0f,  0.0f), glm::vec3(0.0), glm::vec2(1.0f, 0.0f),
+			glm::vec3( 1.0f,  1.0f,  0.0f), glm::vec3(0.0), glm::vec2(1.0f, 1.0f),
+			glm::vec3(-1.0f,  1.0f,  0.0f), glm::vec3(0.0), glm::vec2(0.0f, 1.0f),
 		};
 
 		uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
@@ -263,17 +350,9 @@ namespace Syn {
 		uint32_t flags = _mesh_attrib_flags;
 		flags = flags & ~(MESH_ATTRIB_TANGENT | MESH_ATTRIB_BITANGENT | MESH_ATTRIB_COLOR);
 
-
 		// create vertices
 		//
-		struct vdata
-		{
-			glm::vec3 pos;
-			glm::vec3 normal;
-			glm::vec2 uv;
-		};
-
-		std::vector<vdata> vertices;
+		std::vector<vertex_data> vertices;
 		float x, y, z, xy;
 		float sectorAngle, stackAngle;
 		float lenInv = 1.0f / _radius;
@@ -292,7 +371,7 @@ namespace Syn {
 
 			for (uint32_t j = 0; j <= _sector_count; j++)
 			{
-				vdata vertex;
+				vertex_data vertex;
 
 				// position
 				sectorAngle = j * sectorStep;
@@ -300,10 +379,10 @@ namespace Syn {
 				x = xy * cosf(sectorAngle);
 				// r * cos(u) * sin(v)
 				y = xy * sinf(sectorAngle);
-				vertex.pos = glm::vec3(x, y, z);
+				vertex.position = glm::vec3(x, y, z);
 
 				// normal
-				vertex.normal = vertex.pos * lenInv;
+				vertex.normal = vertex.position * lenInv;
 
 				// UV coordinates
 				vertex.uv = glm::vec2((float)i / _sector_count, (float)j / _stack_count);
@@ -314,7 +393,7 @@ namespace Syn {
 		}
 
 		// create indices
-
+		//
 		std::vector<uint32_t> indices;
 		uint32_t k1, k2;
 
@@ -343,7 +422,7 @@ namespace Syn {
 
 
 		// return ref
-		Ref<MeshShape> mesh = MeshCreator::createMeshShape(vertices.data(), vertices.size() * sizeof(glm::vec3), indices.data(), indices.size(), flags);
+		Ref<MeshShape> mesh = MeshCreator::createMeshShape(vertices.data(), vertices.size() * sizeof(vertex_data), indices.data(), indices.size(), flags);
 
 		// set position of sphere through the model matrix
 		Transform t;
@@ -351,9 +430,10 @@ namespace Syn {
 		mesh->setTransform(t);
 
 		// set bounding-box
-		AABB aabb;
-		aabb.min = _center - glm::vec3(_radius);
-		aabb.max = _center + glm::vec3(_radius);
+		AABB aabb = {
+			{ _center - glm::vec3(_radius) }, 
+			{ _center + glm::vec3(_radius) }
+		};
 		mesh->setAABB(aabb);
 
 		return mesh;
@@ -405,6 +485,30 @@ namespace Syn {
 		aabb.max = glm::vec3(x1, y1, z1);
 		mesh->setAABB(aabb);
 
+		return mesh;
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	Ref<MeshDebug> MeshCreator::createDebugQuad(const glm::vec3& _center, float _side, const std::string& _name)
+	{
+		float s2 = _side / 2.0f;
+		glm::vec3 vertices[] = 
+		{
+			glm::vec3(_center.x-s2, _center.y-s2, _center.z ),
+			glm::vec3(_center.x+s2, _center.y-s2, _center.z ),
+			glm::vec3(_center.x+s2, _center.y+s2, _center.z ),
+			glm::vec3(_center.x-s2, _center.y+s2, _center.z ),
+		};
+
+		uint32_t indices[] { 0, 1, 2, 2, 3, 0 }; 
+
+		Ref<MeshDebug> mesh = MeshCreator::createMeshDebug(_name, MeshDebugType::QUAD, (void*)vertices, sizeof(vertices), (void*)indices, sizeof(indices) / sizeof(uint32_t));
+
+		AABB aabb;
+		aabb.min = aabb.max = _center;
+		mesh->setAABB(aabb);
+		
 		return mesh;
 	}
 
@@ -637,6 +741,75 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	Ref<MeshDebug> MeshCreator::createDebugPlane(const glm::vec3& _center, uint32_t _side, const std::string& _name)
+	{
+		// enforce origin at (0, 0, 0)
+		int side = (_side % 2 == 0) ? (_side + 1) : _side;
+		
+		glm::vec3 vmin = _center - glm::vec3((float)side);
+		glm::vec3 vmax = _center + glm::vec3((float)side);
+
+		// loop through number of vertices
+		std::vector<glm::vec3> vertices;	vertices.reserve(2 * side * 4);
+		std::vector<uint32_t> indices;		indices.reserve(2 * side * 4);
+
+		uint32_t k = 0;
+		for (int i = -side; i < side; i++)
+		{
+			glm::vec3 vx0 = _center;	vx0.z = i;	vx0.x = vmin.x;
+			glm::vec3 vx1 = _center;	vx1.z = i;	vx1.x = vmax.x;
+			vertices.push_back(vx0);	vertices.push_back(vx1);
+			indices.push_back(k++);		indices.push_back(k++);
+			glm::vec3 vz0 = _center;	vz0.x = i;	vz0.z = vmin.z;
+			glm::vec3 vz1 = _center;	vz1.x = i;	vz1.z = vmax.z;
+			vertices.push_back(vz0);	vertices.push_back(vz1);
+			indices.push_back(k++);		indices.push_back(k++);
+		}
+
+		uint32_t vertSz = 2 * side * 4 * sizeof(glm::vec3);
+		
+		// return ref
+		Ref<MeshDebug> mesh = MeshCreator::createMeshDebug(_name, MeshDebugType::GRID_PLANE, (void*)vertices.data(), vertSz, (void*)indices.data(), indices.size());
+
+		AABB aabb;
+		aabb.min = vmin;
+		aabb.max = vmax;
+		mesh->setAABB(aabb);
+
+		return mesh;
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	Ref<MeshDebug> MeshCreator::createDebugPlaneFS(const glm::vec3& _center, uint32_t _side, const std::string& _name)
+	{
+		float s2 = _side / 2.0f;
+		struct vdata { glm::vec3 p; glm::vec2 uv; };
+		vdata vertices[] = 
+		{
+			glm::vec3(_center.x-s2, _center.y, _center.z-s2), glm::vec2(0.0f, 0.0f),
+			glm::vec3(_center.x+s2, _center.y, _center.z-s2), glm::vec2(1.0f, 0.0f),
+			glm::vec3(_center.x+s2, _center.y, _center.z+s2), glm::vec2(1.0f, 1.0f),
+			glm::vec3(_center.x-s2, _center.y, _center.z+s2), glm::vec2(0.0f, 1.0f),
+		};
+
+		// reverse winding order due to xz plane
+		uint32_t indices[] { 0, 3, 2, 2, 1, 0 }; 
+
+		Ref<MeshDebug> mesh = MeshCreator::createMeshDebug(_name, MeshDebugType::GRID_PLANE_FS, (void*)vertices, sizeof(vertices), (void*)indices, sizeof(indices) / sizeof(uint32_t));
+
+		// set grid size
+		mesh->setGridSize(_side);
+
+		AABB aabb;
+		aabb.min = aabb.max = _center;
+		mesh->setAABB(aabb);
+		
+		return mesh;
+	}
+
+
+	//-----------------------------------------------------------------------------------
 	Ref<MeshDebug> MeshCreator::getMeshDebugPtr(const std::string& _name)
 	{
 		if (s_MeshDebugSearchMap.find(_name) != s_MeshDebugSearchMap.end())
@@ -683,7 +856,14 @@ namespace Syn {
 		auto item = s_MeshDebugMap.begin();
 		mesh = item->second;
 		prevType = item->first;
-		shader = (prevType == MeshDebugType::POINTS ? ShaderLibrary::get("static_debug_point_shader") : ShaderLibrary::get("static_debug_general_shader"));
+
+		switch (prevType)
+		{
+		case MeshDebugType::POINTS:			shader = m_debugPointShader;	break;
+		case MeshDebugType::GRID_PLANE_FS:	shader = m_debugGridShader;		break;
+		default:							shader = m_debugGeneralShader;
+		}
+		//shader = (prevType == MeshDebugType::POINTS ? ShaderLibrary::get("static_debug_point_shader") : ShaderLibrary::get("static_debug_general_shader"));
 
 		if (_wireframe)
 		{
@@ -701,21 +881,37 @@ namespace Syn {
 			// has the type changed? if so, get a new shader
 			if (prevType != type)
 			{
-				// enable different shader depending on type of mesh (POINTS or not)
-				shader = (type == MeshDebugType::POINTS ? ShaderLibrary::get("static_debug_point_shader") : ShaderLibrary::get("static_debug_general_shader"));
+				// enable different shader depending on type of mesh
+				switch (type)
+				{
+				case MeshDebugType::POINTS:			shader = m_debugPointShader;	break;
+				case MeshDebugType::GRID_PLANE_FS:	shader = m_debugGridShader;		break;
+				default:							shader = m_debugGeneralShader;
+				}
 			}
 
 			shader->enable();
 
-			// POINT-specific uniform
+			// type-specific uniform
 			if (type == MeshDebugType::POINTS)
 				shader->setUniform1f("u_point_size", mesh->getPointSize());
+			else if (type == MeshDebugType::GRID_PLANE_FS)
+			{
+				if (_wireframe)
+					Renderer::disableWireFrame();
+				shader->setUniform1f("u_grid_size", mesh->getGridSize());
+			}
 
-			// shader-agnostic uniform (u_model_matrix set in MeshDebug::render() ).
+			// shader-agnostic uniform (u_model_matrix is set in MeshDebug::render() ).
 			shader->setMatrix4fv("u_view_projection_matrix", viewProjMatrix);
+			shader->setUniform3fv("u_color", s_debugRenderColor);
 
 			// render (threaded in MeshDebug::render() )
 			mesh->render(shader);
+
+			// reset wireframe status in case of GRID_PLANE
+			if (type == MeshDebugType::GRID_PLANE_FS && _wireframe)
+				Renderer::enableWireFrame();
 
 			// update previous type
 			prevType = type;
@@ -754,6 +950,8 @@ namespace Syn {
 			shader->setUniform1f("u_point_size", mesh->getPointSize());
 
 		shader->setMatrix4fv("u_view_projection_matrix", vp);
+		shader->setUniform3fv("u_color", s_debugRenderColor);
+
 		mesh->render(shader);
 
 		if (_wireframe)
@@ -773,7 +971,7 @@ namespace Syn {
 	
 		
 	//-----------------------------------------------------------------------------------
-	void MeshCreator::createShaders()
+	void MeshCreator::createDebugShaders()
 	{
 		std::string srcPoint = R"(
 			#type VERTEX_SHADER
@@ -791,7 +989,7 @@ namespace Syn {
 			#type FRAGMENT_SHADER
 			#version 330 core
 			layout(location = 0) out vec4 out_color;
-			uniform vec3 u_color = vec3(1.0f, 0.0f, 0.0f);
+			uniform vec3 u_color = vec3(1.0f, 0.0f, 1.0f);
 			void main()
 			{
 				out_color = vec4(u_color, 1.0f);
@@ -812,21 +1010,52 @@ namespace Syn {
 			#type FRAGMENT_SHADER
 			#version 330 core
 			layout(location = 0) out vec4 out_color;
-			uniform vec3 u_color = vec3(1.0f, 0.0f, 0.0f);
+			uniform vec3 u_color = vec3(1.0f, 0.0f, 1.0f);
 			void main()
 			{
 				out_color = vec4(u_color, 1.0f);
 			}
 		)";
 
+		std::string srcGridPlaneFS = R"(
+			#type VERTEX_SHADER
+			#version 330 core
+			layout(location=0) in vec3 a_position;
+			layout(location=4) in vec2 a_uv;
+			uniform mat4 u_view_projection_matrix = mat4(1.0);
+			uniform mat4 u_model = mat4(1.0);
+			out vec2 v_uv;
+			void main()
+			{
+				v_uv = a_uv;
+				gl_Position = u_view_projection_matrix * u_model * vec4(a_position, 1.0);
+			}
+			#type FRAGMENT_SHADER
+			#version 330 core
+			in vec2 v_uv;
+			uniform vec3 u_color;
+			uniform float u_grid_size;
+			out vec4 frag_color;
+			void main()
+			{
+				vec2 uv = v_uv - 0.5;
+				float inv_w = (100.0 * u_grid_size) / (u_grid_size * 2.0);
+				uv = fract(uv * u_grid_size);
+				float grid = max(1.0 - abs((uv.y - 0.5) * inv_w), 1.0 - abs((uv.x - 0.5) * inv_w));
+				frag_color = vec4(vec3(1) * grid, 1.0);
+			}
+		)";
+
 		FileIOHandler::write_buffer_to_file("./static_debug_point_shader.glsl", srcPoint);
 		FileIOHandler::write_buffer_to_file("./static_debug_general_shader.glsl", srcGeneral);
+		FileIOHandler::write_buffer_to_file("./static_debug_grid_plane_fs_shader.glsl", srcGridPlaneFS);
 
-		Ref<Shader> pointShader = MakeRef<Shader>("./static_debug_point_shader.glsl");
-		Ref<Shader> generalShader = MakeRef<Shader>("./static_debug_general_shader.glsl");
-
-		ShaderLibrary::add(pointShader);
-		ShaderLibrary::add(generalShader);
+		ShaderLibrary::load("./static_debug_point_shader.glsl");
+		ShaderLibrary::load("./static_debug_general_shader.glsl");
+		ShaderLibrary::load("./static_debug_grid_plane_fs_shader.glsl");
+		m_debugPointShader = ShaderLibrary::get("static_debug_point_shader");
+		m_debugGeneralShader = ShaderLibrary::get("static_debug_general_shader");
+		m_debugGridShader = ShaderLibrary::get("static_debug_grid_plane_fs_shader");
 
 		s_shadersCreated = true;
 	}

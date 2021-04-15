@@ -21,20 +21,30 @@
 
 #include "Synapse/Renderer/Shader/Shader.hpp"
 
-#include "SynapseAddons/Fluid/FluidFramebuffer.hpp"
-
 
 namespace Syn {
 
 	namespace API {
 
-		// buffers
-		//
-		static inline Ref<Framebuffer> newFramebuffer(uint32_t _width, uint32_t _height, ColorFormat _format=ColorFormat::RGBA8, bool _update_on_resize=true)
-		{	return MakeRef<Framebuffer>(_width, _height, _format, _update_on_resize); } 		
-		static inline Ref<IndexBuffer> newIndexBuffer(GLenum _primitive=GL_TRIANGLES, GLenum _usage=GL_STATIC_DRAW)
+		/* Framebuffer parameters:
+		 * 	Syn::ColorFormat _format : Format of the COLOR_ATTACHMENT used.
+		 *	glm::ivec2 _size		 : Size in px. If not specified, Syn::Renderer::viewport is used.
+		 *  size_t n_draw_buffers	 : Number of GL_COLOR_ATTACHMENT targets.
+		 *  bool _use_depthbuffer	 : Flag for creation of an attached depthbuffer.
+		 *	bool _update_on_resize	 : Controls response to Syn::ViewportResizeEvent:s.
+		 *  std::string _name		 : Name ID (used for debugging).
+		 */		
+		static inline Ref<Framebuffer> newFramebuffer(ColorFormat _format=ColorFormat::RGBA16F, 
+													  const glm::ivec2& _size=glm::ivec2(0), 
+													  size_t _n_drawbuffers=1, 
+													  bool _use_depthbuffer=true, 
+													  bool _update_on_resize=true, 
+													  const std::string& _name="")
+		{	return MakeRef<Framebuffer>(_format, _size, _n_drawbuffers, _use_depthbuffer, _update_on_resize, _name); }
+
+		static inline Ref<IndexBuffer> newIndexBuffer(GLenum _primitive, GLenum _usage)
 		{	return MakeRef<IndexBuffer>(_primitive, _usage);	}
-		static inline Ref<VertexBuffer> newVertexBuffer(GLenum _usage=GL_STATIC_DRAW)
+		static inline Ref<VertexBuffer> newVertexBuffer(GLenum _usage)
 		{	return MakeRef<VertexBuffer>(_usage);	}
 		static inline Ref<VertexArray> newVertexArray(const Ref<VertexBuffer>& _vertex_buffer_ref, const Ref<IndexBuffer>& _index_buffer_ref)
 		{	return MakeRef<VertexArray>(_vertex_buffer_ref, _index_buffer_ref);	}
@@ -44,7 +54,7 @@ namespace Syn {
 
 		// cameras
 		//
-		static inline Ref<OrthographicCamera> newOrthographicCamera(float _aspect_ratio, float _zoom_level=1.0f)
+		static inline Ref<OrthographicCamera> newOrthographicCamera(float _aspect_ratio, float _zoom_level=10.0f)
 		{	return MakeRef<OrthographicCamera>(_aspect_ratio, _zoom_level);	}
 		static inline Ref<PerspectiveCamera> newPerspectiveCamera(const glm::mat4& _projection_matrix)
 		{	return MakeRef<PerspectiveCamera>(_projection_matrix);	}
@@ -78,12 +88,6 @@ namespace Syn {
 		{	return MakeRef<Shader>(_shader_file_path);	}
 		static inline Ref<Shader> newShader(const ::std::string& _shader_name, const ::std::string& _file_path)
 		{	return MakeRef<Shader>(_shader_name, _file_path);	}
-
-
-		// Synapse Addons references
-		//
-		static inline Ref<FluidFramebuffer> newFluidFramebuffer(uint32_t _width, uint32_t _height, const ColorFormat& _format, bool _update_on_resize, const ::std::string& _name)
-		{	return MakeRef<FluidFramebuffer>(_width, _height, _format, _update_on_resize, _name); }
 
 
 

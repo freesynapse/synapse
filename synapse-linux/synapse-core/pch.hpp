@@ -44,6 +44,9 @@
 // OpenGL API
 //
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/compatibility.hpp>
 #include <glad/glad.h>
 #ifdef _WIN32
 #include <GL/glew.h>

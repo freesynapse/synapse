@@ -103,7 +103,7 @@ namespace Syn {
 			// vertices
 			for (size_t i = 0; i < mesh->mNumVertices; i++)
 			{
-				Vertex vertex;
+				VertexBase vertex;
 				vertex.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 
 				// update AABB
@@ -168,7 +168,7 @@ namespace Syn {
 					SYN_CORE_TRACE("displacement vector [ ", disp.x, "  ", disp.y, "  ", disp.z, " ]");
 				#endif
 				// update vertices
-				for (Vertex& v : m_vertices)
+				for (VertexBase& v : m_vertices)
 					v.position += disp;
 				// adjust aabb
 				m_aabb.min += disp;
@@ -188,7 +188,7 @@ namespace Syn {
 
 				// update vertices
 				glm::mat4 mat = _mesh_load_transform.getModelMatrix();
-				for (Vertex& v : m_vertices)
+				for (VertexBase& v : m_vertices)
 				{
 					glm::vec4 pos = glm::vec4(v.position, 1.0f);
 					pos = mat * pos;
@@ -213,9 +213,9 @@ namespace Syn {
 			{ VERTEX_ATTRIB_LOCATION_BITANGENT, ShaderDataType::Float3, "a_bitangent" },
 			{ VERTEX_ATTRIB_LOCATION_UV, ShaderDataType::Float2, "a_uv" }
 		});
-		vertexBuffer->setData(m_vertices.data(), sizeof(Vertex) * m_vertices.size());
+		vertexBuffer->setData(m_vertices.data(), sizeof(VertexBase) * m_vertices.size());
 		#ifdef DEBUG_MESH
-			SYN_CORE_TRACE("vertex buffer size = ", sizeof(Vertex) * m_vertices.size(), " bytes.");
+			SYN_CORE_TRACE("vertex buffer size = ", sizeof(VertexBase) * m_vertices.size(), " bytes.");
 		#endif
 
 		Ref<IndexBuffer> indexBuffer = MakeRef<IndexBuffer>();

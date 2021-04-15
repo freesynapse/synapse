@@ -21,6 +21,8 @@ namespace Syn {
 		m_aspectRatio = _aspect_ratio;
 		m_zoomLevel = _zoom_level;
 
+		m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
+
 		// uses aspect ratio and zoom level
 		updateProjectionMatrix();
 
@@ -117,8 +119,9 @@ namespace Syn {
 		SYN_PROFILE_FUNCTION();
 
 		// only update if in engine camera mode (i.e. not edit mode).
-		if (!m_updateCamera)
-			return;
+		// -- not true for orthographic cameras
+		//if (!m_updateCamera)
+		//	return;
 			
 		glm::vec3 prevPos = m_position;
 		float prevTheta = m_theta;
@@ -181,25 +184,30 @@ namespace Syn {
 			{
 				SYN_CORE_TRACE("called");
 				m_aspectRatio = (float)dynamic_cast<ViewportResizeEvent*>(_e)->getViewportX() / (float)dynamic_cast<ViewportResizeEvent*>(_e)->getViewportY();
+				m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
 				updateProjectionMatrix();
 				break;
 			}
 
 			case EventType::WINDOW_TOGGLE_FROZEN_CURSOR:
 			{
+				// TODO: add code to prevent camera from moving when in editor mode
+				//
 				updateProjectionMatrix();
 				break;
 			}
 
 			case EventType::INPUT_MOUSE_SCROLL:
 			{
-				// only update if in engine camera mode (i.e. not edit mode).				
-				if (!m_updateCamera)
-					break;
+				// only update if in engine camera mode (i.e. not edit mode).			
+				// -- not true for orthographic cameras
+				//if (!m_updateCamera)
+				//	break;
 
 				//SYN_CORE_TRACE("scrolled: ", dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset());
 				m_zoomLevel -= dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset() * 0.25f;
 				m_zoomLevel = std::max(0.25f, m_zoomLevel);
+				m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };				
 				updateProjectionMatrix();
 				break;
 			}

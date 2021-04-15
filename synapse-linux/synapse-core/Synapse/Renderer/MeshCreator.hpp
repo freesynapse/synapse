@@ -57,31 +57,38 @@ namespace Syn {
 												uint32_t _sector_count=21,
 												uint32_t _mesh_attrib_flags=MESH_ATTRIB_POSITION|MESH_ATTRIB_NORMAL|MESH_ATTRIB_UV);
 
+
 	public:
 		// Debug meshes
 
-		// Cube with the around _center with side +/- _diameter. GL_DYNAMIC_DRAW by default.
-		static Ref<MeshDebug> createDebugCube(const glm::vec3& _center = glm::vec3(0.0f), float _diameter = 1.0f, const std::string& _name = "");
+		// Cube translated to _center with side +/- _diameter. GL_DYNAMIC_DRAW by default.
+		static Ref<MeshDebug> createDebugCube(const glm::vec3& _center=glm::vec3(0.0f), float _diameter=1.0f, const std::string& _name="");
+		// Quad with _center +/- _size/2 units. GL_DYNAMIC_DRAW by default.
+		static Ref<MeshDebug> createDebugQuad(const glm::vec3& _center=glm::vec3(0.0f), float _side=1.0f, const std::string& _name="");
 		// Sphere with _radius around _center, with longitudinal and latitudinal resoluton of _stack_count and _sector_count, respectively. GL_DYNAMIC_DRAW by default.
 		static Ref<MeshDebug> createDebugSphere(const glm::vec3& _center=glm::vec3(0.0f), 
 										   		float _radius=10.0f, 
-												   uint32_t _stack_count=21, 
-												   uint32_t _sector_count=21, 
-												   const std::string& _name="");
+												uint32_t _stack_count=21, 
+												uint32_t _sector_count=21, 
+												const std::string& _name="");
 		// Vector of points, gl_PointSize = _size. GL_DYNAMIC_DRAW by default.
 		static Ref<MeshDebug> createDebugPoints(const std::vector<glm::vec3>& _points, float _size, const std::string& _name="");
 		// Vector of vertices representing lines, rendered as GL_LINE_STRIP. GL_DYNAMIC_DRAW by default.
-		static Ref<MeshDebug> createDebugLineStrip(const std::vector<glm::vec3>& _line_vertices, const std::string& _name = "");
+		static Ref<MeshDebug> createDebugLineStrip(const std::vector<glm::vec3>& _line_vertices, const std::string& _name="");
 		// Vector of pairs of vertices representing lines, rendered as GL_LINES. GL_DYNAMIC_DRAW by default.
-		static Ref<MeshDebug> createDebugLines(const std::vector<glm::vec3>& _vertex_pairs, const std::string& _name = "");
+		static Ref<MeshDebug> createDebugLines(const std::vector<glm::vec3>& _vertex_pairs, const std::string& _name="");
 		// A box based on an axis-aligned bounding box (AABB). GL_DYNAMIC_DRAW by default.
 		static Ref<MeshDebug> createDebugAABB(const AABB& _aabb, const std::string& _name="");
+		// A grid plane for unit measurements. The size of a grid cell is 1.0 unit. GL_DYNAMIC_DRAW by default.
+		static Ref<MeshDebug> createDebugPlane(const glm::vec3& _center=glm::vec3(0.0f), uint32_t _side=21, const std::string& _name="");
+		// A grid plane for unit measurements, uses fragment shader for lines. The size of a grid cell is 1.0 unit. GL_DYNAMIC_DRAW by default.
+		static Ref<MeshDebug> createDebugPlaneFS(const glm::vec3& _center=glm::vec3(0.0f), uint32_t _side=21, const std::string& _name="");
 
 	public:
 		// Accessors
 		static Ref<MeshDebug> getMeshDebugPtr(const std::string& _name);
 		static Ref<MeshDebug> getMeshPtr(const std::string& _name);
-
+		static void setDebugRenderColor(const glm::vec3& _c) { s_debugRenderColor = _c; }
 
 
 	public:
@@ -98,7 +105,15 @@ namespace Syn {
 		static void clearDebugMeshes();
 
 
-	public:
+	private:
+		// Basic, base case vertex data for shapes (trimmed based on flags).
+		struct vertex_data
+		{
+			glm::vec3 position;
+			glm::vec3 normal;
+			glm::vec2 uv;
+		};
+
 		// Create a VertexArray reference, given the usual specifications.
 		static Ref<VertexArray> createVertexArray(void* _vertices,
 												  uint32_t _vertices_size_bytes, 
@@ -107,8 +122,16 @@ namespace Syn {
 												  uint32_t _mesh_attrib_flags=MESH_ATTRIB_POSITION,
 												  GLenum _usage=GL_STATIC_DRAW);
 
-	private:
-		// Helper method for setting up debug meshes.
+		// Trims vertex data depending on set flags.
+		static void trimVertexData(vertex_data* _vertex_data, 
+								   uint32_t _n_vertices, 
+								   uint32_t _mesh_attrib_flags, 
+								   float* _raw);
+
+		// Helper function to calculate the size of a vertex based on the flags.
+		static uint32_t vertexSize(uint32_t _mesh_attrib_flags);
+
+		// Helper function for setting up debug meshes.
 		static Ref<MeshDebug> createMeshDebug(const std::string& _mesh_name,
 										 	  MeshDebugType _type, 
 											  void* _vertices, 
@@ -116,15 +139,15 @@ namespace Syn {
 											  void* _indices, 
 											  uint32_t _index_count);
 
-		// Helper method for setting up shape meshes.
-		static Ref<MeshShape> createMeshShape(void* _vertices, 
+		// Helper function for setting up shape meshes.
+		static Ref<MeshShape> createMeshShape(vertex_data* _vertices, 
 											  uint32_t _vertices_size_bytes, 
-											  void* _indices, 
+											  uint32_t* _indices, 
 											  uint32_t _index_count, 
-											  uint32_t _mesh_attrib_flags=MESH_ATTRIB_POSITION);
-
+											  uint32_t _mesh_attrib_flags);
+											  
 		// Setup static shaders used for rendering debug meshes.
-		static void createShaders();
+		static void createDebugShaders();
 
 
 	private:
@@ -134,7 +157,13 @@ namespace Syn {
 		// Permits acquisition of created meshes (same Ref:s as in s_debugMap).
 		static boost::unordered_map<std::string, Ref<MeshDebug>> s_MeshDebugSearchMap;
 		
+		static glm::vec3 s_debugRenderColor;
+
 		static bool s_shadersCreated;
+		static Ref<Shader> m_debugGeneralShader;
+		static Ref<Shader> m_debugPointShader;
+		static Ref<Shader> m_debugGridShader;
+
 		static uint32_t s_meshIndex;
 	};
 

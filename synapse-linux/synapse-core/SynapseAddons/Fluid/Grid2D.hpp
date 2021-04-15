@@ -5,7 +5,6 @@
 #include <string>
 #include <glm/glm.hpp>
 
-#include "SynapseAddons/Fluid/FluidFramebuffer.hpp"
 #include "Synapse/Renderer/Mesh/MeshShape.hpp"
 
 using namespace Syn;
@@ -16,8 +15,8 @@ namespace Syn {
 	//
 	typedef struct slab_ 
 	{
-		Ref<FluidFramebuffer> frontSurface;
-		Ref<FluidFramebuffer> backSurface;
+		Ref<Framebuffer> frontSurface;
+		Ref<Framebuffer> backSurface;
 	} Slab;
 
 
@@ -29,11 +28,11 @@ namespace Syn {
 		virtual ~Grid2D() {};
 
 		virtual Slab createSlab(uint32_t _width, uint32_t _height, const ColorFormat& _fmt, const std::string& _name="");
-		virtual Ref<FluidFramebuffer> createSurface(uint32_t _width, uint32_t _height, const ColorFormat& _fmt, const std::string& _name);
+		virtual Ref<Framebuffer> createSurface(uint32_t _width, uint32_t _height, const ColorFormat& _fmt, const std::string& _name);
 		virtual Ref<VertexArray> createQuad();
 
-		virtual void clearSurface(const Ref<FluidFramebuffer>& _frame_buffer, float _color=0.0f);
-		virtual void clearSurface(const Ref<FluidFramebuffer>& _frame_buffer, const glm::vec4& _color=glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		virtual void clearSurface(const Ref<Framebuffer>& _frame_buffer, float _color=0.0f);
+		virtual void clearSurface(const Ref<Framebuffer>& _frame_buffer, const glm::vec4& _color=glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		virtual void swapSurfaces(Slab* _slab);
 
 		//

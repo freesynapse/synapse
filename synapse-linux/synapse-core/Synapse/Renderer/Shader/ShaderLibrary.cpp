@@ -86,7 +86,7 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	Ref<Shader> ShaderLibrary::createDefaultShader()
 	{
-		SYN_CORE_WARNING("creating static default shader.");
+		SYN_CORE_TRACE("creating static default shader.");
 
 		std::string src = R"(
 			#type VERTEX_SHADER

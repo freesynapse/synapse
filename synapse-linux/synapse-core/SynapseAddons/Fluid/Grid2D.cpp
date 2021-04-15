@@ -28,10 +28,10 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	Ref<FluidFramebuffer> Grid2D::createSurface(uint32_t _width, uint32_t _height, const ColorFormat& _fmt, const std::string& _name)
+	Ref<Framebuffer> Grid2D::createSurface(uint32_t _width, uint32_t _height, const ColorFormat& _fmt, const std::string& _name)
 	{
 
-		Ref<FluidFramebuffer> framebuffer = MakeRef<FluidFramebuffer>(_width, _height, _fmt, false, _name);
+		Ref<Framebuffer> framebuffer = API::newFramebuffer(_fmt, glm::ivec2(_width, _height), 1, true, false, _name);
 		framebuffer->clear(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		Renderer::executeRenderCommands();
 
@@ -76,7 +76,7 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
-	void Grid2D::clearSurface(const Ref<FluidFramebuffer>& _frame_buffer, float _color)
+	void Grid2D::clearSurface(const Ref<Framebuffer>& _frame_buffer, float _color)
 	{
 		_frame_buffer->clear(glm::vec4(_color));
 
@@ -84,7 +84,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void Grid2D::clearSurface(const Ref<FluidFramebuffer>& _frame_buffer, const glm::vec4& _color)
+	void Grid2D::clearSurface(const Ref<Framebuffer>& _frame_buffer, const glm::vec4& _color)
 	{
 		_frame_buffer->clear(_color);
 
@@ -94,7 +94,7 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void Grid2D::swapSurfaces(Slab* _slab)
 	{
-		Ref<FluidFramebuffer> tmp = _slab->backSurface;
+		Ref<Framebuffer> tmp = _slab->backSurface;
 		_slab->backSurface = _slab->frontSurface;
 		_slab->frontSurface = tmp;
 	}

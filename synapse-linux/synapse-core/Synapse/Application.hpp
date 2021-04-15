@@ -38,6 +38,8 @@ namespace Syn {
 		ImGuiLayer* m_imGuiLayer;
 		Ref<Window> m_window = nullptr;
 		bool m_bRunning = true;
+
+		bool m_firstFrame = true;
 		
 	private:
 		static Application* s_instance;

@@ -20,6 +20,15 @@ namespace Syn {
 			Renderer::drawIndexed(m_vertexArray->getIndexCount(), true, GL_TRIANGLES);
 		}
 
+		/* 'Override' if rendering in screen-space coordinates should be requested
+		 * which it would be for screen quads for Framebuffer rendering.
+		 */
+		void renderNDC()
+		{
+			m_vertexArray->bind();
+			Renderer::drawIndexed(m_vertexArray->getIndexCount(), true, GL_TRIANGLES);
+		}
+
 	};
 
 
