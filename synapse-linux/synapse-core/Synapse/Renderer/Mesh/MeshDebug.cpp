@@ -74,7 +74,7 @@ namespace Syn {
 		// shader already enabled in MeshCreator
 
 		// translate by position
-		_shader_ptr->setMatrix4fv("u_model_matrix", glm::translate(m_transform.getModelMatrix(), m_position));
+		_shader_ptr->setMatrix4fv("u_modelMatrix", glm::translate(m_transform.getModelMatrix(), m_position));
 		m_vertexArray->bind();
 
 		Renderer::drawIndexed(m_vertexArray->getIndexCount(), true, m_primitiveType);

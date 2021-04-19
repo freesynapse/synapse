@@ -28,9 +28,22 @@ public:
 	Ref<Framebuffer> m_fboRender = nullptr;
 	
 	Ref<OrthographicCamera> m_camera = nullptr;
-	bool m_bCameraMode = true;	// if true, starts in camera move mode, contrasted to edit mode
+	bool m_bCameraMode = false;	// if true, starts in camera move mode, contrasted to edit mode
 	Ref<Shader> m_shader2D = nullptr;
-	Ref<Texture2D> m_texture = nullptr;
+
+	struct vertex 
+	{ 
+		glm::vec3 position;
+		glm::vec2 uv;
+		glm::vec4 color;
+		vertex() {}
+		vertex(glm::vec3 _p, glm::vec2 _uv, glm::vec4 _c) :
+			position(_p), uv(_uv), color(_c) {}
+	};
+
+	Ref<VertexArray> m_vao;
+	uint32_t m_quadOffset = 0;
+	uint32_t m_maxQuads = 4000;
 
 	// flags
 	bool m_wireframeMode = false;
@@ -70,18 +83,50 @@ void layer::onAttach()
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
-	// --------------- Renderer2D tests ---------------
-	// texture
-	m_texture = API::newTexture2D("../assets/textures/uv_grid.jpg");
+	// =============== Renderer2D tests ===============
+	
 	// load camera
 	// initialization with aspect ratio and zoom level (default = 1.0f)
 	m_camera = API::newOrthographicCamera(Renderer::getAspectRatio());
+	m_camera->setZoomLevel(10.0f);
 	// set camera to edit mode
 	EventHandler::push_event(new WindowToggleFrozenCursorEvent(m_bCameraMode));
 	EventHandler::push_event(new WindowToggleCursorEvent(!m_bCameraMode));
 
-	Renderer2D::init();
-	// --------------- Renderer2D tests ---------------
+	ShaderLibrary::load("../assets/shaders/2D-sandbox/testVBO.glsl");
+	m_shader2D = ShaderLibrary::get("testVBO");
+
+	Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_DYNAMIC_DRAW);
+	vbo->setBufferLayout({
+		{ VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
+		{ VERTEX_ATTRIB_LOCATION_UV, ShaderDataType::Float2, "a_uv" },
+		{ VERTEX_ATTRIB_LOCATION_COLOR, ShaderDataType::Float4, "a_color" }
+	});
+	vbo->setData(nullptr, m_maxQuads * sizeof(vertex) * 4);
+
+	uint32_t indices[m_maxQuads * 6];
+	int offset = 0;
+	for (int i = 0; i < m_maxQuads * 6; i+=6)
+	{
+		indices[i+0] = 0 + offset;
+		indices[i+1] = 1 + offset;
+		indices[i+2] = 2 + offset;
+		
+		indices[i+3] = 2 + offset;
+		indices[i+4] = 3 + offset;
+		indices[i+5] = 0 + offset;
+
+		offset += 4;
+	}
+
+
+	Ref<IndexBuffer> ibo = API::newIndexBuffer(GL_TRIANGLES, GL_DYNAMIC_DRAW);
+	ibo->setData((void*)indices, sizeof(indices) / sizeof(uint32_t));
+
+	m_vao = API::newVertexArray(vbo, ibo);
+
+
+	// =============== Renderer2D tests ===============
 
 
 	// framebuffer
@@ -131,15 +176,13 @@ void layer::onUpdate(float _dt)
 	#ifdef DEBUG_RENDERER_2D
 		Renderer2D::resetStatistics();
 	#endif
-	Renderer2D::beginScene(m_camera);
-	{
-		/* RENDER GEOMETRY */
-		Renderer2D::setShader(m_shader2D);
-		//m_texture->bind();
-		//Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		Renderer2D::renderSprite(glm::vec3(0.0f), glm::vec2(1.1f, 1.1f), m_texture);
-	}
-	Renderer::endScene();
+
+	m_shader2D->enable();
+	m_shader2D->setMatrix4fv("u_view_projection_matrix", m_camera->getViewProjectionMatrix());
+	m_vao->bind();
+	Renderer::drawIndexed(m_maxQuads * 6, true, GL_TRIANGLES);
+
+
 	// -- END OF SCENE -- //
 
 
@@ -149,10 +192,15 @@ void layer::onUpdate(float _dt)
 	// Text rendering 
 	// TODO: all text rendering should go into an overlay layer.
 	m_font->beginRenderBlock();
-	m_font->addString(2.0f, fontHeight * 1, "fps=%.0f  VSYNC=%s", TimeStep::getFPS(), Application::get().getWindow().isVSYNCenabled() ? "ON" : "OFF");
+	int i = 1;
+	m_font->addString(2.0f, fontHeight * i++, "fps=%.0f  VSYNC=%s", TimeStep::getFPS(), Application::get().getWindow().isVSYNCenabled() ? "ON" : "OFF");
 	glm::vec3 camPos = m_camera->getPosition();
 	float camTheta = m_camera->getTheta();
-	m_font->addString(2.0f, fontHeight * 2, "camera [ %.1f  %.1f ], theta [ %.1f ]", camPos.x, camPos.y, camTheta);
+	m_font->addString(2.0f, fontHeight * i++, 
+					  "camera [ %.1f  %.1f ]  theta: %.1f   zoom: %.1f", 
+					  camPos.x, camPos.y, 
+					  m_camera->getTheta(), m_camera->getZoomLevel());
+	m_font->addString(2.0f, fontHeight * i++, "sprites: %d", m_quadOffset);
 	#ifdef DEBUG_RENDERER_2D
 		m_font->addString(2.0f, fontHeight * 3, "draw calls: %d", Renderer2D::getStatistics().drawCalls);
 		m_font->addString(2.0f, fontHeight * 4, "sprites:    %d", Renderer2D::getStatistics().spriteCount);
@@ -363,5 +411,39 @@ void layer::onImGuiRender()
 //---------------------------------------------------------------------------------------
 void layer::handleInput(float _dt)
 {
+	if (InputManager::is_button_pressed(SYN_MOUSE_BUTTON_1))
+	{
+		glm::vec2 m = InputManager::get_mouse_position();
+		glm::vec2 vp = Renderer::getViewportF();
+		glm::vec2 cpos = m_camera->getPosition();
+		auto bounds = m_camera->getBounds();
+		static glm::vec2 vpPos = Renderer::getViewportPos();
+		m -= Renderer::getImGuiViewportOffset();
+
+		m.x = (m.x / vp.x) * bounds.getWidth() - bounds.getWidth() * 0.5f;
+		m.y = bounds.getHeight() * 0.5f - (m.y / vp.y) * bounds.getHeight();
+
+		glm::vec3 clickPos = { m.x + cpos.x, m.y + cpos.y, 0.0f };
+		int nNewQuads = 20;
+		vertex vertices[nNewQuads * 4];
+		for (int i = 0; i < nNewQuads; i++)
+		{
+			glm::vec3 r = glm::vec3(Random::rfloat()-0.5f, Random::rfloat()-0.5f, Random::rfloat()-0.5f) * 4.0f;
+
+			vertices[i*4+0] = { glm::vec3(-0.5f, -0.5f,  0.5f) + clickPos + r, glm::vec2(0.0f, 0.0f), glm::vec4(0.83f, 0.79f, 0.18f, 1.0f) };
+			vertices[i*4+1] = { glm::vec3( 0.5f, -0.5f,  0.5f) + clickPos + r, glm::vec2(1.0f, 0.0f), glm::vec4(0.83f, 0.79f, 0.18f, 1.0f) };
+			vertices[i*4+2] = { glm::vec3( 0.5f,  0.5f,  0.5f) + clickPos + r, glm::vec2(1.0f, 1.0f), glm::vec4(0.83f, 0.79f, 0.18f, 1.0f) };
+			vertices[i*4+3] = { glm::vec3(-0.5f,  0.5f,  0.5f) + clickPos + r, glm::vec2(0.0f, 1.0f), glm::vec4(0.83f, 0.79f, 0.18f, 1.0f) };
+		}
+
+		Ref<VertexBuffer> vbo = m_vao->getVertexBuffer();
+		vbo->bind();
+		vbo->addSubData((void*)vertices, sizeof(vertices), m_quadOffset * (sizeof(vertex) * 4));
+		vbo->unbind();
+		Renderer::get().executeRenderCommands();
+		m_quadOffset = (m_quadOffset + nNewQuads) % m_maxQuads;
+
+		
+	}	
 }
 

@@ -20,9 +20,11 @@ int main(int argc, char* argv[])
 	Log::open("./log.txt");
 	Log::output_new_line(true);
 
-	AABB aabb = { { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } };
-	Log::debug_vector("", "min", aabb.min);
-	Log::debug_vector("", "max", aabb.max);
+	cout << "sizeof(VertexArray) = " << sizeof(VertexArray) << "\n";
+	cout << "sizeof(IndexBuffer) = " << sizeof(IndexBuffer) << "\n";
+	cout << "sizeof(VertexBuffer) = " << sizeof(VertexBuffer) << "\n";
+	cout << "sizeof(Framebuffer) = " << sizeof(Framebuffer) << "\n";
+	
 
 	Log::close();
 

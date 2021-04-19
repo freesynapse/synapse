@@ -31,7 +31,7 @@ public:
 	bool m_bCameraMode = true;	// if true, starts in camera move mode, contrasted to edit mode
 
 	Ref<Shader> m_shader = nullptr;
-	Ref<MeshShape> m_quad;
+	Ref<VertexArray> m_vao;
 
 	// flags
 	bool m_wireframeMode = false;
@@ -68,21 +68,59 @@ void layer::onAttach()
 
 	// load camera
 	m_camera = API::newPerspectiveCamera(glm::perspectiveFov(glm::radians(45.0f), SCREEN_WIDTH_F, SCREEN_HEIGHT_F, 0.1f, 1000.0f));
-	m_camera->setPosition({ -2.5f, 3.0f, 2.5f });
-	m_camera->setYAngle(45.0f);
-	m_camera->setXAngle(45.0f);
+	m_camera->setPosition({ 0.0f, 0.0f, 5.0f });
+	m_camera->setYAngle(0.0f);
+	m_camera->setXAngle(0.0f);
 	EventHandler::push_event(new WindowToggleFrozenCursorEvent(m_bCameraMode));
 	EventHandler::push_event(new WindowToggleCursorEvent(!m_bCameraMode));
 
-	// --------------- 3D tests ---------------
+	// =============== 3D tests ===============
 
-	m_quad = MeshCreator::createShapeCube(glm::vec3(0.0f, 0.5f, 0.0f), 0.5f, MESH_ATTRIB_POSITION | MESH_ATTRIB_NORMAL | MESH_ATTRIB_UV);
-	//ShaderLibrary::load("../assets/shaders/3D-sandbox/testGridShader.glsl");
-	ShaderLibrary::load("../assets/shaders/3D-sandbox/uvShader.glsl");
-	m_shader = ShaderLibrary::get("uvShader");
-	MeshCreator::createDebugPlane(glm::vec3(0.0f), 41, "debug_plane");
+	ShaderLibrary::load("../assets/shaders/3D-sandbox/testVBO.glsl");
+	m_shader = ShaderLibrary::get("testVBO");
 
-	// --------------- 3D tests ---------------
+	struct vertex 
+	{ 
+		glm::vec3 position;
+		glm::vec2 uv;
+		glm::vec4 color;
+		vertex() {}
+		vertex(glm::vec3 _p, glm::vec2 _uv, glm::vec4 _c) :
+			position(_p), uv(_uv), color(_c) {}
+	};
+	float vdata[] = 
+	{
+		-1.5f, -0.5f,  0.5f,   0.0f, 0.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		-0.5f, -0.5f,  0.5f,   1.0f, 0.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		-0.5f,  0.5f,  0.5f,   0.0f, 1.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		-1.5f,  0.5f,  0.5f,   1.0f, 1.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		 0.5f, -0.5f,  0.5f,   0.0f, 0.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		 1.5f, -0.5f,  0.5f,   1.0f, 0.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		 1.5f,  0.5f,  0.5f,   0.0f, 1.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+		 0.5f,  0.5f,  0.5f,   1.0f, 1.0f,   0.83f, 0.79f, 0.18f, 1.0f,
+	};
+
+	uint32_t indices[] = 
+	{
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4
+	};
+
+	Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_DYNAMIC_DRAW);
+	vbo->setBufferLayout({
+		{ VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
+		{ VERTEX_ATTRIB_LOCATION_UV, ShaderDataType::Float2, "a_uv" },
+		{ VERTEX_ATTRIB_LOCATION_COLOR, ShaderDataType::Float4, "a_color" }
+	});
+	vbo->setData((void*)vdata, sizeof(vdata));
+
+	Ref<IndexBuffer> ibo = API::newIndexBuffer(GL_TRIANGLES, GL_DYNAMIC_DRAW);
+	ibo->setData((void*)indices, sizeof(indices) / sizeof(uint32_t));
+
+	m_vao = API::newVertexArray(vbo, ibo);
+
+
+	// =============== 3D tests ===============
 
 
 	// framebuffer
@@ -129,8 +167,10 @@ void layer::onUpdate(float _dt)
 
 	m_shader->enable();
 	m_shader->setMatrix4fv("u_view_projection_matrix", m_camera->getViewProjectionMatrix());
-	m_quad->render(m_shader);
-	//Renderer::debugNormals(m_quad, m_camera);
+
+	m_vao->bind();
+	Renderer::drawIndexed(12, true, GL_TRIANGLES);
+
 	MeshCreator::renderDebugMeshes(m_camera);
 
 

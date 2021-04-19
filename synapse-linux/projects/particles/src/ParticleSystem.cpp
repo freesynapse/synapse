@@ -13,25 +13,16 @@
 
 namespace Syn
 {
-    ParticleSystem::ParticleSystem(uint32_t _count) :
-        m_particleCount(_count)
-    {
-        m_particlePool.resize(m_particleCount);
-        m_poolIndex = m_particleCount - 1;
-
-        m_texture = API::newTexture2D("../assets/textures/particle.png");
-
-    }
-
-    //-----------------------------------------------------------------------------------
-    void ParticleSystem::onUpdate(float _dt)
+    
+    void ParticleSystemBase::onUpdate(float _dt)
     {
         SYN_PROFILE_FUNCTION();
 
         m_activeParticleCount = m_particleCount;
 
-        for (auto& particle : m_particlePool)
+        for (uint32_t i = 0; i < m_particleCount; i++)
         {
+            Particle& particle = m_particlePool[i];
             if (!particle.active)
             {
                 m_activeParticleCount--;
@@ -52,9 +43,48 @@ namespace Syn
         }
     }
 
+    //-----------------------------------------------------------------------------------
+    void ParticleSystemBase::emit(const ParticleProps& _particle_props)
+    {
+        Particle& particle = m_particlePool[m_poolIndex];
+        particle.active = true;
+        particle.position = _particle_props.position;
+        particle.rotation = Random::rfloat() * 2.0f * glm::pi<float>();
+
+        particle.velocity = _particle_props.velocity;
+        particle.velocity.x += _particle_props.velocityVariation.x * (Random::rfloat() - 0.5f);
+        particle.velocity.y += _particle_props.velocityVariation.y * (Random::rfloat() - 0.5f);
+
+        particle.colorBegin = _particle_props.colorBegin;
+        particle.colorEnd = _particle_props.colorEnd;
+
+        particle.lifeTime = _particle_props.lifeTime;
+        particle.lifeRemaining = _particle_props.lifeTime;
+        particle.sizeBegin = _particle_props.sizeBegin + _particle_props.sizeVariation * (Random::rfloat() - 0.5f);
+        particle.sizeEnd = _particle_props.sizeEnd;
+
+        m_poolIndex = (++m_poolIndex) % m_particleCount;
+        //m_poolIndex = --m_poolIndex % m_particleCount; ==> This doesn't work when decreasing.
+        //m_poolIndex--;
+        //if (m_poolIndex == 0)   
+        //    m_poolIndex = m_particleCount-1;
+    }
+
 
     //-----------------------------------------------------------------------------------
-    void ParticleSystem::onRender(const Ref<Camera>& _camera, const Ref<Shader>& _shader)
+    // NAIVE PARTICLE RENDERING
+    //
+    ParticleSystemNaive::ParticleSystemNaive(uint32_t _count)
+    {
+        SYN_CORE_TRACE("Naive rendering system with ", m_particleCount, " particles.");
+
+        m_particleCount = _count;
+        m_particlePool = new Particle[m_particleCount];
+        m_poolIndex = 0;
+    }
+
+    //-----------------------------------------------------------------------------------
+    void ParticleSystemNaive::onRender(const Ref<Camera>& _camera, const Ref<Shader>& _shader)
     {
         SYN_PROFILE_FUNCTION();
 
@@ -83,16 +113,15 @@ namespace Syn
         _shader->enable();
         _shader->setMatrix4fv("u_view_projection_matrix", _camera->getViewProjectionMatrix());
         
-        m_texture->bind();
-        _shader->setUniform1i("u_sampler", 0);
-
-        for (auto& particle : m_particlePool)
+        for (uint32_t i = 0; i < m_particleCount; i++)
         {
+            Particle& particle = m_particlePool[i];
             float life = particle.lifeRemaining / particle.lifeTime;
             glm::vec4 color = glm::lerp(particle.colorEnd, particle.colorBegin, life);
             color.a = color.a * life;
 
             float size = glm::lerp(particle.sizeEnd, particle.sizeBegin, life);
+            float alive = (float)((particle.lifeRemaining >= 0) && (particle.active));
             
             // create model matrix
             glm::mat4 model = glm::translate(glm::mat4(1.0f), { particle.position.x, particle.position.y, 0.0f }) *
@@ -100,36 +129,14 @@ namespace Syn
                               glm::scale(glm::mat4(1.0f), { size, size, 0.0f });
             _shader->setMatrix4fv("u_model_matrix", model);
             _shader->setUniform4fv("u_color", color);
+            _shader->setUniform1f("u_alive", alive);
+            _shader->setUniform1f("u_size", size);
+
             m_vao->bind();
             Renderer::drawArrays(4, 0, true, GL_TRIANGLE_STRIP);
+    
         }
-    }
-
-
-    //-----------------------------------------------------------------------------------
-    void ParticleSystem::emit(const ParticleProps& _particle_props)
-    {
-        Particle& particle = m_particlePool[m_poolIndex];
-        particle.active = true;
-        particle.position = _particle_props.position;
-        particle.rotation = Random::rfloat() * 2.0f * glm::pi<float>();
-
-        particle.velocity = _particle_props.velocity;
-        particle.velocity.x += _particle_props.velocityVariation.x * (Random::rfloat() - 0.5f);
-        particle.velocity.y += _particle_props.velocityVariation.y * (Random::rfloat() - 0.5f);
-
-        particle.colorBegin = _particle_props.colorBegin;
-        particle.colorEnd = _particle_props.colorEnd;
-
-        particle.lifeTime = _particle_props.lifeTime;
-        particle.lifeRemaining = _particle_props.lifeTime;
-        particle.sizeBegin = _particle_props.sizeBegin + _particle_props.sizeVariation * (Random::rfloat() - 0.5f);
-        particle.sizeEnd = _particle_props.sizeEnd;
-
-        //m_poolIndex = --m_poolIndex % m_particleCount; ==> This doesn't work when decreasing.
-        m_poolIndex--;
-        if (m_poolIndex == 0)   
-            m_poolIndex = m_particleCount-1;
+        Renderer::get().executeRenderCommands();
     }
 
 }

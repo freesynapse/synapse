@@ -4,6 +4,7 @@
 
 #include "ParticleSystem.hpp"
 
+
 using namespace Syn;
 
 class layer : public Layer
@@ -23,13 +24,18 @@ public:
 public:
 	// standard objects
 	Ref<Font> m_font = nullptr;
-	Ref<Framebuffer> m_fboRender = nullptr;
+	Ref<Framebuffer> m_renderBuffer = nullptr;
 	
 	Ref<OrthographicCamera> m_camera = nullptr;
 	bool m_bCameraMode = false;	// if true, starts in camera move mode, contrasted to edit mode
 
-	ParticleSystem m_particleSystem = ParticleSystem(2000);
-	Ref<Shader> m_particleShader;
+	int n = 10000;
+	//ParticleSystemNaive m_particlesSystem = ParticleSystemNaive(n);
+	ParticleSystemBatched m_particlesSystem = ParticleSystemBatched(n);
+	
+	Ref<Shader> m_particleShader = nullptr;
+	
+	uint32_t m_newPerUpdate = 100;
 	ParticleProps m_props;
 
 	// flags
@@ -77,12 +83,14 @@ void layer::onAttach()
 
 
 	// the default rendered scene framebuffer, for hand-off to ImGui for rendering
-	m_fboRender = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
+	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
 
 
 	// initalize graph object
-	ShaderLibrary::load("../assets/shaders/particles/testShader.glsl");
-	m_particleShader = ShaderLibrary::get("testShader");
+	ShaderLibrary::load("../assets/shaders/particles/particleShader.glsl");
+	ShaderLibrary::load("../assets/shaders/particles/batchParticleShader.glsl");
+	//m_particleShader = ShaderLibrary::get("particleShader");
+	m_particleShader = ShaderLibrary::get("batchParticleShader");
 	m_props.colorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
 	m_props.colorEnd = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
 	m_props.sizeBegin = 0.5f;
@@ -122,7 +130,7 @@ void layer::onUpdate(float _dt)
 	m_camera->onUpdate(_dt);
 
 	// bind presenting framebuffer
-	m_fboRender->bind();
+	m_renderBuffer->bind();
 
 	// toggle wireframe
 	if (m_wireframeMode) Renderer::enableWireFrame();
@@ -135,14 +143,14 @@ void layer::onUpdate(float _dt)
 	
 	MeshCreator::renderDebugMeshes(m_camera, false);
 	
-	m_particleSystem.onUpdate(_dt);
-	m_particleSystem.onRender(m_camera, m_particleShader);
+	m_particlesSystem.onUpdate(_dt);
+	m_particlesSystem.onRender(m_camera, m_particleShader);
 
 	// -- END OF SCENE -- //
 
 
 	// bind render buffer for text output
-	m_fboRender->bind();
+	m_renderBuffer->bind();
 
 	// toggle wireframe (back)
 	if (m_wireframeMode) Renderer::disableWireFrame();
@@ -156,12 +164,12 @@ void layer::onUpdate(float _dt)
 	m_font->addString(2.0f, fontHeight * ++i, 
 					  "camera [ %.1f  %.1f ] zoom=%.1f", 
 					  camPos.x, camPos.y, m_camera->getZoomLevel());
-	m_font->addString(2.0f, fontHeight * ++i, "particles: %d", m_particleSystem.getActiveParticleCount());
+	m_font->addString(2.0f, fontHeight * ++i, "particles: %d", m_particlesSystem.getActiveParticleCount());
 	m_font->endRenderBlock();
 
 
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
-	m_fboRender->bindDefaultFramebuffer();
+	m_renderBuffer->bindDefaultFramebuffer();
 
 	//EventHandler::push_event(new WindowCloseEvent());
 }
@@ -199,7 +207,7 @@ void layer::onKeyDownEvent(Event* _e)
 			break;
 
 		case SYN_KEY_V:
-			m_fboRender->saveAsPNG();
+			m_renderBuffer->saveAsPNG();
 			break;
 
 		case SYN_KEY_ESCAPE:
@@ -265,10 +273,10 @@ void layer::handleInput(float _dt)
 		m.x = (m.x / vp.x) * bounds.getWidth() - bounds.getWidth() * 0.5f;
 		m.y = bounds.getHeight() * 0.5f - (m.y / vp.y) * bounds.getHeight();
 		m_props.position = { m.x + cpos.x, m.y + cpos.y };
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < m_newPerUpdate; i++)
 		{
 			m_props.velocityVariation = { Random::rfloat()*10.0f, Random::rfloat()*10.0f };
-			m_particleSystem.emit(m_props);
+			m_particlesSystem.emit(m_props);
 		}
 	}	
 }
@@ -373,7 +381,7 @@ void layer::onImGuiRender()
 	}
 
 	// direct ImGui to the framebuffer texture
-	ImGui::Image((void*)m_fboRender->getColorAttachmentIDn(0), viewportSize, { 0, 1 }, { 1, 0 });
+	ImGui::Image((void*)m_renderBuffer->getColorAttachmentIDn(0), viewportSize, { 0, 1 }, { 1, 0 });
 
 	ImGui::End();
 	ImGui::PopStyleVar();
