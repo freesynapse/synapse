@@ -1,3 +1,4 @@
+
 #pragma once
 
 
@@ -20,6 +21,11 @@ int main(int argc, char* argv[])
 	Syn::Log::open("./log.txt");
 	Syn::Log::output_new_line(true);
 	SYN_CORE_TRACE("logging enabled.");
+
+	// total memory tracking
+	#ifdef DEBUG_MEMORY_TOTAL
+		Syn::ProcessInfo::initialize();
+	#endif
 
 	// init profiling
 	#ifdef DEBUG_PROFILING
@@ -52,8 +58,11 @@ int main(int argc, char* argv[])
 	auto app = CreateSynapseApplication();
 	app->run();
 
-	delete app;
 
+	// stop application
+	//
+	delete app;
+	
 
 	// shutdown core modules
 	//
@@ -65,13 +74,6 @@ int main(int argc, char* argv[])
 	#ifdef DEBUG_PROFILING
 		Syn::Profiler::get().endSession();
 	#endif
-
-
-	#ifdef DEBUG_MEMORY_ALLOC
-		SYN_CORE_TRACE(Syn::memory_log::print_alloc_all(false, false));
-	#endif
-	Syn::memory_log::print_alloc_all(false, true);
-
 
 	SYN_CORE_TRACE("closing log.");
 	Syn::Log::close();

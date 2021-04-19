@@ -12,7 +12,7 @@
 //#include "Synapse/SynapseMain.hpp"
 
 #include "Synapse/API/Window.hpp"
-#include "Synapse/API/SynapseOpenGLBindings.hpp"
+#include "Synapse/API/OpenGLBindings.hpp"
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
@@ -35,6 +35,7 @@
 #include "Synapse/Utils/Timer/TimeStep.hpp"
 #include "Synapse/Utils/Noise/Noise.hpp"
 #include "Synapse/Utils/Noise/NoiseGenerator.hpp"
+#include "Synapse/Utils/Random/Random.hpp"
 
 #include "Synapse/Renderer/Renderer.hpp"
 #include "Synapse/Renderer/RenderCommandQueue.hpp"

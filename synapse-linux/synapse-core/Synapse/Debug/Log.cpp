@@ -47,10 +47,10 @@ namespace Syn
 
 		// initialize colors
 		#ifdef _WIN64
-		m_consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		CONSOLE_SCREEN_BUFFER_INFO info;
-		GetConsoleScreenBufferInfo(m_consoleHandle, &info);
-		m_colorNormal = info.wAttributes;
+			m_consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+			CONSOLE_SCREEN_BUFFER_INFO info;
+			GetConsoleScreenBufferInfo(m_consoleHandle, &info);
+			m_colorNormal = info.wAttributes;
 		#endif
 
 	}
@@ -59,8 +59,8 @@ namespace Syn
 	//-----------------------------------------------------------------------------------
 	void Log::close()
 	{
-		*m_logFile << "[" << Time::current_time() << "] " << "application terminated : " 
-				   << s_errorCount << " error(s); " << s_warningCount << " warning(s)." 
+		*m_logFile << ">>>> Application terminated : " 
+				   << s_errorCount << " error(s); " << s_warningCount << " warning(s). <<<<" 
 				   << std::endl;
 		m_logFile->flush();
 		m_logFile->close();

@@ -18,6 +18,7 @@ namespace Syn {
 		static void load(const std::string& _file_path);
 		static void load(const std::string& _name, const std::string& _file_path);
 		static void reload(const std::string& _name);
+		static void reload(const Ref<Shader>& _shader);
 
 		// accessors
 		static inline Ref<Shader> getDefaultInstance() 

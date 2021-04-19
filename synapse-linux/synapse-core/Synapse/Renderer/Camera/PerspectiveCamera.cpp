@@ -17,7 +17,7 @@ namespace Syn {
 		m_xAngle = 0.0f;
 		m_yAngle = 0.0f;
 		m_prevMousePosition = glm::vec2(0.0f);
-		m_position = glm::vec3(0.0f, 20.0f, 130.0f);
+		//m_position = glm::vec3(0.0f, 20.0f, 130.0f);
 
 		// register for viewport resize events
 		EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(PerspectiveCamera::onEvent));
@@ -56,6 +56,7 @@ namespace Syn {
 		// handle change of viewport -- for now the only event handled
 		
 		ViewportResizeEvent* resizeEvent;// = dynamic_cast<ViewportResizeEvent*>(_e);
+		WindowToggleFrozenCursorEvent* frozenCursorEvent;
 
 		switch (_e->getEventType())
 		{
@@ -71,7 +72,32 @@ namespace Syn {
 
 			case EventType::WINDOW_TOGGLE_FROZEN_CURSOR:
 			{
-				updateProjectionMatrix();
+				static glm::vec3 currentPos;
+				static float currentXAngle, currentYAngle;
+				frozenCursorEvent = dynamic_cast<WindowToggleFrozenCursorEvent*>(_e);
+				
+				// toggle == false -> going into editor mode
+				if (frozenCursorEvent->getState() == true)
+				{
+					//currentPos = m_position;
+					//currentXAngle = m_xAngle;
+					//currentXAngle = m_yAngle;
+					updateViewMatrix();
+				}
+				// toggle == true -> going into camera mode
+				else
+				{
+					//m_position = currentPos;
+					//m_xAngle = currentXAngle;
+					//m_yAngle = currentYAngle;
+					updateViewMatrix();
+				}
+				
+				//SYN_CORE_TRACE("frozen cursor toggle = ", toggle ? "TRUE" : "FALSE");
+				// TODO: add code to prevent camera from moving when in editor mode
+				//
+				//updateProjectionMatrix();
+
 				break;
 			}
 
@@ -91,17 +117,17 @@ namespace Syn {
 		
 		// update position
 		if (InputManager::is_key_pressed(SYN_KEY_D))
-			m_position += m_right * CAMERA_MOVESPEED * _dt;
+			m_position += m_right * m_moveSpeed * _dt;
 		else if (InputManager::is_key_pressed(SYN_KEY_A))
-			m_position -= m_right * CAMERA_MOVESPEED * _dt;
+			m_position -= m_right * m_moveSpeed * _dt;
 		if (InputManager::is_key_pressed(SYN_KEY_SPACE))
-			m_position += glm::vec3(0.0f, 1.0f, 0.0f) * CAMERA_MOVESPEED * _dt;
+			m_position += glm::vec3(0.0f, 1.0f, 0.0f) * m_moveSpeed * _dt;
 		else if (InputManager::is_key_pressed(SYN_KEY_LEFT_SHIFT))
-			m_position -= glm::vec3(0.0f, 1.0f, 0.0f) * CAMERA_MOVESPEED * _dt;
+			m_position -= glm::vec3(0.0f, 1.0f, 0.0f) * m_moveSpeed * _dt;
 		if (InputManager::is_key_pressed(SYN_KEY_W))
-			m_position += m_forward * CAMERA_MOVESPEED * _dt;
+			m_position += m_forward * m_moveSpeed * _dt;
 		else if (InputManager::is_key_pressed(SYN_KEY_S))
-			m_position -= m_forward * CAMERA_MOVESPEED * _dt;
+			m_position -= m_forward * m_moveSpeed * _dt;
 
 		// update look-at angles
 		glm::vec2 mousePosition = InputManager::get_mouse_position();
@@ -116,7 +142,7 @@ namespace Syn {
 			glm::vec2 half_vp = Renderer::getViewportF() * 0.5f;
 			glm::vec2 delta = glm::vec2(floor(half_vp.x), floor(half_vp.y)) - mousePosition;
 			m_delta = delta;
-			delta *= CAMERA_LOOKAT_SPEED * _dt;
+			delta *= m_lookatSpeed * _dt;
 			m_xAngle -= delta.x;// *m_aspectRatio;
 			m_yAngle -= delta.y;
 			// clamp angles

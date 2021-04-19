@@ -171,7 +171,11 @@ namespace Syn {
 	Shader::~Shader()
 	{
 		if (m_shaderID)
-			glDeleteProgram(m_shaderID);
+		{
+			SYN_RENDER_S0({
+				glDeleteProgram(self->m_shaderID);
+			});
+		}
 	}
 
 
@@ -186,7 +190,7 @@ namespace Syn {
 		int result = FileIOHandler::read_file_to_buffer(m_assetPath, src);
 		if (result != RETURN_SUCCESS)
 		{
-			SYN_CORE_WARNING("shader not loaded, could not open file '", m_assetPath, "'.");
+			SYN_CORE_TRACE("shader not loaded, could not open file '", m_assetPath, "'.");
 			return;
 		}
 
@@ -476,6 +480,13 @@ namespace Syn {
 	{
 		SYN_RENDER_S2(_location, _f, {
 			glUniform1f(_location, _f);
+		});
+	}
+
+	void Shader::setUniform2iv(const GLint& _location, const glm::ivec2& _v) 
+	{
+		SYN_RENDER_S2(_location, _v, {
+			glUniform2iv(_location, 1, (GLint*)(&_v));
 		});
 	}
 

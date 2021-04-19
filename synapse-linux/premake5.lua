@@ -30,7 +30,7 @@ workspace "Synapse"
     filter "configurations:Release"
         defines "NDEBUG"
         --optimize "On" --> -O2
-        optimize "Speed"
+        optimize "Speed" -- --> -O3
 
     -- reset filter
     filter { }
@@ -65,6 +65,14 @@ LibDirs["libpng"] = "%{wks.location}/../libraries/libpng/lib"
 
 -- projects included in this workspace -- inheriting globals from this file
 include "synapse-core"
-include "renderer2D-sandbox"
-include "smoke-sim"
-include "core-tests"
+--include "./projects/2D-sandbox"
+--include "./projects/3D-sandbox"
+include "./projects/core-tests"
+--include "./projects/fluid-sim"
+--include "./projects/graph-visualization"
+--include "./projects/smoke-sim"
+--include "./projects/bloom-filter"
+--include "./projects/shader-toy"
+--include "./projects/particles"
+include "./projects/graph-tests"
+include "./projects/calling-python3"

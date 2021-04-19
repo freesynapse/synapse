@@ -39,6 +39,10 @@ namespace Syn {
 		glm::vec2 m_prevMousePosition = glm::vec2(0.0f);
 		glm::vec2 m_delta = glm::vec2(0.0f);
 
+		float m_moveSpeed = 15.0f;
+		float m_zoomSpeed = 5.0f;
+		float m_lookatSpeed = 5.5f;
+
 		float m_xAngle = 0.0f;
 		float m_yAngle = 0.0f;
 

@@ -118,24 +118,23 @@ inline uint32_t get_uint32_t_from_uint8_t_3(uint8_t x, uint8_t y, uint8_t z)
 namespace Syn {
 
 
-	struct Vertex
+	class VertexBase
 	{
+	public:
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec3 tangent;
 		glm::vec3 bitangent;
 		glm::vec2 uv;
 
-		Vertex() :
+		VertexBase() :
 			position(glm::vec4(0.0f)),
 			normal(glm::vec3(0.0f)),
 			tangent(glm::vec3(0.0f)),
 			bitangent(glm::vec3(0.0f)),
 			uv(glm::vec2(0.0f))
 		{}
-
 	};
-
 
 	//
 	struct Index
@@ -155,6 +154,9 @@ namespace Syn {
 			min(glm::vec3(std::numeric_limits<float>::max())),
 			max(glm::vec3(std::numeric_limits<float>::lowest()))
 		{}
+		AABB(const glm::vec3& _min, const glm::vec3& _max) :
+			min(_min), max(_max)
+		{}
 
 		void print(const char* _func="", const char* _msg="AABB")
 		{
@@ -168,14 +170,14 @@ namespace Syn {
 	//
 	struct Voxel
 	{
-		/* high 3 bits contain ambient occlusion data (0-2)
-		 * next 5 bits are flags (4-8)
-		 * low 8 bits contain type (24-31)
-		 *
-		 * 0b 1111 1111 0000 0000 0000 0000 1111 1111 
-		 *    ---  ------                   ---------
-		 *    AO   flags                      type
-		 */
+		// high 3 bits contain ambient occlusion data (0-2)
+		// next 5 bits are flags (4-8)
+		// low 8 bits contain type (24-31)
+		//
+		// 0b 1111 1111 0000 0000 0000 0000 1111 1111 
+		//    ---  ------                   ---------
+		//    AO   flags                      type
+		// 
 		Voxel() : data(0) {}
 		Voxel(uint32_t _data) : data(_data) {}
 

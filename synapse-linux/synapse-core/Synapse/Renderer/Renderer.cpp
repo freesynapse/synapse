@@ -2,6 +2,8 @@
 
 #include "pch.hpp"
 
+#include <string>
+
 #include "Synapse/Renderer/Renderer.hpp"
 
 #include "Synapse/Debug/Error.hpp"
@@ -10,21 +12,32 @@
 #include "Synapse/Renderer/Shader/ShaderLibrary.hpp"
 #include "Synapse/Event/EventHandler.hpp"
 
+#include "Synapse/External/imgui/imgui.h"
+#include "Synapse/External/imgui/imgui_internal.h"
+
 
 namespace Syn {
 
 
 	// declaration of static members
-	Ref<Camera> Renderer::s_camera = nullptr;
-	glm::mat4 Renderer::s_viewProjectionMatrix = glm::mat4(1.0f);
-	Renderer* Renderer::s_instance;
-	glm::ivec2 Renderer::s_viewport = glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT);
-	Ref<Shader> Renderer::s_normalShader = nullptr;
-	Ref<Shader> Renderer::s_tangentShader = nullptr;
-	Ref<Shader> Renderer::s_bitangentShader = nullptr;
-	bool Renderer::s_hasNormalShader = false;
-	bool Renderer::s_hasTangentShader = false;
-	bool Renderer::s_hasBitangentShader = false;
+	Ref<Camera> Renderer::s_camera 				= nullptr;
+	glm::mat4 Renderer::s_viewProjectionMatrix 	= glm::mat4(1.0f);
+	Renderer* Renderer::s_instance  			= nullptr;
+	glm::ivec2 Renderer::s_viewport 			= glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glm::ivec2 Renderer::s_imGuiViewportPos		= glm::ivec2(0);
+	glm::ivec2 Renderer::s_imGuiDockPos			= glm::ivec2(0);
+	glm::ivec2 Renderer::s_imGuiWinPos			= glm::ivec2(0);
+	glm::ivec2 Renderer::s_imGuiViewportOffset	= glm::ivec2(0);
+	std::string Renderer::s_imGuiRendererName 	= "synapse-core::renderer";
+
+	glm::vec4 Renderer::s_clearColor			= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	Ref<Shader> Renderer::s_normalShader 		= nullptr;
+	Ref<Shader> Renderer::s_tangentShader 		= nullptr;
+	Ref<Shader> Renderer::s_bitangentShader 	= nullptr;
+	bool Renderer::s_hasNormalShader 			= false;
+	bool Renderer::s_hasTangentShader 			= false;
+	bool Renderer::s_hasBitangentShader 		= false;
 
 
 	//-----------------------------------------------------------------------------------
@@ -109,6 +122,85 @@ namespace Syn {
 
 		// initialize and register debug shaders
 		setupDebugShaders();
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void Renderer::initImGui()
+	{
+		// find the viewport specified in the apps ImGui.ini (if present)
+		std::ifstream fs("./imgui.ini", std::ios::in);
+		if (!fs)
+		{
+			SYN_CORE_WARNING("no ImGui configuration file found.");
+			return;
+		}
+
+		// read the preset viewport for the renderer in config file
+		// under 
+		// [Window][synapse-core::renderer]
+		// Pos=0,22
+		// Size=1528,1031
+		// Collapsed=0
+		// DockId=0x00000001,0
+		//
+		// Both Pos and Size are needed:
+		// the viewport size = (size.x - pos.x, size.y - pos.y).
+		//
+
+		fs.seekg(0);
+		std::string section = "[Window][" + s_imGuiRendererName + "]";
+		std::string line;
+		std::string pos, size;
+		glm::ivec2 vpos, vsize;
+		while (std::getline(fs, line))
+		{
+			// compare for correct section
+			if (section.compare(0, section.size(), line) == 0)
+			{
+				// find Pos and Size and get values into vectors
+				//
+				std::getline(fs, pos);
+				pos = pos.substr(pos.find('=')+1);
+				vpos.x = std::stoi(pos.substr(0, pos.find(',')));
+				vpos.y = std::stoi(pos.substr(pos.find(',')+1));
+
+				//
+				std::getline(fs, size);
+				size = size.substr(size.find('=')+1);
+				vsize.x = std::stoi(size.substr(0, size.find(',')));
+				vsize.y = std::stoi(size.substr(size.find(',')+1));
+
+				break;
+			}
+		}
+
+		fs.seekg(0);
+		section = "[Docking][Data]";
+		std::string dockLine;
+		glm::ivec2 dockPos(0);
+		while (std::getline(fs, line))
+		{
+			if (section.compare(0, section.size(), line) == 0)
+			{
+				std::getline(fs, dockLine);
+				dockLine = dockLine.substr(dockLine.find("Pos=")+4);
+				dockPos.x = std::stoi(dockLine.substr(0, dockLine.find(',')));
+				dockPos.y = std::stoi(dockLine.substr(dockLine.find(',')+1));
+			}
+		}
+
+		// set all the things we found!
+		s_viewport.x = vsize.x - vpos.x;
+		s_viewport.y = vsize.y - vpos.y;
+		s_imGuiViewportPos = vpos;
+
+		s_imGuiDockPos = dockPos;
+
+		SYN_CORE_TRACE("ImGui docker pos (", s_imGuiDockPos.x, ", ", s_imGuiDockPos.y, ")");
+		SYN_CORE_TRACE("ImGui viewport [ ", s_viewport.x, ", ", s_viewport.y, " ]");
+		SYN_CORE_TRACE("ImGui viewport pos (", s_imGuiViewportPos.x, ", ", s_imGuiViewportPos.y, ")");
+
 	}
 
 
@@ -202,11 +294,19 @@ namespace Syn {
 
 	void Renderer::setClearColor(float _r, float _g, float _b, float _a)
 	{
+		s_clearColor = glm::vec4(_r, _g, _b, _a);
 		SYN_RENDER_4(_r, _g, _b, _a, {
 			glClearColor(_r, _g, _b, _a);
 		});
 	}
 
+	void Renderer::setClearColor(const glm::vec4& _color)
+	{
+		s_clearColor = _color;
+		SYN_RENDER_1(_color, {
+			glClearColor(_color.r, _color.g, _color.b, _color.a);
+		});
+	}
 
 	//-----------------------------------------------------------------------------------
 	// viewport
@@ -342,6 +442,33 @@ namespace Syn {
 		});
 	}
 
+	void Renderer::enableBlending()
+	{
+		SYN_RENDER_0({
+			glEnable(GL_BLEND);
+		});
+	}
+
+	void Renderer::disableBlending()
+	{
+		SYN_RENDER_0({
+			glDisable(GL_BLEND);
+		});
+	}
+
+	void Renderer::setBlending(bool _blending)
+	{
+		SYN_RENDER_1(_blending, {
+			if (_blending)
+			{
+				glEnable(GL_BLEND);
+				return;
+			}
+			glDisable(GL_BLEND);
+		});
+	}
+
+
 	void Renderer::enableGLenum(GLenum _gl_enum)
 	{
 		SYN_RENDER_1(_gl_enum, {
@@ -401,8 +528,8 @@ namespace Syn {
 		SYN_RENDER_2(_vertex_array, _depth_test, {
 			if (!_depth_test)
 				glDisable(GL_DEPTH_TEST);
-
-			glDrawElements(_vertex_array->getIndexBuffer()->getPrimitiveType(), 
+			glBindVertexArray(_vertex_array->getArrayID());
+			glDrawElements(_vertex_array->getIndexBuffer()->getPrimitiveType(),
 						   _vertex_array->getIndexCount(), 
 						   GL_UNSIGNED_INT, 
 						   nullptr);

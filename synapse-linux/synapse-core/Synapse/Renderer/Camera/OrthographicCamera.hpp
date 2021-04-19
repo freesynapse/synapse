@@ -6,12 +6,21 @@
 
 namespace Syn {	
 
+	struct OrthographicCameraBounds
+	{
+		float left, right;
+		float bottom, top;
+
+		float getWidth()  { return right - left; }
+		float getHeight() { return top - bottom; }
+	};
+
 
 	class OrthographicCamera : public Camera
 	{
 	public:
 		// default constructor -- with zoom
-		OrthographicCamera(float _aspect_ratio, float _zoom_level=1.0f);
+		OrthographicCamera(float _aspect_ratio, float _zoom_level=10.0f);
 		~OrthographicCamera() {}
 		// don't really know when I'd use this
 		//OrthographicCamera(float _left, float _right, float _bottom, float _top);
@@ -36,14 +45,18 @@ namespace Syn {
 		inline void setZoomLevel(float _zoom_level) { m_zoomLevel = _zoom_level; }
 		inline float getZoomLevel() { return m_zoomLevel; }
 
+		inline const OrthographicCameraBounds& getBounds() const { return m_bounds; }
+
 
 	private:
 
 		float m_theta = 0.0f;
 		float m_zoomLevel = 1.0f;
 
-		const float m_cameraMoveSpeed = 0.003f;
-		const float m_cameraRotationSpeed = 0.2f;
+		OrthographicCameraBounds m_bounds;
+
+		const float m_cameraMoveSpeed = 6.0f;
+		const float m_cameraRotationSpeed = 180.0f;
 
 	};
 

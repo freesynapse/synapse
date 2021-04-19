@@ -37,6 +37,7 @@ namespace Syn {
 		static void release() { delete s_instance; }
 
 		static void initOpenGL();
+		static void initImGui();
 		static void onResizeEvent(Event* _e);
 		static RendererAPICapabilities& getCapabilities()
 		{
@@ -57,7 +58,21 @@ namespace Syn {
 		static glm::mat4& getViewProjectionMatrix() { return s_viewProjectionMatrix; }
 		static inline glm::ivec2& getViewport() { return s_viewport; }
 		static inline glm::vec2 getViewportF() { return glm::vec2(s_viewport.x, s_viewport.y); }
-
+		static inline glm::ivec2& getViewportPos() { return s_imGuiViewportPos; }
+		static inline glm::ivec2& getImGuiDockingPosition() { return s_imGuiDockPos; }
+		static inline glm::ivec2& getImGuiWindowPosition() { return s_imGuiWinPos; }
+		static inline float getAspectRatio() { return static_cast<float>(s_viewport.x) / static_cast<float>(s_viewport.y); }
+		static const std::string& getImGuiRenderTargetName() { return s_imGuiRendererName; }
+		static void getImGuiRenderTargetName(const std::string& _name) { s_imGuiRendererName = _name; }
+		static glm::vec4& getClearColor() { return s_clearColor; }
+		static void setImGuiWindowPosition(const glm::ivec2& _pos) 
+		{ 
+			s_imGuiWinPos = _pos;
+			SYN_CORE_TRACE("ImGui window pos (", s_imGuiWinPos.x, ", ", s_imGuiWinPos.y, ")");
+			s_imGuiViewportOffset = s_imGuiDockPos - s_imGuiWinPos + s_imGuiViewportPos;
+			SYN_CORE_TRACE("ImGui viewport offset (", s_imGuiViewportOffset.x, ", ", s_imGuiViewportOffset.y, ")");
+		}
+		static inline glm::ivec2& getImGuiViewportOffset() { return s_imGuiViewportOffset; }
 		
 		// API calls
 		//
@@ -71,6 +86,7 @@ namespace Syn {
 		static void clearDepthBuffer();
 		static void clear(uint32_t _bitfield);
 		static void setClearColor(float _r, float _g, float _b, float _a);
+		static void setClearColor(const glm::vec4& _color);
 
 		// viewport
 		static void setViewport(const glm::ivec2& _position, const glm::ivec2& _size);
@@ -95,6 +111,11 @@ namespace Syn {
 		static void enableCulling();
 		static void disableCulling();
 		static void setCulling(bool _cull);
+	//-----------------------------------------------------------------------------------
+
+		static void enableBlending();
+		static void disableBlending();
+		static void setBlending(bool _blending);
 
 		static void enableGLenum(GLenum _gl_enum);
 		static void disableGLenum(GLenum _gl_enum);
@@ -141,7 +162,15 @@ namespace Syn {
 		static Renderer* s_instance;
 		static glm::ivec2 s_viewport;
 
+		static glm::ivec2 s_imGuiViewportPos;
+		static glm::ivec2 s_imGuiDockPos;
+		static glm::ivec2 s_imGuiWinPos;
+		static glm::ivec2 s_imGuiViewportOffset;
+		static std::string s_imGuiRendererName;
+
 		RenderCommandQueue m_commandQueue;
+
+		static glm::vec4 s_clearColor;
 
 		static Ref<Shader> s_normalShader;
 		static Ref<Shader> s_tangentShader;

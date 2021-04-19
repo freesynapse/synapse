@@ -1,3 +1,0 @@
->>>> 2020-12-09 : SYNAPSE-CORE <<<<
-[13:13:33] int main(int, char **): logging enabled.
-[13:13:33] static void Syn::EventHandler::init(): listening.

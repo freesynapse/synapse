@@ -24,7 +24,7 @@ namespace Syn {
 		SYN_PROFILE_FUNCTION();
 
 		s_currentTime = (float)glfwGetTime();
-		s_deltaTimeMs = (s_currentTime - s_lastFrameTime) * 1000.0f;
+		s_deltaTimeMs = (s_currentTime - s_lastFrameTime);// * 1000.0f;
 
 		s_lastFrameTime = s_currentTime;
 
@@ -32,9 +32,9 @@ namespace Syn {
 		s_nframes++;
 
 		// update FPS every second
-		if (s_cumulativeTime >= 1000.0f)
+		if (s_cumulativeTime >= 1.0f)//1000.0f)
 		{
-			s_fps = (float)s_nframes / (s_cumulativeTime / 1000.0f);
+			s_fps = (float)s_nframes / (s_cumulativeTime);// / 1000.0f);
 			s_cumulativeTime = 0.0f;
 			s_nframes = 0;
 		}

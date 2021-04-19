@@ -77,6 +77,17 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
+	void ShaderLibrary::reload(const Ref<Shader>& _shader)
+	{
+		SYN_CORE_TRACE("reloading shader '", _shader->getName(), "'.");
+
+		auto& shader = s_shaders[_shader->getName()];
+		shader->reload();
+		Renderer::get().executeRenderCommands();
+	}
+
+
+	//-----------------------------------------------------------------------------------
 	bool ShaderLibrary::exists(const std::string& _name)
 	{
 		return s_shaders.find(_name) != s_shaders.end();
@@ -86,7 +97,7 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	Ref<Shader> ShaderLibrary::createDefaultShader()
 	{
-		SYN_CORE_WARNING("creating static default shader.");
+		SYN_CORE_TRACE("creating static default shader.");
 
 		std::string src = R"(
 			#type VERTEX_SHADER

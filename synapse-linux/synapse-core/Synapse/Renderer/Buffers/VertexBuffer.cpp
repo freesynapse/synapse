@@ -17,7 +17,6 @@ namespace Syn {
 		});
 	}
 	
-	
 	//-----------------------------------------------------------------------------------
 	VertexBuffer::~VertexBuffer()
 	{
@@ -25,7 +24,6 @@ namespace Syn {
 			glDeleteBuffers(1, &self->m_bufferID);
 		});
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::setData(void* _data, uint32_t _size_in_bytes)
@@ -35,7 +33,6 @@ namespace Syn {
 			glBufferData(GL_ARRAY_BUFFER, _size_in_bytes, _data, self->m_usage);
 		});
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::updateBufferData(void* _data, uint32_t _size, uint32_t _offset)
@@ -47,15 +44,15 @@ namespace Syn {
 		});
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::startDataBlock(uint32_t _total_size_in_bytes)
 	{
 		SYN_RENDER_S1(_total_size_in_bytes, {
 			glBindBuffer(GL_ARRAY_BUFFER, self->m_bufferID);
-			glBufferData(GL_ARRAY_BUFFER, _total_size_in_bytes, 0, self->m_usage);
+			glBufferData(GL_ARRAY_BUFFER, _total_size_in_bytes, nullptr, self->m_usage);
 		});
 	}
+
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::addSubData(void* _data, uint32_t _size_in_bytes, uint32_t _offset_in_bytes)
 	{
@@ -63,10 +60,13 @@ namespace Syn {
 			glBufferSubData(GL_ARRAY_BUFFER, _offset_in_bytes, _size_in_bytes, _data);
 		});
 	}
+
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::endDataBlock()
 	{
-		SYN_RENDER_S0({ glBindBuffer(GL_ARRAY_BUFFER, 0); });
+		SYN_RENDER_S0({ 
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		});
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -77,7 +77,6 @@ namespace Syn {
 		});
 	}
 	
-	
 	//-----------------------------------------------------------------------------------
 	const void VertexBuffer::unbind() const
 	{
@@ -85,7 +84,5 @@ namespace Syn {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		});
 	}
-
-
 
 }

@@ -11,14 +11,17 @@ namespace Syn {
 	{
 		switch (_type)
 		{
-		case MeshDebugType::CUBE:		return "MeshDebugType::CUBE";
-		case MeshDebugType::SPHERE:		return "MeshDebugType::SPHERE";
-		case MeshDebugType::POINTS:		return "MeshDebugType::POINTS";
-		case MeshDebugType::LINES:		return "MeshDebugType::LINES";
-		case MeshDebugType::LINE_STRIP:	return "MeshDebugType::LINE_STRIP";
-		case MeshDebugType::AABB:		return "MeshDebugType::AABB";
-		case MeshDebugType::AXES:		return "MeshDebugType::AXES";
-		default:						return "";
+		case MeshDebugType::CUBE:			return "MeshDebugType::CUBE";
+		case MeshDebugType::QUAD:			return "MeshDebugType::QUAD";
+		case MeshDebugType::SPHERE:			return "MeshDebugType::SPHERE";
+		case MeshDebugType::POINTS:			return "MeshDebugType::POINTS";
+		case MeshDebugType::LINES:			return "MeshDebugType::LINES";
+		case MeshDebugType::LINE_STRIP:		return "MeshDebugType::LINE_STRIP";
+		case MeshDebugType::AABB:			return "MeshDebugType::AABB";
+		case MeshDebugType::AXES:			return "MeshDebugType::AXES";
+		case MeshDebugType::GRID_PLANE:		return "MeshDebugType::GRID_PLANE";
+		case MeshDebugType::GRID_PLANE_FS:	return "MeshDebugType::GRID_PLANE_FS";
+		default:							return "";
 		}
 	}
 
@@ -31,9 +34,12 @@ namespace Syn {
 		case MeshDebugType::POINTS:		return GL_POINTS;
 		case MeshDebugType::LINES:
 		case MeshDebugType::AABB:
+		case MeshDebugType::GRID_PLANE:
 		case MeshDebugType::AXES:		return GL_LINES;
 		case MeshDebugType::LINE_STRIP:	return GL_LINE_STRIP;
 		case MeshDebugType::CUBE:
+		case MeshDebugType::QUAD:
+		case MeshDebugType::GRID_PLANE_FS:	
 		case MeshDebugType::SPHERE:		return GL_TRIANGLES;
 		default:						return GL_TRIANGLES;
 		}
@@ -68,7 +74,7 @@ namespace Syn {
 		// shader already enabled in MeshCreator
 
 		// translate by position
-		_shader_ptr->setMatrix4fv("u_model_matrix", glm::translate(m_transform.getModelMatrix(), m_position));
+		_shader_ptr->setMatrix4fv("u_modelMatrix", glm::translate(m_transform.getModelMatrix(), m_position));
 		m_vertexArray->bind();
 
 		Renderer::drawIndexed(m_vertexArray->getIndexCount(), true, m_primitiveType);
