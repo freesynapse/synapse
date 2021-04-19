@@ -24,8 +24,8 @@
 
 #include "Synapse/ImGui/ImGuiLayer.hpp"
 
-#include "Synapse/External/imgui/imgui.h"
-#include "Synapse/External/FastNoise/FastNoise.h"
+#include "External/imgui/imgui.h"
+#include "External/FastNoise/FastNoise.h"
 
 #include "Synapse/Input/InputManager.hpp"
 #include "Synapse/Input/KeyCodes.hpp"

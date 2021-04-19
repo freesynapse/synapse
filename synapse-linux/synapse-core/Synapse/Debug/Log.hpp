@@ -1,3 +1,4 @@
+
 #pragma once
 
 
@@ -5,7 +6,7 @@
 
 #include "Synapse/Utils/Timer/Time.hpp"
 #include "Synapse/Utils/FileIOHandler.hpp"
-#include "Synapse/External/imgui/imgui.h"
+#include "External/imgui/imgui.h"
 
 
 namespace Syn { 

@@ -1,3 +1,4 @@
+
 #pragma once
 
 
@@ -7,7 +8,7 @@
 
 #include "Synapse/Core.hpp"
 #include "Synapse/Types.hpp"
-#include "Synapse/External/FastNoise/FastNoise.h"
+#include "External/FastNoise/FastNoise.h"
 #include "Synapse/Utils/Random/Random.hpp"
 
 

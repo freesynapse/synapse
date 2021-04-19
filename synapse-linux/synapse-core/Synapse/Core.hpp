@@ -6,7 +6,7 @@
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
-#include "external/FastNoise/FastNoise.h"
+#include "External/FastNoise/FastNoise.h"
 
 
 // UTILITY //

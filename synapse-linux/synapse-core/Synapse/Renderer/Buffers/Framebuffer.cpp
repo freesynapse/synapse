@@ -4,7 +4,7 @@
 #include "Synapse/Renderer/Buffers/Framebuffer.hpp"
 #include "Synapse/Core.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
-#include "Synapse/External/stb_image/stb_image_write.h"
+#include "External/stb_image/stb_image_write.h"
 #include "Synapse/Utils/Timer/Time.hpp"
 #include "Synapse/Utils/Noise/Noise.hpp"
 #include "Synapse/Event/EventHandler.hpp"

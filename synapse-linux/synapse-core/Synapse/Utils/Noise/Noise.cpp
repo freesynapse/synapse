@@ -3,8 +3,8 @@
 
 #include "Synapse/Utils/Noise/Noise.hpp"
 #include "Synapse/Utils/Noise/NoiseGenerator.hpp"
-#include "Synapse/External/stb_image/stb_image_write.h"
-#include "Synapse/External/FastNoise/FastNoise.h"
+#include "External/stb_image/stb_image_write.h"
+#include "External/FastNoise/FastNoise.h"
 
 
 // buffer overflow in indexing 3 * size * size in save_noise_PNG()

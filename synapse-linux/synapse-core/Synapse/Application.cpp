@@ -17,8 +17,8 @@
 #include "Synapse/Utils/Random/Random.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
 
-#include "Synapse/External/imgui/imgui.h"
-#include "Synapse/External/imgui/imgui_internal.h"
+#include "External/imgui/imgui.h"
+#include "External/imgui/imgui_internal.h"
 
 
 namespace Syn {

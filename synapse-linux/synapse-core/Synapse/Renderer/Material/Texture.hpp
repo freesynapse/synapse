@@ -1,10 +1,10 @@
-#pragma once
 
+#pragma once
 
 #include <stdint.h>
 
 #include "Synapse/Core.hpp"
-#include "Synapse/External/stb_image/stb_image_write.h"
+#include "External/stb_image/stb_image_write.h"
 
 
 namespace Syn {

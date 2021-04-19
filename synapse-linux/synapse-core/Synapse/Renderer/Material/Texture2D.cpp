@@ -6,7 +6,7 @@
 #include "Synapse/Core.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
 #include "Synapse/Debug/Profiler.hpp"
-#include "Synapse/External/stb_image/stb_image.h"
+#include "External/stb_image/stb_image.h"
 
 
 namespace Syn {

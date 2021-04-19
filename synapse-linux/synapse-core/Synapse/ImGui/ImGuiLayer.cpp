@@ -5,10 +5,10 @@
 
 #include "Synapse/Application.hpp"
 
-#include "Synapse/External/imgui/imgui.h"
+#include "External/imgui/imgui.h"
 //#define IMGUI_IMPL_OPENGL_LOADER_GLEW
-#include "Synapse/External/imgui/examples/imgui_impl_opengl3.h"
-#include "Synapse/External/imgui/examples/imgui_impl_glfw.h"
+#include "External/imgui/examples/imgui_impl_opengl3.h"
+#include "External/imgui/examples/imgui_impl_glfw.h"
 
 
 namespace Syn {
