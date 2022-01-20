@@ -1,0 +1,89 @@
+
+#include "pch.hpp"
+
+#include "PyFunction3D.hpp"
+
+#include <inttypes.h>
+
+
+namespace Syn
+{
+    void PyFunction3D::computeFunctionFromPySrc(const std::string& _module, 
+                                                const std::string& _func)
+    {
+        SYN_PROFILE_FUNCTION();
+        Timer timer("", false);
+
+        m_module = _module;
+        m_function = _func;
+
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("Calling ", m_module.c_str(), " : ", m_function.c_str(), ".");
+        #endif
+        // get module and function pointers
+        CPyObject pyModule, pyFunc;
+
+        bool res_module = PyWrapper::getPyModulePtr(m_module, pyModule);
+        bool res_func   = PyWrapper::getPyFunctionPtr(m_function, pyModule, pyFunc);
+
+        // error check
+        if (!res_module || !res_func)
+            return;
+
+        // repopulate NumPy function pointer arrays
+        _import_array();
+
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("module and function pointers found.");
+            SYN_CORE_TRACE("    module   : 0x", (uintptr_t)pyModule, ".");
+            SYN_CORE_TRACE("    function : 0x", (uintptr_t)pyFunc, ".");
+        #endif
+
+        // create array objects that python can process
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("creating NumPy arrays.");
+        #endif
+        const int nd = 2;
+        npy_intp x_shape[2] = { 1, m_x.steps };
+        npy_intp y_shape[2] = { 1, m_y.steps };
+
+        PyObject* pyArray_x = PyArray_SimpleNewFromData(nd, x_shape, NPY_LONGDOUBLE, reinterpret_cast<void*>(m_x.values));
+        PyObject* pyArray_y = PyArray_SimpleNewFromData(nd, y_shape, NPY_LONGDOUBLE, reinterpret_cast<void*>(m_y.values));
+
+        // call python function and get result
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("calling Python function '", m_function.c_str(), "'.");
+        #endif
+        PyObject* pyReturn = PyObject_CallFunctionObjArgs(pyFunc, pyArray_x, pyArray_y, NULL);
+        PyArrayObject* np_array = reinterpret_cast<PyArrayObject*>(pyReturn);
+        // convert to c++
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("converting result to c++.");
+        #endif
+        m_size = PyArray_SHAPE(np_array)[0]; // dynamic, but not strictly needed
+        //int len = m_x.steps * m_y.steps;
+        // called before?
+        if (m_z) delete[] m_z;
+        // copy data
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            SYN_CORE_TRACE("copying data.");
+        #endif
+        m_z = reinterpret_cast<long double*>(PyArray_DATA(np_array));
+
+        #ifdef DEBUG_PY_FUNCTION_CALLS
+            for (int i = 0; i < m_size; i++)
+                printf("%Lf ", m_z[i]);
+            printf("\n");
+        #endif
+
+    }
+    //-----------------------------------------------------------------------------------
+    void PyFunction3D::updateCoordinates()
+    {
+
+    }
+
+
+
+
+}

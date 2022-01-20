@@ -1,0 +1,17 @@
+#!/bin/bash
+
+rm -r ./build/obj
+rm ./build/*.make
+rm ./build/Makefile
+
+# outdated
+#clang -c std=c++17 -I./include/boost -I./include/glm -I./libraries/glad/include -I./libraries/exprtk/include ./synapse-core/pch.hpp
+
+#clang -x c++-header -I./include/boost -I./include/glm -I./libraries/glad/include -I./libraries/exprtk/include ./synapse-core/pch.hpp -o ./synapse-core/pch.hpp.pch
+clang -v -x c++-header -I./include/boost -I./include/glm -I./libraries/glad/include -I./libraries/exprtk/include ./synapse-core/pch.hpp -o ./synapse-core/pch.hpp.gch
+./premake5/premake5 --cc=clang --verbose gmake2
+
+#cd build
+#make
+#cd ..
+

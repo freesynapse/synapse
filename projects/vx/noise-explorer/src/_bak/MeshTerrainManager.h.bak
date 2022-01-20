@@ -1,0 +1,101 @@
+#pragma once
+
+
+#include "MeshTerrain.h"
+
+
+namespace Syn {
+
+
+	class MeshTerrainManager
+	{
+	public:
+		/* 
+		 * Constructor.
+		 * _chunk_size			:	width (x) and breadth (z) of each chunk.
+		 * _resolution			:	number of grids along x and z
+		 * _use_static_shader	:	use of static shader, defined and stored privately.
+		 */
+		MeshTerrainManager(uint32_t _chunk_size=2, uint32_t _resolution=128, bool _use_static_shader=false);
+		/* Deallocation of all created chunks i m_chunkMap. */
+		~MeshTerrainManager();
+		
+		/* Update chunks around the camera.
+		 * Chunks outside of viewing distance gets flagged for deletion, and are deleted 
+		 * at the end of this method.
+		 * New chunks needed to be loaded are identified and added to m_pendingChunks and
+		 * one chunk is loaded per call to this->loadPendingChunks();
+		 */
+		void updateChunks(const glm::vec3& _camera_position);
+		
+		/* Renders chunks, using static or provided shader. If static shader is used, all uniforms will be set by MeshTerrainManager.
+		 * If not, the user have to set all uniforms except the model matrix before calling render().
+		 */
+		void render(const Ref<Shader>& _shader_ptr=nullptr, const Ref<Camera>& _camera_ptr=nullptr, const glm::vec3& _diffuse_light_pos=glm::vec3(0.0f, 100.0f, 0.0f));
+		
+		// debug normals of all loaded chunks
+		void debugTerrainNormals(const Ref<Shader>& _normal_shader, const Ref<Camera>& _camera_ptr);
+
+	
+		// accessors
+		const glm::ivec2& getCameraChunkPosition() const { return m_currentCameraChunk; }
+
+	
+	private:
+		/* Loads one (1) chunk per function call. Loads the first chunk in m_pendingChunksLoad. */
+		void loadPendingChunks();
+
+		/* Deletes one (1) chunk per function call. Deletes the first chunk in m_pendingChunksDelete. */
+		void deletePendingChunks();
+
+		// render using provided shader
+		void renderTerrain(const Ref<Shader>& _shader_ptr);
+		
+		// render using static shader
+		void renderTerrainStatic(const Ref<Camera>& _camera_ptr, const glm::vec3& _diffuse_light_pos);
+		
+		// setup a static shader, for use with renderTerrainStatic() above.
+		void setupStaticShader();
+		
+		// hashing function for glm::ivec2
+		struct KeyHash
+		{
+			size_t operator()(const glm::ivec2& _k) const { return std::hash<int>()(_k.x) ^ std::hash<int>()(_k.y); }
+			bool operator()(const glm::ivec2& _a, const glm::ivec2& _b) const { return _a.x == _b.x && _a.y == _b.y; }
+		};
+
+	private:
+		// size of each chunk, in units. x = z.
+		uint32_t m_chunkSize = 0;
+
+		// resolution of chunk grid
+		uint32_t m_resolution = 0;
+
+		// storage of last camera position in chunk coordinates
+		glm::ivec2 m_currentCameraChunk = glm::ivec2(0);
+
+		// radius of chunks to be loaded around the current camera position
+		int m_chunkRenderDistance = 3;
+
+		// map of all chunks, sorted by 2d vector (x and z offset)
+		std::unordered_map<glm::ivec2, MeshTerrain*, KeyHash, KeyHash> m_chunkMap;
+
+		// vector of chunk positions flagged for loading and deletion.
+		std::list<glm::ivec2> m_pendingChunksLoad;
+		std::list<glm::ivec2> m_pendingChunksDelete;
+
+		// shader for rendering of all chunks
+		Ref<Shader> m_shader = nullptr;
+
+		// flag for usage of static shader
+		bool m_useStaticShader = false;
+
+		// debug : line length of normals, tangents and bitangents
+		float m_debugLineLength = 0.5f;
+
+	};
+
+
+
+
+}

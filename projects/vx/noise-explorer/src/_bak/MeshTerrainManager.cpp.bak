@@ -1,0 +1,250 @@
+
+#include "pch.hpp"
+
+#include <Synapse/Renderer/Shader/ShaderLibrary.hpp>
+#include <Synapse/Utils/FileIOHandler.hpp>
+#include <Synapse/Utils/Timer/Timer.hpp>
+#include <Synapse/Utils/Timer/TimeStep.hpp>
+
+#include "MeshTerrainManager.h"
+
+
+namespace Syn {
+
+
+	MeshTerrainManager::MeshTerrainManager(uint32_t _chunk_size, uint32_t _resolution, bool _use_static_shader) :
+		m_chunkSize(_chunk_size), m_resolution(_resolution), m_useStaticShader(_use_static_shader)
+	{
+		// set shader and rendering function pointer
+		if (_use_static_shader)
+			setupStaticShader();
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	MeshTerrainManager::~MeshTerrainManager()
+	{
+		for (auto item : m_chunkMap)
+			delete item.second;
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::updateChunks(const glm::vec3& _camera_position)
+	{
+		// 'chunk' position of camera
+		m_currentCameraChunk = glm::ivec2(
+			(int)(floor(_camera_position.x / (float)m_chunkSize)),
+			(int)(floor(_camera_position.z / (float)m_chunkSize))
+		);
+
+
+		// delete all chunks outside render distance
+		//
+
+		// step through all loaded chunks
+		for (auto it = m_chunkMap.begin(); it != m_chunkMap.end(); it++)
+		{
+			MeshTerrain* chunk = it->second;
+			glm::vec3 offset = chunk->getXZOffset();
+			glm::ivec2 pos = glm::ivec2((int)(offset.x / m_chunkSize), (int)(offset.z / m_chunkSize));
+			// find distance in 'chunks' to camera
+			glm::ivec2 distance = glm::abs(pos - m_currentCameraChunk);
+			
+			// is this chunk already pending deletion?
+			bool alreadyFlagged = std::find(m_pendingChunksDelete.begin(), m_pendingChunksDelete.end(), pos) != m_pendingChunksDelete.end();
+
+			// this chunk is outside render distance and not flagged for deletion
+			if ((distance.x > m_chunkRenderDistance || distance.y > m_chunkRenderDistance) && !alreadyFlagged)
+				m_pendingChunksDelete.push_back(pos);
+		}
+
+
+		// load chunks in within viewing distance from the camera
+		for (int x = m_currentCameraChunk.x - m_chunkRenderDistance; x < m_currentCameraChunk.x + m_chunkRenderDistance + 1; x++)
+		{
+			for (int z = m_currentCameraChunk.y - m_chunkRenderDistance; z < m_currentCameraChunk.y + m_chunkRenderDistance + 1; z++)
+			{
+				glm::ivec2 pos = glm::ivec2(x, z);
+		
+				// load unloaded chunks within viewing distance
+				auto it = std::find(m_pendingChunksLoad.begin(), m_pendingChunksLoad.end(), pos);
+				if (m_chunkMap.find(pos) == m_chunkMap.end() &&
+					it == m_pendingChunksLoad.end())
+				{
+					//SYN_CORE_TRACE("pushing chunk [ ", pos.x, ", ", pos.y, " ] to list.");
+					m_pendingChunksLoad.push_back(pos);
+				}
+			}
+		}
+
+		// load the first chunk in the load list
+		loadPendingChunks();
+		
+		// delete the first chunk in the deletion list
+		deletePendingChunks();
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::loadPendingChunks()
+	{
+		if (m_pendingChunksLoad.size() == 0)
+			return;
+
+		// get first chunk in list, then remove it
+		glm::ivec2 chunkPos = m_pendingChunksLoad.front();
+		m_pendingChunksLoad.pop_front();
+
+		#ifdef DEBUG_MESH_TERRAIN
+			SYN_CORE_TRACE("loading new chunk at [ ", chunkPos.x, ", ", chunkPos.y, " ]");
+		#endif
+
+		// create new chunk with correct offset
+		glm::vec3 xzOffset = glm::vec3(chunkPos.x * (float)m_chunkSize, 0.0f, chunkPos.y * (float)m_chunkSize);
+		m_chunkMap[chunkPos] = new MeshTerrain(m_chunkSize, m_resolution, xzOffset);
+		m_chunkMap[chunkPos]->setupVertexData(7, 1.5f);
+	}
+
+	
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::deletePendingChunks()
+	{
+		if (m_pendingChunksDelete.size() == 0)
+			return;
+
+		glm::ivec2 chunkPos = m_pendingChunksDelete.front();
+		m_pendingChunksDelete.pop_front();
+
+		// delete pointer
+		delete m_chunkMap[chunkPos];
+		// remove from map
+		m_chunkMap.erase(chunkPos);
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::render(const Ref<Shader>& _shader_ptr, const Ref<Camera>& _camera_ptr, const glm::vec3& _diffuse_light_pos)
+	{
+		if (m_useStaticShader)
+		{
+			// uniforms set in called rendering function
+			this->renderTerrainStatic(_camera_ptr, _diffuse_light_pos);
+		}
+		else
+		{
+			// all uniforms set outside
+			this->renderTerrain(_shader_ptr);
+		}
+
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::renderTerrain(const Ref<Shader>& _shader_ptr)
+	{
+		for (auto& item : m_chunkMap)
+			item.second->render(_shader_ptr);
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::renderTerrainStatic(const Ref<Camera>& _camera_ptr, const glm::vec3& _diffuse_light_pos)
+	{
+		m_shader->enable();
+		m_shader->setMatrix4fv("u_view_projection_matrix", _camera_ptr->getViewProjectionMatrix());
+		m_shader->setUniform3fv("u_camera_position", _camera_ptr->getPosition());
+		m_shader->setUniform3fv("u_diffuse_light_position", _diffuse_light_pos);
+
+		for (auto& item : m_chunkMap)
+		{
+			if (item.second)
+				item.second->render(m_shader);
+		}
+	}
+	
+	
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::debugTerrainNormals(const Ref<Shader>& _normal_shader, const Ref<Camera>& _camera_ptr)
+	{
+		_normal_shader->enable();
+		_normal_shader->setMatrix4fv("u_view_projection_matrix", _camera_ptr->getViewProjectionMatrix());
+		_normal_shader->setUniform1f("u_length", m_debugLineLength);
+
+		for (auto it : m_chunkMap)
+		{
+			glm::vec3 xzOffset = it.second->getXZOffset();
+			glm::mat4 modelMatrix = it.second->getModelMatrix();
+			glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(modelMatrix)));
+			_normal_shader->setMatrix4fv("u_model_matrix", glm::translate(modelMatrix, xzOffset));
+			_normal_shader->setMatrix3fv("u_normal_matrix", normalMatrix);
+			it.second->getVertexArray()->bind();
+			Renderer::drawIndexed(it.second->getVertexArray()->getIndexCount(), true, GL_POINTS);
+		}
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void MeshTerrainManager::setupStaticShader()
+	{
+		std::string src = R"(
+			#type VERTEX_SHADER
+			#version 330 core
+
+			layout(location = 0) in vec3 a_position;
+			layout(location = 1) in vec3 a_normal;
+
+			uniform mat4 u_view_projection_matrix = mat4(1.0f);
+			uniform mat4 u_model_matrix = mat4(1.0f);
+			uniform mat3 u_normal_matrix = mat3(1.0f);
+
+			out vec3 f_position;
+			out vec3 f_normal;
+
+			void main()
+			{
+				gl_Position = u_view_projection_matrix * u_model_matrix * vec4(a_position, 1.0f);
+				f_normal = u_normal_matrix * a_normal;
+				f_position = vec3(u_model_matrix * vec4(a_position, 1.0f));
+			}
+
+
+			#type FRAGMENT_SHADER
+			#version 330 core
+
+			layout(location = 0) out vec4 out_color;
+
+			in vec3 f_position;
+			in vec3 f_normal;
+		
+			vec3 mesh_color = vec3(0.055, 0.91, 0.208);
+
+			uniform vec3 u_camera_position;
+			uniform vec3 u_diffuse_light_position = vec3(0.0, 2.0, 0.0);
+
+			void main()
+			{
+				// ambient
+				vec3 c_ambient = vec3(0.3f);
+
+				// diffuse
+				vec3 norm = normalize(f_normal);
+				vec3 light_dir = normalize(u_diffuse_light_position - f_position);
+				float diff = max(dot(norm, light_dir), 0.0);
+				vec3 c_diffuse = diff * vec3(1.0);
+
+				// final color
+				vec3 c_final = (c_ambient + c_diffuse) * mesh_color;
+				out_color = vec4(c_final, 1.0);
+			}
+		)";
+
+		FileIOHandler::write_buffer_to_file("./static_terrain_shader.glsl", src);
+		m_shader = MakeRef<Shader>("./static_terrain_shader.glsl");
+		ShaderLibrary::add(m_shader);
+
+		Renderer::executeRenderCommands();
+	}
+
+
+}

@@ -1,0 +1,9 @@
+**/assets
+**/build
+fps-time-analysis.py
+**/external
+**/include
+**/libraries
+**/synapse-core/External
+**/screenshots
+**/.vscode
