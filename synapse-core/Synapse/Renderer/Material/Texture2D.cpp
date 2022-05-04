@@ -1,17 +1,17 @@
 
 #include "pch.hpp"
 
+#include "stb_image/stb_image.h"
+
 #include "Synapse/Renderer/Material/Texture2D.hpp"
 
 #include "Synapse/Core.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
 #include "Synapse/Debug/Profiler.hpp"
-#include "External/stb_image/stb_image.h"
 
 
-namespace Syn {
-
-
+namespace Syn
+{
 	Texture2D::Texture2D(const std::string& _asset_path) :
 		m_assetPath(_asset_path)
 	{

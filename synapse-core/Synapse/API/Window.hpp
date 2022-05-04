@@ -8,7 +8,8 @@
 #include "Synapse/Event/WindowEvents.hpp"
 
 
-namespace Syn { 
+namespace Syn
+{ 
 
 	class Window
 	{

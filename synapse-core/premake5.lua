@@ -20,7 +20,7 @@ project "synapse-core"
 
     files
     {
-        "Synapse.h",
+        "Synapse.hpp",
 
         "Synapse/**.c",
         "Synapse/**.cpp",
@@ -32,24 +32,13 @@ project "synapse-core"
         "SynapseAddons/**.h",
         "SynapseAddons/**.hpp",
 
-        "external/FastNoise/**.cpp",
-        "external/FastNoise/**.h",
-        "external/imgui/**.cpp",
-        "external/imgui/**.h",
-        "external/jc_voronoi/**.cpp",
-        "external/jc_voronoi/**.h",
-        "external/muparser/**.cpp",
-        "external/muparser/**.h",
-        "external/OBJ_loader/**.cpp",
-        "external/stb_image/**.cpp",
-        "external/stb_image/**.h",
+        "%{IncludeDirs.headers}/imgui/*.cpp",
     }
 
     defines
     {
         "_CRT_SECURE_NO_WARNINGS",
         "GLFW_INCLUDE_NONE",
-        "IMGUI_IMPL_OPENGL_LOADER_GLAD",
     }
 
     includedirs
@@ -67,8 +56,7 @@ project "synapse-core"
         "%{IncludeDirs.muparser}",
 
         -- header-only inclusions
-        "%{IncludeDirs.glm}",
-        "%{IncludeDirs.boost}",
+        "%{IncludeDirs.headers}",
 
         -- embedding python (in SynapseAddons)
         "%{IncludeDirs.python}",
@@ -88,7 +76,6 @@ project "synapse-core"
         
         -- embedding python (in SynapseAddons)
         "%{LibDirs.python}",
-        
     }
 
     links

@@ -1,4 +1,30 @@
 #!/bin/bash
 
-./premake5/premake5 --cc=clang --verbose gmake2
+if [ $1 = "debug" ]; then 
+    ./premake5/premake5 --cc=clang --verbose gmake2
+    cd build
+    make config=debug
+    cd ..
+elif [ $1 = "release" ]; then
+    ./premake5/premake5 --cc=clang --verbose gmake2
+    cd build
+    make config=release
+    cd ..
+elif [ $1 = "clean" ]; then
+    rm -r ./build/obj
+    rm ./build/*.make
+    rm ./build/Makefile
+elif [ $1 = "pch" ]; then
+    rm -r ./build/obj
+    rm ./build/*.make
+    rm ./build/Makefile
+    clang -v -x c++-header -I./include/boost -I./include -I./libraries/glad/include -I./libraries/exprtk/include -I./include/imgui -I./include/stbi_image ./synapse-core/pch.hpp -o ./synapse-core/pch.hpp.gch
+    #clang -v -x c++-header -I./include -I./libraries/glad/include -I./libraries/exprtk/include ./synapse-core/pch.hpp -o ./synapse-core/pch.hpp.gch
+    ./premake5/premake5 --cc=clang --verbose gmake2
+else
+    echo "Usage: premake <debug|release|clean|pch>"
+fi
+
+
+
 

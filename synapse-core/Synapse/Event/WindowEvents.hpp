@@ -1,11 +1,11 @@
-#pragma once
 
+#pragma once
 
 #include "Synapse/Event/Event.hpp"
 
 
-namespace Syn {
-
+namespace Syn
+{
 
 	class WindowCloseEvent : public Event
 	{
@@ -71,5 +71,6 @@ namespace Syn {
 	private:
 		bool m_visible = true;
 	};
+
 }
 

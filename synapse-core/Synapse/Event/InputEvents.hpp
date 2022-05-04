@@ -1,12 +1,10 @@
 #pragma once
 
-
 #include "Synapse/Event/Event.hpp"
 
 
-namespace Syn {
-
-
+namespace Syn 
+{
 	class KeyDownEvent : public Event
 	{
 	public:

@@ -1,11 +1,12 @@
 
 #include "pch.hpp"
 
+#include "stb_image/stb_image.h"
+#include "stb_image/stb_image_write.h"
+
 #include "Synapse/Renderer/Material/Texture2DNoise.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
 #include "Synapse/Utils/Timer/Timer.hpp"
-#include "External/stb_image/stb_image.h"
-//#include "External/stb_image/stb_image_write.h"
 
 
 namespace Syn

@@ -6,7 +6,7 @@
 
 #include "Synapse/Utils/Timer/Time.hpp"
 #include "Synapse/Utils/FileIOHandler.hpp"
-#include "External/imgui/imgui.h"
+#include "imgui/imgui.h"
 
 
 namespace Syn { 

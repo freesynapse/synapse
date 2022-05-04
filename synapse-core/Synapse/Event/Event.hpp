@@ -20,6 +20,7 @@ namespace Syn {
 		//FILE_IO_ERROR,
 		//RAISE_FATAL_ERROR, RAISE_ERROR, RAISE_WARNING,		// Error.h
 		//EVENT_HANDLER_QUEUE_FULL,
+		CUSTOM_EVENT,
 	};
 
 	inline static const char* strEventType(EventType e)
@@ -43,6 +44,7 @@ namespace Syn {
 			//case EventType::RAISE_ERROR:					return "EventType::RAISE_ERROR";
 			//case EventType::RAISE_WARNING:				return "EventType::RAISE_WARNING";
 			//case EventType::EVENT_HANDLER_QUEUE_FULL:		return "EventType::EVENT_HANDLER_QUEUE_FULL";
+			case EventType::CUSTOM_EVENT:					return "EventType::CUSTOM_EVENT";
 			default:										return "Unknown EventType.";
 		}
 

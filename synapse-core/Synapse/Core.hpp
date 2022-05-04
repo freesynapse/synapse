@@ -6,7 +6,7 @@
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
-#include "External/FastNoise/FastNoise.h"
+#include "FastNoise/FastNoise.h"
 
 
 // UTILITY //
@@ -112,8 +112,7 @@ static constexpr int RETURN_FAILURE = -1;
 //#define DEBUG_CURSOR_MOVE
 
 // events
-#define DEBUG_EVENTS
-#undef DEBUG_EVENTS
+//#define DEBUG_EVENTS
 
 // rendering
 //#define DEBUG_RENDERER_2D

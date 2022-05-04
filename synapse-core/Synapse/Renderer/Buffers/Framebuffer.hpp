@@ -8,8 +8,8 @@
 #include "Synapse/Renderer/Material/Texture.hpp"
 
 
-namespace Syn {
-
+namespace Syn
+{
 	class FramebufferBase
 	{
 	public:

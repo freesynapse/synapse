@@ -25,8 +25,7 @@
 
 #include "Synapse/ImGui/ImGuiLayer.hpp"
 
-#include "External/imgui/imgui.h"
-#include "External/FastNoise/FastNoise.h"
+#include "FastNoise/FastNoise.h"
 
 #include "Synapse/Input/InputManager.hpp"
 #include "Synapse/Input/KeyCodes.hpp"
@@ -34,11 +33,11 @@
 #include "Synapse/Utils/FileIOHandler.hpp"
 #include "Synapse/Utils/Timer/Timer.hpp"
 #include "Synapse/Utils/Timer/TimeStep.hpp"
-#include "Synapse/Utils/Thread/ThreadPool.h"
+#include "Synapse/Utils/Thread/ThreadPool.hpp"
 #include "Synapse/Utils/Noise/Noise.hpp"
 #include "Synapse/Utils/Noise/NoiseGenerator.hpp"
 #include "Synapse/Utils/Random/Random.hpp"
-#include "Synapse/Utils/Bits.h"
+#include "Synapse/Utils/Bits.hpp"
 
 //#include "Synapse/Types/Linspace.hpp"
 //#include "Synapse/Types/Meshgrid.hpp"

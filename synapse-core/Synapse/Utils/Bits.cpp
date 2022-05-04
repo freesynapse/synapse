@@ -1,6 +1,8 @@
 
 #include "pch.hpp"
-#include "Bits.h"
+
+#include "Bits.hpp"
+
 
 namespace Syn
 {

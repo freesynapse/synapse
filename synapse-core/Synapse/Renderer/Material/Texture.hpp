@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include "Synapse/Core.hpp"
-#include "External/stb_image/stb_image_write.h"
 
 
 namespace Syn {

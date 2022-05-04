@@ -20,9 +20,8 @@
 #include "Synapse/Utils/Timer/Timer.hpp"
 
 
-namespace Syn { 
-
-
+namespace Syn 
+{
 	//-----------------------------------------------------------------------------------
 	Window::Window(const char* _name, const int& _width, const int& _height, bool _fixed_size) :
 		m_width(_width), m_height(_height), m_title(_name)

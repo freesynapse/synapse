@@ -1,8 +1,0 @@
-#!/bin/bash
-
-./premake5/premake5 --cc=clang --verbose gmake2
-cd build
-make config=debug
-cd ..
-
-

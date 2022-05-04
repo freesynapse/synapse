@@ -9,13 +9,16 @@
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Utils/Random/Random.hpp"
 #include "Synapse/Memory.hpp"
+#include "Synapse/Utils/Thread/ThreadPool.hpp"
 
-#include "SynapseAddons/AddonsCore.hpp"
-#ifdef ENABLE_ADDONS_VOXEL
+#ifdef ENABLE_ADDONS
+	#include "SynapseAddons/AddonsCore.hpp"
+#endif
+#ifdef ENABLE_ADDONS_PY_EMBEDDING
 	#include "SynapseAddons/Python/PyWrapper.hpp"
 #endif
 
-#ifdef ENABLE_ADDONS_PY_EMBEDDING
+#ifdef ENABLE_ADDONS_VOXEL
 	#include "SynapseAddons/Voxel/VxNoise.hpp"
 #endif
 
@@ -88,6 +91,8 @@ int main(int argc, char* argv[])
 	auto app = CreateSynapseApplication();
 	app->run();
 
+	Syn::EventHandler::push_event(new Syn::ApplicationExitEvent());
+	Syn::EventHandler::process_events();
 
 	// stop application
 	//

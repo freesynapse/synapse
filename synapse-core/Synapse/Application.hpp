@@ -33,13 +33,16 @@ namespace Syn {
 
 		inline Window& getWindow() const { return *m_window; }
 		static inline Application& get() { return *s_instance; }
+		inline float getFrameTime() { return (*s_instance).m_frameTime; }
+		inline float getRenderTime() { return (*s_instance).m_renderTime; }
 
 	private:
 		Layerstack m_layerStack;
 		ImGuiLayer* m_imGuiLayer;
 		Ref<Window> m_window = nullptr;
 		bool m_bRunning = true;
-
+		float m_frameTime = 0.0f;
+		float m_renderTime = 0.0f;
 		bool m_firstFrame = true;
 		
 	private:

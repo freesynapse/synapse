@@ -6,10 +6,12 @@
 #include <random>
 #include <cmath>
 
+#include "FastNoise/FastNoise.h"
+
 #include "Synapse/Core.hpp"
 #include "Synapse/Types.hpp"
-#include "External/FastNoise/FastNoise.h"
 #include "Synapse/Utils/Random/Random.hpp"
+
 
 
 // type definitions of member function pointer

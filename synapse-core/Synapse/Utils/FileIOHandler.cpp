@@ -15,8 +15,8 @@
 #include "Synapse/Debug/Error.hpp"
 
 
-namespace Syn {	
-
+namespace Syn
+{
 
 	// static declarations
 	std::vector<std::string> FileIOHandler::m_createdFiles;

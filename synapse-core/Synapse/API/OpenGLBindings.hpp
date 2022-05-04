@@ -19,9 +19,11 @@
 #include "Synapse/Types/Linspace.hpp"
 
 
-namespace Syn {
+namespace Syn
+{
 
-	namespace API {
+	namespace API
+	{
 
 		/* Framebuffer parameters:
 		 * 	Syn::ColorFormat _format : Format of the COLOR_ATTACHMENT used.

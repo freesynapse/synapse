@@ -12,8 +12,8 @@
 #include "Synapse/Renderer/Shader/ShaderLibrary.hpp"
 #include "Synapse/Event/EventHandler.hpp"
 
-#include "External/imgui/imgui.h"
-#include "External/imgui/imgui_internal.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 
 
 namespace Syn {

@@ -14,12 +14,13 @@
 #include "Synapse/Input/InputManager.hpp"
 #include "Synapse/API/Window.hpp"
 #include "Synapse/Utils/Timer/TimeStep.hpp"
+#include "Synapse/Utils/Timer/Timer.hpp"
 #include "Synapse/Utils/Random/Random.hpp"
 #include "Synapse/Renderer/Renderer.hpp"
-#include "Synapse/Utils/Thread/ThreadPool.h"
+#include "Synapse/Utils/Thread/ThreadPool.hpp"
 
-#include "External/imgui/imgui.h"
-#include "External/imgui/imgui_internal.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 
 
 namespace Syn {
@@ -78,13 +79,6 @@ namespace Syn {
 		
 		m_imGuiLayer->begin();
 
-		//ImGui::Begin("Renderer");
-		//auto& caps = Renderer::getCapabilities();
-		//ImGui::Text("Vendor: %s", caps.vendor.c_str());
-		//ImGui::Text("Renderer: %s", caps.renderer.c_str());
-		//ImGui::Text("Version: %s", caps.version.c_str());
-		//ImGui::End();
-
 		for (Layer* layer : m_layerStack)
 			layer->onImGuiRender();
 
@@ -103,7 +97,9 @@ namespace Syn {
 		#endif
 
 		while (m_bRunning)
-		{			
+		{
+			Timer t0("", false);	// frame time counter
+
 			TimeStep::update();
 			EventHandler::process_events();
 
@@ -125,20 +121,23 @@ namespace Syn {
 				app->renderImGui();
 			});
 			
-
 			// execute the render command queue
-			Renderer::get().executeRenderCommands();
+			{
+				Timer t1("", false);
+				Renderer::get().executeRenderCommands();
+				m_renderTime = t1.getDeltaTimeMs();
+			}
 
 
 			// update GLFW
 			m_window->onUpdate();
-
 
 			#ifdef DEBUG_ONE_FRAME
 				SYN_CORE_TRACE("DEBUG_ONE_FRAME defined. Exit.");
 				m_bRunning = false;
 			#endif
 
+			m_frameTime = t0.getDeltaTimeMs();
 		}
 
 	}
