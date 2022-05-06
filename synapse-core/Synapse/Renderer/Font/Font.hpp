@@ -87,7 +87,7 @@ namespace Syn {
 		std::vector<uint32_t> m_bufferOffsets;
 		uint32_t m_offset;
 		std::vector<glm::vec2> m_renderOffsets;
-		static constexpr int MAX_BUFFER_LENGTH = 4096;
+		static constexpr int MAX_BUFFER_LENGTH = 8192;
 		static constexpr int MAX_CHAR_SET_SIZE = 128;
 		character_info_s m_sChars[MAX_CHAR_SET_SIZE];
 		std::unique_ptr<font_point[]> m_texCoords;

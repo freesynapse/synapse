@@ -68,7 +68,7 @@ namespace Syn {
 		// allocate memory for text
 		m_buffer = new char[MAX_BUFFER_LENGTH];
 		memset(m_buffer, 0, MAX_BUFFER_LENGTH);
-		m_tmpBuffer = new char[128];
+		m_tmpBuffer = new char[256];
 
 		// reserve memory for rendering
 		m_bufferOffsets.reserve(128);
@@ -383,7 +383,7 @@ namespace Syn {
 			return;
 
 		// set the new buffer and store the incremented offset
-		memset(m_tmpBuffer, 0, 128);
+		memset(m_tmpBuffer, 0, 256);
 		va_start(arglist, _str);
 		int offset = vsprintf(m_tmpBuffer, _str, arglist);
 		va_end(arglist);

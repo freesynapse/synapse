@@ -164,6 +164,8 @@ namespace Syn {
 	{
 		if (_size.x == m_size.x && _size.y == m_size.y)
 			return;
+		else
+			m_size = _size;
 
 		SYN_RENDER_S0({
 			if (self->m_framebufferID)
