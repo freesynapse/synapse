@@ -82,6 +82,8 @@ namespace Syn {
 			self->initAtlas(_filename, _pixel_size);
 		});
 
+		Renderer::get().executeRenderCommands();
+
 	} // end Font::Font()
 
 
@@ -138,8 +140,8 @@ namespace Syn {
 		unsigned int roww = 0;
 		unsigned int rowh = 0;
 
-		m_iTextureWidth = 0;
-		m_iTextureHeight = 0;
+		this->m_iTextureWidth = 0;
+		this->m_iTextureHeight = 0;
 
 		memset(m_sChars, 0, sizeof(character_info_s) * MAX_CHAR_SET_SIZE);
 
@@ -164,8 +166,8 @@ namespace Syn {
 			rowh = MAX(rowh, g->bitmap.rows);
 		}
 
-		m_iTextureWidth = MAX(m_iTextureWidth, roww);
-		m_iTextureHeight += rowh;
+		this->m_iTextureWidth = MAX(m_iTextureWidth, roww);
+		this->m_iTextureHeight += rowh;
 
 		// Setup swizzle mask for alpha texture shader rendering
 		//GLint m_swizzleMask[4]; 

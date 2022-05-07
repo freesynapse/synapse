@@ -103,6 +103,7 @@ namespace Syn {
 			glm::ivec4 lim = getViewportLimits();
 			return glm::vec4(lim.x, lim.y, lim.z, lim.w);
 		}
+
 		
 		// API calls
 		//

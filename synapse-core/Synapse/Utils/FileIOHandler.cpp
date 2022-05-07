@@ -92,7 +92,10 @@ namespace Syn
 		file.close();
 
 		if (!_keep_file)
-			m_createdFiles.push_back(_file_path);
+		{
+			if (std::find(m_createdFiles.begin(), m_createdFiles.end(), _file_path) != m_createdFiles.end())
+				m_createdFiles.push_back(_file_path);
+		}
 
 		return RETURN_SUCCESS;
 

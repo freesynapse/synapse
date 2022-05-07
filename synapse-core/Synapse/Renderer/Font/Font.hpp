@@ -46,7 +46,7 @@ namespace Syn {
 		// Accessors
 		inline const void enableShader() const { m_shader->enable(); }
 		inline const void disableShader() const { m_shader->disable(); }
-		inline const unsigned int& getFontHeight() const { return (m_iTextureHeight); }
+		inline unsigned int getFontHeight() { return (m_iTextureHeight); }
 		inline Ref<Shader> getShader() const { return (m_shader); }
 		inline const glm::vec4& getColor() const { return (m_textColor); }
 		void setColor(const glm::vec4& _color);

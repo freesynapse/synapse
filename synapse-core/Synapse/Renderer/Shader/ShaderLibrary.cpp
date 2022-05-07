@@ -37,7 +37,7 @@ namespace Syn {
 	{
 		if (exists(_name))
 		{
-			SYN_CORE_WARNING("shader '", _name, "' already exists.");
+			SYN_CORE_TRACE("shader '", _name, "' already exists.");
 			return;
 		}
 		

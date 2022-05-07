@@ -103,7 +103,7 @@ void layer::onUpdate(float _dt)
 	SYN_PROFILE_FUNCTION();
 	
 	static float fontHeight = (float)m_font->getFontHeight() + 1.0f;
-
+	printf("%.1f\n", fontHeight);
 
 	// handle input
 	handleInput(_dt);
