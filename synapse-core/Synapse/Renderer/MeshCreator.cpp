@@ -10,14 +10,15 @@
 #include "Synapse/Utils/FileIOHandler.hpp"
 #include "Synapse/Utils/Timer/TimeStep.hpp"
 #include "Synapse/Utils/Timer/Timer.hpp"
+#include "Synapse/Utils/MathUtils.hpp"
 
 
-namespace Syn {
-
+namespace Syn 
+{
 
 	// static declarations
 	std::multimap<MeshDebugType, Ref<MeshDebug>> MeshCreator::s_MeshDebugMap;
-	boost::unordered_map<std::string, Ref<MeshDebug>> MeshCreator::s_MeshDebugSearchMap;
+	/*boost::*/std::unordered_map<std::string, Ref<MeshDebug>> MeshCreator::s_MeshDebugSearchMap;
 	glm::vec3 MeshCreator::s_debugRenderColor = glm::vec3(1.0f, 0.0f, 1.0f);
 	bool MeshCreator::s_shadersCreated = false;
 	Ref<Shader> MeshCreator::m_debugGeneralShader = nullptr;
@@ -494,17 +495,17 @@ namespace Syn {
 		for (int i = 0; i < ny; i++)
 		{
 			float y = _y[i];
-			ylim.min = std::min(ylim.min, y);
-			ylim.max = std::max(ylim.max, y);
+			ylim.min_ = min(ylim.min_, y);
+			ylim.max_ = max(ylim.max_, y);
 		}
 
 		// normalized to [0.0 .. 100.0] for all axes -- later adjusted to 
 		float xrange_i = 1.0f / _x.range();
-		float yrange_i = 1.0f / (ylim.max - ylim.min);
+		float yrange_i = 1.0f / (ylim.max_ - ylim.min_);
 		float zrange_i = 1.0f / _z.range();
 
 		float xmin = _x.get(0);
-		float ymin = ylim.min;
+		float ymin = ylim.min_;
 		float zmin = _z.get(0);
 
 		float* x = _x.getValues();
@@ -666,13 +667,13 @@ namespace Syn {
 											  _mesh_attrib_flags);
 
 		AABB aabb = {
-			{ (_x.lim.min - _x.lim.min) * xrange_i, 
-			  (  ylim.min -   ylim.min) * yrange_i, 
-			  (_z.lim.min - _z.lim.min) * zrange_i },
+			{ (_x.lim.min_ - _x.lim.min_) * xrange_i, 
+			  (  ylim.min_ -   ylim.min_) * yrange_i, 
+			  (_z.lim.min_ - _z.lim.min_) * zrange_i },
 
-			{ (_x.lim.max - _x.lim.min) * xrange_i, 
-			  (	 ylim.max -   ylim.min) * yrange_i, 
-			  (_z.lim.max - _z.lim.min) * zrange_i }
+			{ (_x.lim.max_ - _x.lim.min_) * xrange_i, 
+			  (	 ylim.max_ -   ylim.min_) * yrange_i, 
+			  (_z.lim.max_ - _z.lim.min_) * zrange_i }
 		};
 		mesh->setAABB(aabb);
 
@@ -727,18 +728,18 @@ namespace Syn {
 		for (int i = 0; i < ny; i++)
 		{
 			float y = _y[i];
-			ylim.min = std::min(ylim.min, y);
-			ylim.max = std::max(ylim.max, y);
+			ylim.min_ = std::min(ylim.min_, y);
+			ylim.max_ = std::max(ylim.max_, y);
 		}
 
 		// normalize to [0.0 .. 1.0] for all axes -- later adjusted to [-0.5 .. 0.5] through 
 		// translation after mesh creation
 		float xrange_i = 1.0f / _x.range();
-		float yrange_i = 1.0f / (ylim.max - ylim.min);
+		float yrange_i = 1.0f / (ylim.max_ - ylim.min_);
 		float zrange_i = 1.0f / _z.range();
 
 		float xmin = _x.get(0);
-		float ymin = ylim.min;
+		float ymin = ylim.min_;
 		float zmin = _z.get(0);
 
 		long double* x = _x.getValues();
@@ -792,11 +793,11 @@ namespace Syn {
 
 		AABB aabb = {
 			{ (_x.lim.min - _x.lim.min) * xrange_i, 
-			  (   ylim.min -    ylim.min) * yrange_i, 
+			  (   ylim.min_ -    ylim.min_) * yrange_i, 
 			  (_z.lim.min - _z.lim.min) * zrange_i },
 
 			{ (_x.lim.max - _x.lim.min) * xrange_i, 
-			  (	  ylim.max -    ylim.min) * yrange_i, 
+			  (	  ylim.max_ -    ylim.min_) * yrange_i, 
 			  (_z.lim.max - _z.lim.min) * zrange_i }
 		};
 		mesh->setAABB(aabb);

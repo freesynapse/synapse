@@ -7,6 +7,7 @@
 #include "Synapse/Core.hpp"
 #include "Synapse/Memory.hpp"
 #include "Synapse/Event/Event.hpp"
+#include "Synapse/Utils/MathUtils.hpp"
 
 
 namespace Syn {

@@ -93,7 +93,7 @@ namespace Syn
 
 		if (!_keep_file)
 		{
-			if (std::find(m_createdFiles.begin(), m_createdFiles.end(), _file_path) != m_createdFiles.end())
+			if (std::find(m_createdFiles.begin(), m_createdFiles.end(), _file_path) == m_createdFiles.end())
 				m_createdFiles.push_back(_file_path);
 		}
 
@@ -163,6 +163,17 @@ namespace Syn
 		file.close();
 
 		return RETURN_SUCCESS;
+
+	}
+
+
+	//-----------------------------------------------------------------------------------
+	void FileIOHandler::print_created_files()
+	{
+		for (auto const& file : m_createdFiles)
+		{
+			SYN_CORE_TRACE("", file.c_str());
+		}
 
 	}
 

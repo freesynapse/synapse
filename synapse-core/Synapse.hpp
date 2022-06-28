@@ -38,6 +38,7 @@
 #include "Synapse/Utils/Noise/NoiseGenerator.hpp"
 #include "Synapse/Utils/Random/Random.hpp"
 #include "Synapse/Utils/Bits.hpp"
+#include "Synapse/Utils/MathUtils.hpp"
 
 //#include "Synapse/Types/Linspace.hpp"
 //#include "Synapse/Types/Meshgrid.hpp"

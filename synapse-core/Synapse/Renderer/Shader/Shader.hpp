@@ -3,7 +3,8 @@
 
 #include <vector>
 
-#include <boost/unordered_map.hpp>
+//#include <boost/unordered_map.hpp>
+//#include <map>
 #include <string>
 
 #include "Synapse/Core.hpp"
@@ -23,7 +24,7 @@ namespace Syn {
 		void reload();
 
 	protected:
-		boost::unordered_map<GLenum, std::string> preprocess(const std::string& _source);
+		/*boost::*/std::unordered_map<GLenum, std::string> preprocess(const std::string& _source);
 		std::vector<std::string> parseUniforms();
 		int compileShader();
 		void resolveUniforms(const std::vector<std::string>& _uniforms);
@@ -45,8 +46,8 @@ namespace Syn {
 	protected:
 		std::string m_shaderName = "";
 		std::string m_assetPath = "";
-		boost::unordered_map<GLenum, std::string> m_shaderSrc;
-		boost::unordered_map<std::string, GLint> m_uniforms;
+		/*boost::*/std::unordered_map<GLenum, std::string> m_shaderSrc;
+		/*boost::*/std::unordered_map<std::string, GLint> m_uniforms;
 		bool m_loaded = false;
 
 		GLuint m_shaderID = 0;

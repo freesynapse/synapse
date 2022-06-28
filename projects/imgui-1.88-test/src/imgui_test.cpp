@@ -3,6 +3,10 @@
 #include <Synapse.hpp>
 #include <Synapse/SynapseMain.hpp>
 
+#include <map>
+
+#include "imgui/imgui_internal.h"
+
 using namespace Syn;
 #undef DEBUG_IMGUI_LOG
 
@@ -24,7 +28,9 @@ public:
 	// standard objects
 	Ref<Font> m_font = nullptr;
 	Ref<Framebuffer> m_renderBuffer = nullptr;
-	
+
+	std::map<int, std::string> m_map;
+
 	Ref<PerspectiveCamera> m_perspectiveCamera = nullptr;
 	Ref<OrbitCamera> m_orbitCamera = nullptr;
 	Ref<Camera> m_activeCamera = nullptr;
@@ -32,6 +38,8 @@ public:
 
 	Ref<Shader> m_shader = nullptr;
 	
+	std::string m_message = "";
+
 	// flags
 	bool m_wireframeMode = true;
 	bool m_toggleCulling = false;
@@ -85,6 +93,14 @@ void layer::onAttach()
 
 	// something to look at..
 	MeshCreator::createDebugCube();
+	m_map.insert(std::pair<int, std::string>(0, "aaa"));
+	m_map.insert(std::pair<int, std::string>(2, "bbb"));
+	m_map.insert(std::pair<int, std::string>(4, "ccc"));
+	m_map.insert(std::pair<int, std::string>(6, "ddd"));
+	m_map.insert(std::pair<int, std::string>(8, "eee"));
+	m_map.insert(std::pair<int, std::string>(10, "fff"));
+	m_map.insert(std::pair<int, std::string>(12, "ggg"));
+	m_map.insert(std::pair<int, std::string>(14, "hhh"));
 
 	// framebuffer
 	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
@@ -93,6 +109,10 @@ void layer::onAttach()
 	// misc setup
 	Renderer::setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+
+	// Test fps cap
+	Application::get().setMaxFPS(30.0f);
+	//
 
 	// execute pending rendering commands
 	Renderer::get().executeRenderCommands();
@@ -103,7 +123,6 @@ void layer::onUpdate(float _dt)
 	SYN_PROFILE_FUNCTION();
 	
 	static float fontHeight = (float)m_font->getFontHeight() + 1.0f;
-	printf("%.1f\n", fontHeight);
 
 	// handle input
 	handleInput(_dt);
@@ -195,7 +214,13 @@ void layer::onKeyDownEvent(Event* _e)
 			break;
 
 		case SYN_KEY_X:
-			printf("vp offset = %.0f %.0f\n\n", vp_offset.x, vp_offset.y);
+			if (InputManager::is_key_pressed(SYN_KEY_LEFT_CONTROL) || InputManager::is_key_pressed(SYN_KEY_RIGHT_CONTROL))
+				EventHandler::push_event(new WindowCloseEvent);
+			break;
+			
+		case SYN_KEY_W:
+			if (InputManager::is_key_pressed(SYN_KEY_LEFT_CONTROL) || InputManager::is_key_pressed(SYN_KEY_RIGHT_CONTROL))
+				EventHandler::push_event(new WindowCloseEvent);
 			break;
 
 		case SYN_KEY_ENTER:
@@ -277,6 +302,7 @@ void layer::onImGuiRender()
 
 	window_flags |= ImGuiWindowFlags_NoTitleBar;
 
+	ImGui::GetCurrentContext()->NavWindowingToggleLayer = false;
 
 	//-----------------------------------------------------------------------------------
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -338,6 +364,45 @@ void layer::onImGuiRender()
 		}
 		ImGui::EndTable();
 	}
+
+	// list test
+	ImGui::Separator();
+
+	static int current_idx = 0;
+	// extract indices from map
+	std::vector<int> map_indices;
+	for ( auto const& it : m_map)
+		map_indices.push_back(it.first);
+	
+	if (ImGui::BeginListBox("##listbox 2", ImVec2(-FLT_MIN, 32 * ImGui::GetTextLineHeightWithSpacing())))
+	{
+		for (size_t i = 0; i < map_indices.size(); i++)
+		{
+			auto entry = m_map[map_indices[i]];
+			char buffer[128];
+			sprintf(buffer, "%zu --- %s", i, entry.c_str());
+			const bool is_selected = (current_idx == i);
+			//if (ImGui::Selectable(m_map[map_indices[i]].c_str(), is_selected))
+			if (ImGui::Selectable(buffer, is_selected))
+				current_idx = (int)i;
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+
+		ImGui::EndListBox();
+	}
+
+	ImGui::Separator();
+	ImGui::Text("fps : %f", TimeStep::getFPS());
+	ImGui::Text("idle time : %f", TimeStep::getIdleTime());
+
+	// debug key input
+	ImGui::Separator();
+	ImGui::Text("key 'X'  : %s", InputManager::is_key_pressed(SYN_KEY_X) ? "true" : "false");
+	ImGui::Text("key 'W'  : %s", InputManager::is_key_pressed(SYN_KEY_W) ? "true" : "false");
+	ImGui::Text("L <CTRL> : %s", InputManager::is_key_pressed(SYN_KEY_LEFT_CONTROL) ? "true" : "false");
+	ImGui::Text("R <CTRL> : %s", InputManager::is_key_pressed(SYN_KEY_RIGHT_CONTROL) ? "true" : "false");
+
 	ImGui::End();
 	ImGui::PopStyleVar();
 	//-----------------------------------------------------------------------------------
@@ -369,9 +434,9 @@ void layer::onImGuiRender()
 
 }
 
-
 //---------------------------------------------------------------------------------------
 void layer::handleInput(float _dt)
 {
+
 }
 

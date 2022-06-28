@@ -65,9 +65,9 @@ namespace Syn {
 		m_up = glm::normalize(glm::cross(m_right, m_forward));
 
 		// update camera position based on rotation angles
-		m_position.x = m_radius * sinf(DEG_TO_RAD(m_yAngle)) * cosf(DEG_TO_RAD(m_xAngle));
-		m_position.y = m_radius * cosf(DEG_TO_RAD(m_yAngle));
-		m_position.z = m_radius * sinf(DEG_TO_RAD(m_yAngle)) * sinf(DEG_TO_RAD(m_xAngle));
+		m_position.x = m_radius * sinf(deg_to_rad(m_yAngle)) * cosf(deg_to_rad(m_xAngle));
+		m_position.y = m_radius * cosf(deg_to_rad(m_yAngle));
+		m_position.z = m_radius * sinf(deg_to_rad(m_yAngle)) * sinf(deg_to_rad(m_xAngle));
 
 		// set view matrix and update VP matrix
 		m_viewMatrix = glm::lookAt(m_position, m_target, m_up);
@@ -103,7 +103,7 @@ namespace Syn {
 			case EventType::INPUT_MOUSE_SCROLL:
 			{
 				m_radius -= dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset() * m_zoomSpeed;
-				m_radius = CLAMP(m_radius, 0.05f, m_zFar+100.0f);
+				m_radius = clamp(m_radius, 0.05f, m_zFar+100.0f);
 				break;
 			}
 
@@ -151,7 +151,7 @@ namespace Syn {
 			if (m_xAngle >= 360.0f)	m_xAngle -= 360.0f;
 			if (m_xAngle < 0.0f)	m_xAngle += 360.0f;
 
-			m_yAngle = CLAMP(m_yAngle, 0.1f, 179.9f);
+			m_yAngle = clamp(m_yAngle, 0.1f, 179.9f);
 			
 			// update mouse position
 		}

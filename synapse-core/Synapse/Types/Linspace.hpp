@@ -11,21 +11,21 @@ namespace Syn
     class limit_2D_t
     {
     public:
-        T min = 0.0f;
-        T max = 0.0f;
+        T min_ = 0.0f;
+        T max_ = 0.0f;
 
         limit_2D_t() = default;
         limit_2D_t(const limit_2D_t&) = default;
         limit_2D_t(T _min, T _max) :
-            min(_min), max(_max)
+            min_(_min), max_(_max)
         {
-            min = MIN(min, _min);
-            max = MAX(max, _max);
+            min_ = min(min_, _min);
+            max_ = max(max_, _max);
         }
-        T range() { return max - min; }
+        T range() { return max_ - min_; }
         void print(bool _newline=true) 
         { 
-            std::cout<<"min="<<min<<", max="<<max;
+            std::cout << "min=" << min_ << ", max=" << max_;
             if (_newline) std::cout << '\n';
         }
     };
@@ -75,7 +75,7 @@ namespace Syn
         { if (values != nullptr) { delete[] values; values = nullptr; } }
 
         uint32_t size() const { return steps; }
-        const T range() const { return lim.max - lim.min; }
+        const T range() const { return lim.max_ - lim.min_; }
         const T operator[](uint32_t _index) const { return values[_index]; }
         const T get(uint32_t _index) const { return values[_index]; }
         T* getValues() const { return values; }

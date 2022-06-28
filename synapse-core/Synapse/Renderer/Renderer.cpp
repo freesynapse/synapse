@@ -211,6 +211,7 @@ namespace Syn {
 
 		// store new viewport
 		s_viewport = e->getViewport();
+		
 		// set main viewport
 		setViewport(glm::ivec2(0, 0), s_viewport);
 

@@ -10,7 +10,8 @@
 #include "Synapse/Event/InputEvents.hpp"
 
 
-namespace Syn { 
+namespace Syn
+{
 
 	// static declarations
 	bool InputManager::m_bKeys[InputManager::MAX_KEYS];
@@ -40,9 +41,10 @@ namespace Syn {
 			EventHandler::push_event(new WindowCloseEvent());
 		*/
 
+		/*
 		if (is_key_pressed(SYN_KEY_F))
 			EventHandler::push_event(new WindowToggleFullscreenEvent());
-
+		*/
 	}
 
 	

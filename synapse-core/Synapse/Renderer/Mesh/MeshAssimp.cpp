@@ -107,12 +107,12 @@ namespace Syn {
 				vertex.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 
 				// update AABB
-				m_aabb.min.x = MIN(m_aabb.min.x, vertex.position.x);
-				m_aabb.max.x = MAX(m_aabb.max.x, vertex.position.x);
-				m_aabb.min.y = MIN(m_aabb.min.y, vertex.position.y);
-				m_aabb.max.y = MAX(m_aabb.max.y, vertex.position.y);
-				m_aabb.min.z = MIN(m_aabb.min.z, vertex.position.z);
-				m_aabb.max.z = MAX(m_aabb.max.z, vertex.position.z);
+				m_aabb.min.x = min(m_aabb.min.x, vertex.position.x);
+				m_aabb.max.x = max(m_aabb.max.x, vertex.position.x);
+				m_aabb.min.y = min(m_aabb.min.y, vertex.position.y);
+				m_aabb.max.y = max(m_aabb.max.y, vertex.position.y);
+				m_aabb.min.z = min(m_aabb.min.z, vertex.position.z);
+				m_aabb.max.z = max(m_aabb.max.z, vertex.position.z);
 
 				vertex.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 

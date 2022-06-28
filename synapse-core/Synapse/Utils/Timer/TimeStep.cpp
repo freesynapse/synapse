@@ -13,6 +13,7 @@ namespace Syn {
 	float TimeStep::s_deltaTimeMs = 0.0f;
 	float TimeStep::s_lastFrameTime = 0.0f;
 	float TimeStep::s_cumulativeTime = 0.0f;
+	float TimeStep::s_idleTime = 0.0f;
 	uint32_t TimeStep::s_nframes = 0;
 	long long TimeStep::s_framesTotal = 0;
 	float TimeStep::s_fps = 0.0f;

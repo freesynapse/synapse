@@ -16,24 +16,6 @@ static constexpr int RETURN_SUCCESS = 0;
 static constexpr int RETURN_FAILURE = -1;
 
 
-#ifndef M_PI
-	#define M_PI 3.14159265358979f
-#endif
-
-#define _1_OVER_PI		0.31830988618379f
-#define _1_OVER_180		0.00555555555555f
-#define PI_OVER_180		M_PI * _1_OVER_180
-#define _180_OVER_PI	180.0f * _1_OVER_PI
-#define DEG_TO_RAD(x)	(float)x * PI_OVER_180
-#define RAD_TO_DEG(x)	(float)x * _180_OVER_PI
-
-#define MIN(a, b) ((a)<(b)?(a):(b))
-#define MAX(a, b) ((a)>(b)?(a):(b))
-#define CLAMP(x, lo, hi) MIN(MAX(x, lo), hi)
-
-#define BIT_SHIFT(x) (1 << (x))
-
-
 // EVENTS //
 //
 

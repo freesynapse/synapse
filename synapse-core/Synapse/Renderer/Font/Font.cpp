@@ -8,6 +8,7 @@
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Debug/Profiler.hpp"
+#include "Synapse/Utils/MathUtils.hpp"
 
 
 namespace Syn { 
@@ -156,17 +157,17 @@ namespace Syn {
 
 			if (roww + g->bitmap.width + 1 >= 1024)
 			{
-				m_iTextureWidth = MAX(m_iTextureWidth, roww);
+				m_iTextureWidth = max(m_iTextureWidth, roww);
 				m_iTextureHeight += rowh;
 				roww = 0;
 				rowh = 0;
 			}
 
 			roww += g->bitmap.width + 1;
-			rowh = MAX(rowh, g->bitmap.rows);
+			rowh = max(rowh, g->bitmap.rows);
 		}
 
-		this->m_iTextureWidth = MAX(m_iTextureWidth, roww);
+		this->m_iTextureWidth = max(m_iTextureWidth, roww);
 		this->m_iTextureHeight += rowh;
 
 		// Setup swizzle mask for alpha texture shader rendering
@@ -235,7 +236,7 @@ namespace Syn {
 			m_sChars[i].tx = ox / (float)m_iTextureWidth;
 			m_sChars[i].ty = oy / (float)m_iTextureHeight;
 
-			rowh = MAX(rowh, g->bitmap.rows);
+			rowh = max(rowh, g->bitmap.rows);
 			ox += g->bitmap.width + 1;
 
 		}

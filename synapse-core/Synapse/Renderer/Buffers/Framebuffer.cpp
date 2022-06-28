@@ -54,7 +54,7 @@ namespace Syn {
 
 		// format filename
 		// TODO: don't hardcode this path!!
-		std::string dirName = _relative_path + "/../screenshots/";
+		std::string dirName = _relative_path;// + "/../screenshots/";
 		
 		std::string time = Time::current_time();
 		std::replace(time.begin(), time.end(), ':', '.');

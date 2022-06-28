@@ -23,6 +23,7 @@ namespace Syn {
 		// accessors
 		static bool is_key_pressed(unsigned int _key);
 		static bool is_button_pressed(unsigned int _button);
+		/* Returns the raw mouse position, in pixel space */
 		static const glm::vec2& get_mouse_position();
 		static const glm::vec2& get_mouse_scroll_position();
 

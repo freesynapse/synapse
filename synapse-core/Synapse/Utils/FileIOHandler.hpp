@@ -19,6 +19,7 @@ namespace Syn {
 		static int read_file_to_buffer(const std::string& _file_path, std::vector<unsigned char> &_buffer);
 		static int read_file_to_buffer(const std::string& _file_path, std::string &_buffer);
 
+		static void print_created_files();
 
 	private:
 		static std::vector<std::string> m_createdFiles;

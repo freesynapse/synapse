@@ -201,7 +201,7 @@ namespace Syn {
 		static std::multimap<MeshDebugType, Ref<MeshDebug>> s_MeshDebugMap;
 		
 		// Permits acquisition of created meshes (same Ref:s as in s_debugMap).
-		static boost::unordered_map<std::string, Ref<MeshDebug>> s_MeshDebugSearchMap;
+		static /*boost::*/std::unordered_map<std::string, Ref<MeshDebug>> s_MeshDebugSearchMap;
 		
 		static glm::vec3 s_debugRenderColor;
 

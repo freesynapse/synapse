@@ -227,7 +227,7 @@ namespace Syn
 			return;
 
 		// cant scale using a negative value
-		float scale = MAX(_f, 0.0f);
+		float scale = max(_f, 0.0f);
 
 		uint32_t index;
 
@@ -261,7 +261,7 @@ namespace Syn
 			return;
 		}
 
-		float thatWeight = MIN(MAX(_weight, 0.0f), 1.0f);
+		float thatWeight = min(max(_weight, 0.0f), 1.0f);
 		float thisWeight = 1.0f - thatWeight;
 
 		float* incomingData = _texture_ptr->getNoiseData();

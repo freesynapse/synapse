@@ -9,7 +9,7 @@
 #include "Synapse/Renderer/Renderer.hpp"
 #include "Synapse/Renderer/Transform.hpp"
 #include "Synapse/Types.hpp"
-
+#include "Synapse/Utils/MathUtils.hpp"
 
 //struct aiNode;
 //struct aiAnimation;

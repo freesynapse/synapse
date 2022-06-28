@@ -42,7 +42,7 @@ namespace Syn {
 
 		// Member variables .............................................................
 	private:
-		static const unsigned char MAX_EVENTS = 32;
+		static const unsigned char MAX_EVENTS = 64;
 		static const unsigned short MAX_CALLBACKS = 256;
 
 		static unsigned char m_queueHead;

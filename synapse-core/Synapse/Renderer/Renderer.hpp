@@ -13,8 +13,8 @@
 #include "Synapse/Event/EventTypes.hpp"
 
 
-namespace Syn {
-
+namespace Syn 
+{
 
 	struct RendererAPICapabilities
 	{
@@ -74,13 +74,14 @@ namespace Syn {
 		static const std::string& getImGuiRenderTargetName() { return s_imGuiRendererName; }
 		static void setImGuiRenderTargetName(const std::string& _name) { s_imGuiRendererName = _name; }
 		static glm::vec4& getClearColor() { return s_clearColor; }
-		static void setImGuiWindowPosition(const glm::ivec2& _pos) 
+		/* The docking poisition is absolute in px, location on desktop (for this version of Ubuntu [46, 71]),
+		 * but mouse position, for instance, is relative to the window. To get the limits of the viewport in 
+		 * relative coordinates, use getViewportLimits() or getViewportLimitsF().
+		 */
+		static void setImGuiWindowPosition(const glm::ivec2& _pos)
 		{ 
 			s_imGuiWinPos = _pos;
 			SYN_CORE_TRACE("ImGui window pos (", s_imGuiWinPos.x, ", ", s_imGuiWinPos.y, ")");
-			// The focking poisition is absolute in px, location on desktop (for this version of Ubuntu [46, 71]),
-			// but mouse position, for instance, is relative to the window. To get the limits of the viewport in 
-			// relative coordinates, use getViewportLimits() or getViewportLimitsF().
 			s_imGuiViewportOffset = s_imGuiDockPos - s_imGuiWinPos + s_imGuiViewportPos;
 			SYN_CORE_TRACE("ImGui viewport offset (", s_imGuiViewportOffset.x, ", ", s_imGuiViewportOffset.y, ")");
 		}

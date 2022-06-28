@@ -216,9 +216,9 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
-	boost::unordered_map<GLenum, std::string> Shader::preprocess(const std::string& _source)
+	/*boost::*/std::unordered_map<GLenum, std::string> Shader::preprocess(const std::string& _source)
 	{
-		boost::unordered_map<GLenum, std::string> shaderSources;
+		/*boost::*/std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
 		size_t lenToken = strlen(typeToken);
@@ -421,7 +421,7 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	GLint Shader::getUniformLocation(const std::string& _uniform_name)
 	{
-		boost::unordered_map<std::string, GLint>::const_iterator found = m_uniforms.find(_uniform_name);
+		/*boost::*/std::unordered_map<std::string, GLint>::const_iterator found = m_uniforms.find(_uniform_name);
 		if (found == m_uniforms.end())
 		{
 			#ifdef DEBUG_UNIFORMS

@@ -3,6 +3,7 @@
 
 #ifndef _WIN_32
 	#include <time.h>
+	#include <unistd.h>
 #endif
 
 #include "Synapse/Application.hpp"
@@ -138,6 +139,21 @@ namespace Syn {
 			#endif
 
 			m_frameTime = t0.getDeltaTimeMs();
+
+			#ifndef _WIN_32
+			// are we using a FPS limiter?
+			if (m_maxFPS > 0.0f)
+			{
+				float ms_per_frame = 1000.0f / m_maxFPS;
+				float remaining_time_ms = ms_per_frame - m_frameTime;
+				if (remaining_time_ms > 0.0f)
+				{
+					usleep(1000.0f * remaining_time_ms);
+					TimeStep::setIdleTime(remaining_time_ms);
+				}
+			}
+			#endif
+
 		}
 
 	}
@@ -159,7 +175,8 @@ namespace Syn {
 			case EventType::INPUT_KEY:
 				if (dynamic_cast<KeyDownEvent*>(_event)->getKey() == SYN_KEY_ESCAPE)
 				{
-					m_bRunning = false;
+					if (m_quitOnEscape)
+						m_bRunning = false;
 				}
 				break;
 			case EventType::VIEWPORT_RESIZE:

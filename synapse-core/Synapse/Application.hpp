@@ -35,6 +35,12 @@ namespace Syn {
 		static inline Application& get() { return *s_instance; }
 		inline float getFrameTime() { return (*s_instance).m_frameTime; }
 		inline float getRenderTime() { return (*s_instance).m_renderTime; }
+		inline void setMaxFPS(float _fps) { m_maxFPS = _fps; }
+
+		inline void disableQuitOnEscape() { m_quitOnEscape = false; }
+
+	protected:
+		bool m_quitOnEscape = true;
 
 	private:
 		Layerstack m_layerStack;
@@ -42,6 +48,7 @@ namespace Syn {
 		Ref<Window> m_window = nullptr;
 		bool m_bRunning = true;
 		float m_frameTime = 0.0f;
+		float m_maxFPS = -1.0f;
 		float m_renderTime = 0.0f;
 		bool m_firstFrame = true;
 		
