@@ -120,6 +120,7 @@ void layer::onAttach()
 //---------------------------------------------------------------------------------------
 void layer::onUpdate(float _dt)
 {
+	SYN_CORE_ASSERT(0 == 1, "kdlsakds");
 	SYN_PROFILE_FUNCTION();
 	
 	static float fontHeight = (float)m_font->getFontHeight() + 1.0f;

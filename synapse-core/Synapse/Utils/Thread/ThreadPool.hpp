@@ -40,7 +40,7 @@ namespace Syn
                         if (m_pool->m_queue.empty())
                         {
                             #ifdef DEBUG_THREADPOOL
-                                SYN_CORE_TRACE("thread " << m_id << " waiting for work");
+                                SYN_CORE_TRACE("thread ", m_id, " waiting for work");
                             #endif
                             m_pool->m_conditionalLock.wait(lock);
                         }
@@ -50,13 +50,13 @@ namespace Syn
                     if (assigned_task)
                     {
                         #ifdef DEBUG_THREADPOOL
-                            SYN_CORE_TRACE("thread " << m_id << " starting task");
+                            SYN_CORE_TRACE("thread ", m_id, " starting task");
                         #endif
                         func();
                     }
                 }
                 #ifdef DEBUG_THREADPOOL
-                    SYN_CORE_TRACE("thread " << m_id << " shutting down");
+                    //SYN_CORE_TRACE("thread ", m_id, " shutting down");
                 #endif
             }
         };
@@ -93,7 +93,7 @@ namespace Syn
             SYN_CORE_TRACE("initializing worker threads (", m_threads.size(),").");
 
             #ifdef DEBUG_THREADPOOL
-                SYN_CORE_TRACE("creating " << m_threads.size() << " worker threads");
+                SYN_CORE_TRACE("creating ", m_threads.size(), " worker threads");
             #endif
             for (size_t i = 0; i < m_threads.size(); i++)
                 m_threads[i] = std::thread(ThreadWorker(this, i));

@@ -80,7 +80,7 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_PYTHON_EMBEDDING
 
 // threading
-//#define DEBUG_THREADPOOL
+#define DEBUG_THREADPOOL
 
 // profiling of engine performance
 #define DEBUG_PROFILING
@@ -197,22 +197,19 @@ static constexpr int RETURN_FAILURE = -1;
 
 #define SYNAPSE_ASSERT
 #ifdef SYNAPSE_ASSERT
-	#ifdef _MSC_VER
-		#define SYN_CORE_ASSERT_NO_MESSAGE(condition) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed."); __debugbreak(); } }
-		#define SYN_CORE_ASSERT_MESSAGE(condition, ...) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed: ", __VA_ARGS__); __debugbreak(); } }
-	#else
-		#define SYN_CORE_ASSERT_NO_MESSAGE(condition) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed."); } }
-		#define SYN_CORE_ASSERT_MESSAGE(condition, ...) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed: ", __VA_ARGS__); } }
-	#endif
+	#include "Synapse/Debug/DebugBreak.h"
+	#define SYN_CORE_ASSERT_NO_MESSAGE(condition) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed."); debug_break(); } }
+	#define SYN_CORE_ASSERT_MESSAGE(condition, ...) { if (!(condition)) { SYN_CORE_ERROR("Assertion failed: ", __VA_ARGS__); debug_break(); } }
 
 	#define SYN_ASSERT_NO_MESSAGE(condition) { if (!(condition)) { SYN_ERROR("Assertion failed."); } }
 	#define SYN_ASSERT_MESSAGE(condition, ...) { if (!(condition)) { SYN_ERROR("Assertion failed: ", __VA_ARGS__); } }
 
 	#define SYN_ASSERT_RESOLVE(arg0, arg1, macro, ...) macro
 
-	#define SYN_CORE_ASSERT(condition, ...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_CORE_ASSERT_MESSAGE, SYN_CORE_ASSERT_NO_MESSAGE)(__VA_ARGS__)
-	#define SYN_ASSERT(condition, ...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_ASSERT_MESSAGE, SYN_ASSERT_NO_MESSAGE)(__VA_ARGS__)
+	#define SYN_CORE_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_CORE_ASSERT_MESSAGE, SYN_CORE_ASSERT_NO_MESSAGE)(__VA_ARGS__)
+	#define SYN_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_ASSERT_MESSAGE, SYN_ASSERT_NO_MESSAGE)(__VA_ARGS__)
 #else
+	#include <assert.h>
 	#define SYN_CORE_ASSERT(condtion) assert(condition)
 	#define SYN_ASSERT(condtion) assert(condition)
 #endif
