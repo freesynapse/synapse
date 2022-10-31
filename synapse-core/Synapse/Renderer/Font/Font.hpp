@@ -35,37 +35,44 @@ namespace Syn {
 	{
 	public:
 		// Constructor / destructor
-		Font(const char *_filename, const int& _pixel_size=12, const Ref<Shader>& _shader=nullptr);
+		Font(const char *_filename, const int& _pixel_size=12, const Ref<Shader>& _shader=nullptr, const glm::vec2& _vp_sz=glm::vec2(0.0f));
 		~Font();
 
 		void beginRenderBlock();
 		void endRenderBlock();
 		void addString(const float& _x, const float& _y, const char* _str, ...);
+		// in pixels
+		float getStringWidth(const char* _str, ...);
 		
 
 		// Accessors
 		inline const void enableShader() const { m_shader->enable(); }
 		inline const void disableShader() const { m_shader->disable(); }
-		inline unsigned int getFontHeight() { return (m_iTextureHeight); }
+		inline float getFontHeight() { return static_cast<float>(m_iTextureHeight); }
 		inline Ref<Shader> getShader() const { return (m_shader); }
 		inline const glm::vec4& getColor() const { return (m_textColor); }
 		void setColor(const glm::vec4& _color);
+		void enableUpdateOnResize() { m_updateOnResize = true; }
+		void disableUpdateOnResize() { m_updateOnResize = false; }
 		
 		void onResizeEvent(Event* _e)
 		{
+			if (!m_updateOnResize)
+				return;
 			ViewportResizeEvent* e = dynamic_cast<ViewportResizeEvent*>(_e);
 			m_sx = 2.0f / static_cast<float>(e->getViewportX());
 			m_sy = 2.0f / static_cast<float>(e->getViewportY());
 		}
-		//void setScreenRes(float _width, float _height)
-		//{
-		//	m_sx = 2.0f / _width;
-		//	m_sy = 2.0f / _height;
-		//}
+
+		void resize(const glm::vec2& _vp_sz_px)
+		{
+			m_sx = 2.0f / _vp_sz_px.x;
+			m_sy = 2.0f / _vp_sz_px.y;
+		}
 
 
 	private:
-		int initAtlas(const char* _filename, const int& _pixel_size);
+		int initAtlas(const char* _filename, const int& _pixel_size, const glm::vec2& _vp_sz);
 
 
 	private:
@@ -106,6 +113,8 @@ namespace Syn {
 		glm::vec4 m_textColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// .text rendering attributes
+		glm::vec2 m_vpSz = { 0.0f, 0.0f };
+		bool m_updateOnResize = true;
 		float m_sx = 0.0f;
 		float m_sy = 0.0f;
 

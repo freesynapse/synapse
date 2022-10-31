@@ -40,8 +40,10 @@ namespace Syn {
 			auto duration = end - start;
 			double ms = duration * 0.001;
 
-			if (m_printResult)
-				Log::log_no_func(m_caller, ": ", ms, " ms");
+			if (m_printResult && Log::initialized())
+				Log::log_no_func(m_caller, ": ", ms, " ms.");
+			else if (m_printResult && !Log::initialized())
+				printf("%s: %.3f ms.\n", m_caller, ms);
 		}
 
 		/* Elapsed time in microseconds. */

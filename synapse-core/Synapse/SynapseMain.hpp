@@ -6,6 +6,7 @@
 #include "Synapse/Core.hpp"
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Profiler.hpp"
+#include "Synapse/Debug/Stacktrace.h"
 #include "Synapse/Event/EventHandler.hpp"
 #include "Synapse/Utils/Random/Random.hpp"
 #include "Synapse/Memory.hpp"
@@ -65,6 +66,9 @@ int main(int argc, char* argv[])
 		//GetWindowRect(console, &r);
 		//MoveWindow(console, 0, 0, 1440, 960, TRUE);
 	#endif
+
+	// register stacktracing for segmentation faults
+	Syn::Stacktracer::register_signal_handler();
 
 	// init the random number engine -- singleton
 	Syn::Random::init();

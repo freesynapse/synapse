@@ -81,9 +81,12 @@ namespace Syn
 		static void setImGuiWindowPosition(const glm::ivec2& _pos)
 		{ 
 			s_imGuiWinPos = _pos;
-			SYN_CORE_TRACE("ImGui window pos (", s_imGuiWinPos.x, ", ", s_imGuiWinPos.y, ")");
 			s_imGuiViewportOffset = s_imGuiDockPos - s_imGuiWinPos + s_imGuiViewportPos;
-			SYN_CORE_TRACE("ImGui viewport offset (", s_imGuiViewportOffset.x, ", ", s_imGuiViewportOffset.y, ")");
+			if (s_reportImGuiUpdate)
+			{
+				SYN_CORE_TRACE("ImGui window pos (", s_imGuiWinPos.x, ", ", s_imGuiWinPos.y, ")");
+				SYN_CORE_TRACE("ImGui viewport offset (", s_imGuiViewportOffset.x, ", ", s_imGuiViewportOffset.y, ")");
+			}
 		}
 		/* The limits of the viewport as a glm::ivec4, where x and y
 		 * are the top and left limits, and z and w are the right 
@@ -104,6 +107,9 @@ namespace Syn
 			glm::ivec4 lim = getViewportLimits();
 			return glm::vec4(lim.x, lim.y, lim.z, lim.w);
 		}
+		//
+		static void disableImGuiUpdateReport() { s_reportImGuiUpdate = false; }
+		static void enableImGuiUpdateReport() { s_reportImGuiUpdate = true; }
 
 		
 		// API calls
@@ -206,6 +212,7 @@ namespace Syn
 		static glm::ivec2 s_imGuiWinPos;
 		static glm::ivec2 s_imGuiViewportOffset;
 		static std::string s_imGuiRendererName;
+		static bool s_reportImGuiUpdate;
 
 		RenderCommandQueue m_commandQueue;
 

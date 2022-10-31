@@ -17,7 +17,9 @@ namespace Syn {
 	Layerstack::~Layerstack()
 	{
 		for (Layer* layer : m_layers)
+		{
 			delete layer;
+		}
 	}
 
 

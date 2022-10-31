@@ -23,9 +23,10 @@ workspace "Synapse"
 
     -- enable symbols for Debug builds
     filter "configurations:Debug"
-        defines "DEBUG"
+        defines { "DEBUG", "DEBUG_PROFILING" }
         optimize "Debug"
         symbols "On"
+        linkoptions { "-rdynamic" }
 
     -- enable optimization for Release builds
     filter "configurations:Release"
@@ -82,6 +83,9 @@ LibDirs["python"] = "%{wks.location}/../libraries/python3.8/config-3.8-x86_64-li
 
 -- projects included in this workspace -- inheriting globals from this file
 include "synapse-core"
-include "projects/imgui-1.88-test"
-include "projects/pan-and-zoom"
+--include "projects/imgui-1.88-test"
+--include "projects/mplc"
+include "projects/mpl_test"
+--include "projects/imgui-1.88-tabs"
+--include "projects/pan-and-zoom"
 

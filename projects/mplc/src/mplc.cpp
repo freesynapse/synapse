@@ -4,10 +4,16 @@
 #include <Synapse/SynapseMain.hpp>
 
 #include <map>
+#include <chrono>
 
 #include "imgui/imgui_internal.h"
 
+#include "Figure/Figure.h"
+
+
 using namespace Syn;
+using namespace Syn::mplc;
+
 #undef DEBUG_IMGUI_LOG
 
 class layer : public Layer
@@ -23,34 +29,31 @@ public:
 	void onMouseButtonEvent(Event* _e);
 	void handleInput(float _dt);
 
+	void popup_test();
 
 public:
 	// standard objects
 	Ref<Font> m_font = nullptr;
 	Ref<Framebuffer> m_renderBuffer = nullptr;
 
-	std::map<int, std::string> m_map;
-
-	Ref<PerspectiveCamera> m_perspectiveCamera = nullptr;
-	Ref<OrbitCamera> m_orbitCamera = nullptr;
-	Ref<Camera> m_activeCamera = nullptr;
-	bool m_usePerspectiveCamera = false;	// if true, starts in perspective camera mode, else orbital mode
-
 	Ref<Shader> m_shader = nullptr;
 	
-	std::string m_message = "";
+	//
+	Ref<Figure> m_fig = nullptr;
 
 	// flags
 	bool m_wireframeMode = true;
 	bool m_toggleCulling = false;
 
+	bool open_popup = true;
+
 };
-class imgui_tests : public Application
+class mplc_inst : public Application
 {
 public:
-	imgui_tests() { this->pushLayer(new layer); }
+	mplc_inst() { this->pushLayer(new layer); }
 };
-Application* CreateSynapseApplication() { return new imgui_tests(); }
+Application* CreateSynapseApplication() { return new mplc_inst(); }
 
 //---------------------------------------------------------------------------------------
 void layer::onAttach()
@@ -71,36 +74,11 @@ void layer::onAttach()
 	m_font = MakeRef<Font>("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 14.0f);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-
-	// load camera
-	m_orbitCamera = API::newOrbitCamera(45.0f, SCREEN_WIDTH_F, SCREEN_HEIGHT_F, 0.1f, 1000.0f);
-	m_orbitCamera->setPosition({ 0.0f, 0.0f, 0.0f });
-	m_orbitCamera->setYAngle(60.0f);
-	m_orbitCamera->setXAngle(20.0f);
-	m_orbitCamera->setRadius(10.0f);
-	m_orbitCamera->setOrbitSpeed(0.6f);
-	m_orbitCamera->setZoomSpeed(0.1f);
-	m_orbitCamera->onUpdate(0.0f);
-	EventHandler::push_event(new WindowToggleFrozenCursorEvent(m_usePerspectiveCamera));
-	EventHandler::push_event(new WindowToggleCursorEvent(!m_usePerspectiveCamera));
-
-	m_perspectiveCamera = API::newPerspectiveCamera(45.0f, SCREEN_WIDTH_F, SCREEN_HEIGHT_F, 0.1f, 400.0f);
-	m_perspectiveCamera->setPosition({ 0.0f, 0.0f, 0.0f });
-	m_perspectiveCamera->setXAngle(75.0f);
-	m_perspectiveCamera->setYAngle(20.0f);
-	m_perspectiveCamera->setMoveSpeed(1.0f);
-	m_perspectiveCamera->onUpdate(0.0f);
-
-	// something to look at..
-	MeshCreator::createDebugCube();
-	m_map.insert(std::pair<int, std::string>(0, "aaa"));
-	m_map.insert(std::pair<int, std::string>(2, "bbb"));
-	m_map.insert(std::pair<int, std::string>(4, "ccc"));
-	m_map.insert(std::pair<int, std::string>(6, "ddd"));
-	m_map.insert(std::pair<int, std::string>(8, "eee"));
-	m_map.insert(std::pair<int, std::string>(10, "fff"));
-	m_map.insert(std::pair<int, std::string>(12, "ggg"));
-	m_map.insert(std::pair<int, std::string>(14, "hhh"));
+	// Figure
+	glm::vec2 fig_sz = glm::vec2(480.0f, 320.0f);
+	m_fig = std::make_shared<Figure>(fig_sz);
+	m_fig->scatter();
+	m_fig->__debug();
 
 	// framebuffer
 	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
@@ -120,31 +98,17 @@ void layer::onAttach()
 //---------------------------------------------------------------------------------------
 void layer::onUpdate(float _dt)
 {
-	SYN_CORE_ASSERT(0 == 1, "kdlsakds");
 	SYN_PROFILE_FUNCTION();
 	
-	static float fontHeight = (float)m_font->getFontHeight() + 1.0f;
+	static float fontHeight = m_font->getFontHeight() + 1.0f;
 
 	// handle input
 	handleInput(_dt);
 
 
-	// update camera
-	if (m_usePerspectiveCamera)
-	{
-		m_perspectiveCamera->setUpdateMode(m_usePerspectiveCamera);
-		m_perspectiveCamera->onUpdate(_dt);
-		m_activeCamera = m_perspectiveCamera;
-	}
-	else
-	{
-		m_orbitCamera->setUpdateMode(m_usePerspectiveCamera);
-		m_orbitCamera->onUpdate(_dt);
-		m_activeCamera = m_orbitCamera;
-	}
-
 	// bind presenting framebuffer
 	m_renderBuffer->bind();
+
 
 	// toggle wireframe
 	if (m_wireframeMode) Renderer::enableWireFrame();
@@ -154,37 +118,46 @@ void layer::onUpdate(float _dt)
 
 
 	// -- BEGINNING OF SCENE -- //
-
-	MeshCreator::renderDebugMeshes(m_activeCamera);
-
 	// -- END OF SCENE -- //
 
 
 	// toggle wireframe (back)
 	if (m_wireframeMode) Renderer::disableWireFrame();
 
+	
 	// Text rendering 
 	// TODO: all text rendering should go into an overlay layer.
-	int i = 1;
-	m_font->beginRenderBlock();
-	m_font->addString(2.0f, fontHeight * i++, "fps=%.0f  VSYNC=%s", TimeStep::getFPS(), Application::get().getWindow().isVSYNCenabled() ? "ON" : "OFF");
-	glm::vec3 camPos = m_orbitCamera->getPosition();
-	m_font->addString(2.0f, fontHeight * i++, 
-					  "camera 1 [ %.1f  %.1f  %.1f ], phi %.1f  theta %.1f  r %.1f", 
-					  camPos.x, camPos.y, camPos.z, 
-					  m_orbitCamera->getYAngle(), m_orbitCamera->getXAngle(), m_orbitCamera->getRadius());
-	camPos = m_perspectiveCamera->getPosition();
-	m_font->addString(2.0f, fontHeight * i++, 
-					  "camera 2 [ %.1f  %.1f  %.1f ], X %.1f  Y %.1f", 
-					  camPos.x, camPos.y, camPos.z, 
-					  m_perspectiveCamera->getXAngle(), m_perspectiveCamera->getYAngle());
-	m_font->addString(2.0f, fontHeight * i++, "camera: perspective %s  orbit %s", 
-					  m_usePerspectiveCamera ? "TRUE" : "FALSE", m_usePerspectiveCamera ? "FALSE" : "TRUE");
-	m_font->endRenderBlock();
 
 
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
 	m_renderBuffer->bindDefaultFramebuffer();
+
+	if (m_fig)
+		m_fig->render();
+
+}
+//---------------------------------------------------------------------------------------
+void layer::popup_test()
+{
+	static ImGuiIO& io = ImGui::GetIO();
+	static ImVec2 size = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
+	static int n = 1000;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+	ImGui::SetNextWindowPos(size, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowSize(ImVec2(500.0f, 850.0f), ImGuiCond_Appearing);
+
+	ImGui::OpenPopup("modal_popup");
+	if (ImGui::BeginPopupModal("modal_popup", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+	{
+		if (m_fig)
+			ImGui::Image((void*)m_fig->figurePtrID(), m_fig->imGuiFigureSz(), { 0, 1 }, { 1, 0 });
+
+
+		ImGui::EndPopup();
+
+	}
+	ImGui::PopStyleVar();
 
 }
 //---------------------------------------------------------------------------------------
@@ -257,12 +230,15 @@ void layer::onKeyDownEvent(Event* _e)
 			break;
 
 		case SYN_KEY_TAB:
-			m_usePerspectiveCamera = !m_usePerspectiveCamera;
-			if (m_usePerspectiveCamera)
-				m_perspectiveCamera->resetMousePosition();
-			EventHandler::push_event(new WindowToggleFrozenCursorEvent(m_usePerspectiveCamera));
-			EventHandler::push_event(new WindowToggleCursorEvent(!m_usePerspectiveCamera));
+			//m_usePerspectiveCamera = !m_usePerspectiveCamera;
+			//if (m_usePerspectiveCamera)
+			//	m_perspectiveCamera->resetMousePosition();
+			//EventHandler::push_event(new WindowToggleFrozenCursorEvent(m_usePerspectiveCamera));
+			//EventHandler::push_event(new WindowToggleCursorEvent(!m_usePerspectiveCamera));
 			break;
+		
+		case SYN_KEY_SPACE:
+			open_popup = !open_popup;
 		}
 	}
 
@@ -315,105 +291,42 @@ void layer::onImGuiRender()
 
 	// Dockspace
 	ImGuiIO& io = ImGui::GetIO();
+	ImGuiID dockspace_id = 0;	//
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
-		ImGuiID dockspace_id = ImGui::GetID("dockspace");
+		dockspace_id = ImGui::GetID("dockspace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
 	}
-	//-----------------------------------------------------------------------------------
-	#ifdef DEBUG_IMGUI_LOG
-		ImGui::Begin("synapse-core::log");
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-		ImGuiTextBuffer buffer = Log::getImGuiBuffer();
-		const char* bufBegin = buffer.begin();
-		const char* bufEnd = buffer.end();
-
-		// only process lines within the visible area
-		ImGuiListClipper clipper;
-		ImVector<int> lineOffsets = Log::getImGuiLineOffset();
-		clipper.Begin(lineOffsets.Size);
-		while (clipper.Step())
-		{
-			for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
-			{
-				const char* lineStart = bufBegin + lineOffsets[line_no];
-				const char* lineEnd = (line_no + 1 < lineOffsets.Size) ? (bufBegin + lineOffsets[line_no + 1] - 1) : bufEnd;
-				ImGui::TextUnformatted(lineStart, lineEnd);
-			}
-		}
-
-		// scroll to end
-		ImGui::SetScrollHereY(1.0f);
-
-
-		//ImGui::TextUnformatted(bufBegin, bufEnd);
-		ImGui::PopStyleVar();
-		ImGui::End();
-	#endif
+	
 	//-----------------------------------------------------------------------------------
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("settings");
-	if (ImGui::BeginTable("split1", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
-	{
-		static bool selected[10] = {};
-		for (int i = 0; i < 10; i++)
-		{
-			char label[32];
-			sprintf(label, "Item %d", i);
-			ImGui::TableNextColumn();
-			ImGui::Selectable(label, &selected[i]); // FIXME-TABLE: Selection overlap
-		}
-		ImGui::EndTable();
-	}
 
-	// list test
-	ImGui::Separator();
-
-	static int current_idx = 0;
-	// extract indices from map
-	std::vector<int> map_indices;
-	for ( auto const& it : m_map)
-		map_indices.push_back(it.first);
-	
-	if (ImGui::BeginListBox("##listbox 2", ImVec2(-FLT_MIN, 32 * ImGui::GetTextLineHeightWithSpacing())))
-	{
-		for (size_t i = 0; i < map_indices.size(); i++)
-		{
-			auto entry = m_map[map_indices[i]];
-			char buffer[128];
-			sprintf(buffer, "%zu --- %s", i, entry.c_str());
-			const bool is_selected = (current_idx == i);
-			//if (ImGui::Selectable(m_map[map_indices[i]].c_str(), is_selected))
-			if (ImGui::Selectable(buffer, is_selected))
-				current_idx = (int)i;
-			if (is_selected)
-				ImGui::SetItemDefaultFocus();
-		}
-
-		ImGui::EndListBox();
-	}
-
-	ImGui::Separator();
 	ImGui::Text("fps : %f", TimeStep::getFPS());
 	ImGui::Text("idle time : %f", TimeStep::getIdleTime());
 
-	// debug key input
+	// TEST ImGui::BeginPopupModal()
+	//
 	ImGui::Separator();
-	ImGui::Text("key 'X'  : %s", InputManager::is_key_pressed(SYN_KEY_X) ? "true" : "false");
-	ImGui::Text("key 'W'  : %s", InputManager::is_key_pressed(SYN_KEY_W) ? "true" : "false");
-	ImGui::Text("L <CTRL> : %s", InputManager::is_key_pressed(SYN_KEY_LEFT_CONTROL) ? "true" : "false");
-	ImGui::Text("R <CTRL> : %s", InputManager::is_key_pressed(SYN_KEY_RIGHT_CONTROL) ? "true" : "false");
+	ImGui::Text("open_popup : %s", open_popup ? "true" : "false");
+	if (ImGui::Button("Open popup"))
+		open_popup = true;
 
+	if (open_popup)
+	{	
+		popup_test();
+	}
+	//
+	
 	ImGui::End();
 	ImGui::PopStyleVar();
+
 	//-----------------------------------------------------------------------------------
 	// set the 'rest' of the window as the viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("synapse-core::renderer");
 	static ImVec2 oldSize = { 0, 0 };
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-	//printf("  vp %.0f x %.0f\n", viewportSize.x, viewportSize.y);
-	//printf("o vp %.0f x %.0f\n", oldSize.x, oldSize.y);
 
 	if (viewportSize.x != oldSize.x || viewportSize.y != oldSize.y)
 	{
@@ -434,7 +347,6 @@ void layer::onImGuiRender()
 	ImGui::End();
 
 }
-
 //---------------------------------------------------------------------------------------
 void layer::handleInput(float _dt)
 {

@@ -30,6 +30,7 @@ namespace Syn {
 	glm::ivec2 Renderer::s_imGuiWinPos			= glm::ivec2(0);
 	glm::ivec2 Renderer::s_imGuiViewportOffset	= glm::ivec2(0);
 	std::string Renderer::s_imGuiRendererName 	= "synapse-core::renderer";
+	bool Renderer::s_reportImGuiUpdate			= true;
 
 	glm::vec4 Renderer::s_clearColor			= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	Ref<Shader> Renderer::s_normalShader 		= nullptr;
@@ -195,9 +196,12 @@ namespace Syn {
 
 		s_imGuiDockPos = dockPos;
 
-		SYN_CORE_TRACE("ImGui docker pos (", s_imGuiDockPos.x, ", ", s_imGuiDockPos.y, ")");
-		SYN_CORE_TRACE("ImGui viewport [ ", s_viewport.x, ", ", s_viewport.y, " ]");
-		SYN_CORE_TRACE("ImGui viewport pos (", s_imGuiViewportPos.x, ", ", s_imGuiViewportPos.y, ")");
+		if (s_reportImGuiUpdate)
+		{
+			SYN_CORE_TRACE("ImGui docker pos (", s_imGuiDockPos.x, ", ", s_imGuiDockPos.y, ")");
+			SYN_CORE_TRACE("ImGui viewport [ ", s_viewport.x, ", ", s_viewport.y, " ]");
+			SYN_CORE_TRACE("ImGui viewport pos (", s_imGuiViewportPos.x, ", ", s_imGuiViewportPos.y, ")");
+		}
 
 		setImGuiWindowPosition(glm::ivec2(0, 0));
 

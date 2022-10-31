@@ -14,7 +14,7 @@
 namespace Syn { 
 
 
-	Font::Font(const char* _filename, const int& _pixel_size, const Ref<Shader>& _shader)
+	Font::Font(const char* _filename, const int& _pixel_size, const Ref<Shader>& _shader, const glm::vec2& _vp_sz)
 	{
 		// create and load shaders?
 		if (_shader == nullptr)
@@ -79,9 +79,10 @@ namespace Syn {
 		EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Font::onResizeEvent));
 
 		// initialize the text atlas texture
-		SYN_RENDER_S2(_filename, _pixel_size, {
-			self->initAtlas(_filename, _pixel_size);
+		SYN_RENDER_S3(_filename, _pixel_size, _vp_sz, {
+			self->initAtlas(_filename, _pixel_size, _vp_sz);
 		});
+		m_vpSz = _vp_sz;
 
 		Renderer::get().executeRenderCommands();
 
@@ -104,7 +105,7 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	int Font::initAtlas(const char* _filename, const int& _pixel_size)
+	int Font::initAtlas(const char* _filename, const int& _pixel_size, const glm::vec2& _vp_sz)
 	{
 		SYN_PROFILE_FUNCTION();
 
@@ -135,8 +136,16 @@ namespace Syn {
 		// Initialize variables before atlas creation
 		FT_Set_Pixel_Sizes(m_ftFace, 0, _pixel_size);
 		FT_GlyphSlot g = m_ftFace->glyph;
-		m_sx = 2.0f / SCREEN_WIDTH_F;
-		m_sy = 2.0f / SCREEN_HEIGHT_F;
+		if (_vp_sz.x <= 1.0f || _vp_sz.y <= 1.0f)
+		{
+			m_sx = 2.0f / SCREEN_WIDTH_F;
+			m_sy = 2.0f / SCREEN_HEIGHT_F;
+		}
+		else
+		{
+			m_sx = 2.0f / _vp_sz.x;
+			m_sy = 2.0f / _vp_sz.y;
+		}
 
 		unsigned int roww = 0;
 		unsigned int rowh = 0;
@@ -271,7 +280,6 @@ namespace Syn {
 		m_offset = 0;
 		m_renderOffsets.clear();
 		memset(m_texCoords.get(), 0, sizeof(font_point) * MAX_BUFFER_LENGTH * 6);
-
 	}
 
 
@@ -303,7 +311,7 @@ namespace Syn {
 				glm::vec2& pos = self->m_renderOffsets[i];
 
 				float x = -1 + pos.x * self->m_sx;
-				float y = 1 - pos.y * self->m_sy;
+				float y =  1 - pos.y * self->m_sy;
 
 
 				// Loop through all characters
@@ -315,7 +323,7 @@ namespace Syn {
 				{
 					const uint8_t* p = (const uint8_t*)(self->m_buffer + j);
 					// calculate vertex and texture coordinates
-					float x2 = x + self->m_sChars[*p].bl * self->m_sx;
+					float x2 =  x + self->m_sChars[*p].bl * self->m_sx;
 					float y2 = -y - self->m_sChars[*p].bt * self->m_sy;
 					float w = self->m_sChars[*p].bw * self->m_sx;
 					float h = self->m_sChars[*p].bh * self->m_sy;
@@ -401,6 +409,20 @@ namespace Syn {
 
 
 	} // Font::RenderString_ss()
+
+
+	//-----------------------------------------------------------------------------------
+	float Font::getStringWidth(const char* _str, ...)
+	{
+		memset(m_tmpBuffer, 0, 256);
+
+		va_list arglist;
+		va_start(arglist, _str);
+		int offset = vsprintf(m_tmpBuffer, _str, arglist);
+		va_end(arglist);
+
+		return offset * m_sChars[m_tmpBuffer[0]].ax;
+	}
 
 
 	//-----------------------------------------------------------------------------------

@@ -198,6 +198,7 @@ namespace Syn {
 		static uint32_t getWarningCount() { return s_warningCount; }
 		static void increaseErrorCount() { s_errorCount++; }
 		static void increaseWarningCount() { s_warningCount++; }
+		static bool initialized() { return m_bInitialized; }
 
 
 		#ifdef _WIN64
@@ -210,7 +211,8 @@ namespace Syn {
 		#else
 			inline static const void setErrorColor() 	{ std::cout << "\x1b[1;37;41m"; }	// bold white text, red background
 			inline static const void setWarningColor() 	{ std::cout << "\x1b[0;30;42m"; }	// regular, black text, cyan background
-			inline static const void setCoreColor() 	{ std::cout << "\x1b[1m"; }			// bold, unformatted color
+			//inline static const void setCoreColor() 	{ std::cout << "\x1b[1m"; }			// bold, unformatted color
+			inline static const void setCoreColor() 	{ std::cout << "\x1b[0m"; }			// regular, unformatted color
 			inline static const void setClientColor() 	{ std::cout << "\x1b[0m;"; }		// regular, unformatted color
 			inline static const void resetColor() 		{ std::cout << "\x1b[0m"; }			// regular, unformatted color
 			inline static const void setOkColor() 		{ std::cout << "\x1b[0;32m"; }		// regular, green text

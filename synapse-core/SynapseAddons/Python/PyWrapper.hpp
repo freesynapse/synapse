@@ -60,16 +60,34 @@ namespace Syn
     class PyWrapper
     {
     private:
-        static int s_npReturnCode;    // ugly hack to debug import_array()
-
+        static int s_npReturnCode;    // hack to debug import_array()
+        
     public:
-        static void init(const std::string& _script_path="../assets/python_scripts/")
-        { 
+        static void initPython()
+        {
             SYN_PROFILE_FUNCTION();
             Timer timer("", false);
 
             /* Initialize the python interpreter */
             Py_Initialize();
+
+            SYN_CORE_TRACE("Python interpreter initialized in ", timer.getDeltaTimeMs(), " ms.");
+        }
+
+        /* Shut down python interpreter */
+        static void finalizePython() 
+        {
+            SYN_PROFILE_FUNCTION();
+            Timer timer("", false);
+
+            Py_Finalize();
+            SYN_CORE_TRACE("Python interpreter finalized in ", timer.getDeltaTimeMs(), " ms.");
+        }
+
+        static void init(const std::string& _script_path="../assets/python_scripts/")
+        { 
+            SYN_PROFILE_FUNCTION();
+            Timer timer("", false);
 
             /* 
             * Append to python sys path instead of setting the env 
@@ -90,7 +108,7 @@ namespace Syn
                 SYN_CORE_TRACE("NumPy function pointer tables initalized.")
             }
 
-            SYN_CORE_TRACE("Python interpreter initialized in ", timer.getDeltaTimeMs(), " ms.");
+            SYN_CORE_TRACE("NumPy initialized in ", timer.getDeltaTimeMs(), " ms.");
         }
 
         /* Helper function for getting pointers to python symbols. 
@@ -118,16 +136,6 @@ namespace Syn
             /* Function taking a function string as argument and storing the result in a 2d array */
             static void run_np_func(const std::string& _src, const std::string& _func);
         #endif
-
-        /* Shut down python interpreter */
-        static void shutdown() 
-        {
-            SYN_PROFILE_FUNCTION();
-            Timer timer("", false);
-
-            Py_Finalize(); 
-            SYN_CORE_TRACE("Python interpreter terminated (", timer.getDeltaTimeMs(), " ms).");
-        }
 
     private:
         static int* init_numpy()

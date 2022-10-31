@@ -61,6 +61,7 @@ namespace Syn {
 		void setUniform2fv(const GLint& _location, const glm::vec2& _v);
 		void setUniform3fv(const GLint& _location, const glm::vec3& _v);
 		void setUniform4fv(const GLint& _location, const glm::vec4& _v);
+		void setMatrix2fv(const GLint& _location, const glm::mat2& _mat);
 		void setMatrix3fv(const GLint& _location, const glm::mat3& _mat);
 		void setMatrix4fv(const GLint& _location, const glm::mat4& _mat);
 
@@ -70,6 +71,7 @@ namespace Syn {
 		void setUniform2fv(const std::string& _name, const glm::vec2& _v) { setUniform2fv(getUniformLocation(_name), _v); }
 		void setUniform3fv(const std::string& _name, const glm::vec3& _v) { setUniform3fv(getUniformLocation(_name), _v); }
 		void setUniform4fv(const std::string& _name, const glm::vec4& _v) { setUniform4fv(getUniformLocation(_name), _v); }
+		void setMatrix2fv(const std::string& _name, const glm::mat2& _mat) { setMatrix2fv(getUniformLocation(_name), _mat); }
 		void setMatrix3fv(const std::string& _name, const glm::mat3& _mat) { setMatrix3fv(getUniformLocation(_name), _mat); }
 		void setMatrix4fv(const std::string& _name, const glm::mat4& _mat) { setMatrix4fv(getUniformLocation(_name), _mat); }
 

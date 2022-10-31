@@ -499,6 +499,12 @@ namespace Syn {
 			glUniform4fv(_location, 1, (GLfloat*)(&_v));
 		});
 	}
+	void Shader::setMatrix2fv(const GLint& _location, const glm::mat2& _mat) 
+	{
+		SYN_RENDER_S2(_location, _mat, {
+			glUniformMatrix2fv(_location, 1, GL_FALSE, (GLfloat*)& _mat);
+		});
+	}
 	void Shader::setMatrix3fv(const GLint& _location, const glm::mat3& _mat) 
 	{
 		SYN_RENDER_S2(_location, _mat, {

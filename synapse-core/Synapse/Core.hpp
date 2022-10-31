@@ -3,6 +3,7 @@
 
 
 #include <assert.h>
+#include <inttypes.h>
 
 #include "Synapse/Debug/Log.hpp"
 #include "Synapse/Debug/Error.hpp"
@@ -83,7 +84,7 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_THREADPOOL
 
 // profiling of engine performance
-#define DEBUG_PROFILING
+//#define DEBUG_PROFILING
 
 // log to ImGui instead of stdout
 // N.B.! also #define:d in Log.h due to circular inclusions
@@ -103,7 +104,7 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_MESH_BITANGENT_SHADER
 //#define DEBUG_MESH
 //#define DEBUG_MESH_TERRAIN
-#define DEBUG_FRAMEBUFFER
+//#define DEBUG_FRAMEBUFFER
 #define DEBUG_VERTEX_ARRAY
 #define DEBUG_VERTEX_BUFFER
 
@@ -166,6 +167,13 @@ static constexpr int RETURN_FAILURE = -1;
 										Syn::Error::raise_warning(nullptr, __func__, __VA_ARGS__);\
 										Syn::Log::resetColor();
 
+	#define SYN_DEBUG_PTR(ptr_id, ptr)	Syn::Log::setCoreColor();\
+										{\
+										char s[64]; memset(s, 0, 64); sprintf(s, "%s : 0x%" PRIXPTR ".", ptr_id, (uintptr_t)ptr);\
+										Syn::Log::log(__func__, s);\
+										}\
+										Syn::Log::resetColor();
+
 	// client macros
 	#define SYN_TRACE(...)				Syn::Log::setClientColor();\
 										Syn::Log::log(__func__, __VA_ARGS__);\
@@ -187,6 +195,7 @@ static constexpr int RETURN_FAILURE = -1;
 	#define SYN_CORE_ERROR(...)
 	#define SYN_CORE_FATAL_ERROR(...)
 	#define SYN_CORE_WARNING(...)
+	#define SYN_DEBUG_PTR(ptr_id, ptr)
 
 	#define SYN_TRACE(...)
 	#define SYN_ERROR(...)
@@ -207,12 +216,12 @@ static constexpr int RETURN_FAILURE = -1;
 	#define SYN_ASSERT_RESOLVE(arg0, arg1, macro, ...) macro
 
 	#define SYN_CORE_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_CORE_ASSERT_MESSAGE, SYN_CORE_ASSERT_NO_MESSAGE)(__VA_ARGS__)
-	#define SYN_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_ASSERT_MESSAGE, SYN_ASSERT_NO_MESSAGE)(__VA_ARGS__)
+	//#define SYN_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_ASSERT_MESSAGE, SYN_ASSERT_NO_MESSAGE)(__VA_ARGS__)
+	#define SYN_ASSERT(...) SYN_ASSERT_RESOLVE(__VA_ARGS__, SYN_CORE_ASSERT_MESSAGE, SYN_CORE_ASSERT_NO_MESSAGE)(__VA_ARGS__)
 #else
 	#include <assert.h>
 	#define SYN_CORE_ASSERT(condtion) assert(condition)
 	#define SYN_ASSERT(condtion) assert(condition)
 #endif
-
 
 

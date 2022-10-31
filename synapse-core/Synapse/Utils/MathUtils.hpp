@@ -31,8 +31,8 @@ namespace Syn
     template<class T>
     inline const T& clamp(const T& _x, const T& _lo, const T& _hi) { return min(max(_x, _lo), _hi); }
 
-    inline float deg_to_rad(float _theta) { return _theta * PI_OVER_180;  }
-    inline float rad_to_deg(float _theta) { return _theta * _180_OVER_PI; }
+    inline float deg_to_rad(float _theta_deg) { return _theta_deg * PI_OVER_180;  }
+    inline float rad_to_deg(float _theta_rad) { return _theta_rad * _180_OVER_PI; }
 
     /* Linearly maps a range [_in0 ... _in1] to another range [_out0 ... _out1].
      * _x is expected to be in range [_in0 ... _in1].

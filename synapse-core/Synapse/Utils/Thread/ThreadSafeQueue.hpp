@@ -40,9 +40,6 @@ namespace Syn
                 return false;
             _t = std::move(m_queue.front());
             m_queue.pop();
-            #ifdef DEBUG_THREADPOOL
-                SYN_CORE_TRACE(m_queue.size(), " tasks pending.");
-            #endif
             return true;
         }
 
@@ -50,9 +47,6 @@ namespace Syn
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             m_queue.push(_t);
-            #ifdef DEBUG_THREADPOOL
-                SYN_CORE_TRACE(m_queue.size() << " tasks pending.");
-            #endif
         }
     };
 

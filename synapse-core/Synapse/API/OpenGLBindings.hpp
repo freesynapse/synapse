@@ -65,8 +65,8 @@ namespace Syn
 		
 		// font
 		//
-		static inline Ref<Font> newFont(const char *_filename, const int& _pixel_size=12, const Ref<Shader>& _shader=nullptr)
-		{	return MakeRef<Font>(_filename, _pixel_size, _shader);	}
+		static inline Ref<Font> newFont(const char *_filename, const int& _pixel_size=12, const Ref<Shader>& _shader=nullptr, const glm::vec2& _viewport_sz=glm::vec2(0.0f))
+		{	return MakeRef<Font>(_filename, _pixel_size, _shader, _viewport_sz);	}
 
 
 		// textures

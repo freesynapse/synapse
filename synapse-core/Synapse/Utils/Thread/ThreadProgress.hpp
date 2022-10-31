@@ -17,5 +17,11 @@ namespace Syn
             done.store(false);
         }
 
+        void reset()
+        {
+            progress.store(0.0f);
+            done.store(false);
+        }
+
     } thread_progress_t;
 }
