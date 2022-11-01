@@ -11,7 +11,11 @@ namespace Syn
     {
         Figure::Figure(const glm::vec2& _fig_sz_px)
         {
-            m_figureSizePx = _fig_sz_px;
+            glm::vec2 fig_sz = check_fig_size(_fig_sz_px);
+            m_figureSizePx = fig_sz;
+            
+            m_figureParams = MakeRef<figure_params_t>(fig_sz);
+            
             m_renderObjPtr = MakeRef<FigureRenderObj>(this);
         }
         //-------------------------------------------------------------------------------
@@ -32,6 +36,7 @@ namespace Syn
         //    std::vector<float> fdata = std::vector<float>(_data.begin(), _data.end());
         //    ScatterPlot2D* scatter_plot = new ScatterPlot2D(fdata);
         //    m_canvases.push_back(scatter_plot);
+        //    update_data_limits(scatter_plot);
         //}        
         //-------------------------------------------------------------------------------
         void Figure::render()

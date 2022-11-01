@@ -16,6 +16,7 @@ using namespace Syn::mplc;
 
 #undef DEBUG_IMGUI_LOG
 
+
 class layer : public Layer
 {
 public:
@@ -37,10 +38,9 @@ public:
 	Ref<Framebuffer> m_renderBuffer = nullptr;
 
 	Ref<Shader> m_shader = nullptr;
-	
-	//
-	Ref<Figure> m_fig = nullptr;
 
+	Ref<Figure> m_figure = nullptr;
+	
 	// flags
 	bool m_wireframeMode = true;
 	bool m_toggleCulling = false;
@@ -48,12 +48,12 @@ public:
 	bool open_popup = true;
 
 };
-class mplc_inst : public Application
+class mpl_test_v02 : public Application
 {
 public:
-	mplc_inst() { this->pushLayer(new layer); }
+	mpl_test_v02() { this->pushLayer(new layer); }
 };
-Application* CreateSynapseApplication() { return new mplc_inst(); }
+Application* CreateSynapseApplication() { return new mpl_test_v02(); }
 
 //---------------------------------------------------------------------------------------
 void layer::onAttach()
@@ -74,12 +74,15 @@ void layer::onAttach()
 	m_font = MakeRef<Font>("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 14.0f);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// Figure
+	// HISTOGRAM
 	glm::vec2 fig_sz = glm::vec2(480.0f, 320.0f);
-	m_fig = std::make_shared<Figure>(fig_sz);
-	m_fig->scatter();
-	m_fig->__debug();
+	m_figure = MakeRef<Figure>(fig_sz);
 
+	std::default_random_engine gen(1); // seed 1 for reproducibility
+	std::normal_distribution<float> dist(10.0, 2.0);
+	int n = 5000;
+
+	
 	// framebuffer
 	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
 
@@ -100,6 +103,7 @@ void layer::onUpdate(float _dt)
 {
 	SYN_PROFILE_FUNCTION();
 	
+	static auto& renderer = Renderer::get();
 	static float fontHeight = m_font->getFontHeight() + 1.0f;
 
 	// handle input
@@ -111,10 +115,11 @@ void layer::onUpdate(float _dt)
 
 
 	// toggle wireframe
-	if (m_wireframeMode) Renderer::enableWireFrame();
+	if (m_wireframeMode) renderer.enableWireFrame();
 
 	// clear the screen
-	Renderer::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	renderer.setClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+	renderer.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	// -- BEGINNING OF SCENE -- //
@@ -122,7 +127,7 @@ void layer::onUpdate(float _dt)
 
 
 	// toggle wireframe (back)
-	if (m_wireframeMode) Renderer::disableWireFrame();
+	if (m_wireframeMode) renderer.disableWireFrame();
 
 	
 	// Text rendering 
@@ -132,8 +137,9 @@ void layer::onUpdate(float _dt)
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
 	m_renderBuffer->bindDefaultFramebuffer();
 
-	if (m_fig)
-		m_fig->render();
+
+	if (m_figure != nullptr)
+		m_figure->render();
 
 }
 //---------------------------------------------------------------------------------------
@@ -150,9 +156,15 @@ void layer::popup_test()
 	ImGui::OpenPopup("modal_popup");
 	if (ImGui::BeginPopupModal("modal_popup", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		if (m_fig)
-			ImGui::Image((void*)m_fig->figurePtrID(), m_fig->imGuiFigureSz(), { 0, 1 }, { 1, 0 });
+		if (m_figure)
+			ImGui::Image((void*)m_figure->framebufferTexturePtr(), m_figure->size(), { 0, 1 }, { 1, 0 });
 
+		if (ImGui::Button("Close"))
+		{
+			ImGui::CloseCurrentPopup();
+			open_popup = false;
+		}
+		ImGui::SameLine();
 
 		ImGui::EndPopup();
 

@@ -1,4 +1,4 @@
-project "mpl_test"
+project "mpl_test_v0.2"
 
     kind "ConsoleApp"
 

@@ -50,12 +50,12 @@ public:
 	bool open_popup = true;
 
 };
-class imgui_188_test : public Application
+class mpl_test_v01 : public Application
 {
 public:
-	imgui_188_test() { this->pushLayer(new layer); }
+	mpl_test_v01() { this->pushLayer(new layer); }
 };
-Application* CreateSynapseApplication() { return new imgui_188_test(); }
+Application* CreateSynapseApplication() { return new mpl_test_v01(); }
 
 //---------------------------------------------------------------------------------------
 void layer::onAttach()
@@ -83,12 +83,12 @@ void layer::onAttach()
 	std::normal_distribution<float> dist(10.0, 2.0);
 	int n = 5000;
 
-	std::vector<int> idata;
-	for (int i = 0; i < n; i++)
-		idata.push_back(static_cast<int>(dist(gen)));
-	m_histogramInt = MakeRef<Histogram>(idata, 0, canvas_sz);
-	m_histogramInt->title("int_histogram");
-	m_histogramInt->interactiveMode(true);
+	//std::vector<int> idata;
+	//for (int i = 0; i < n; i++)
+	//	idata.push_back(static_cast<int>(dist(gen)));
+	//m_histogramInt = MakeRef<Histogram>(idata, 0, canvas_sz);
+	//m_histogramInt->title("int_histogram");
+	//m_histogramInt->interactiveMode(true);
 
 	std::default_random_engine gen2(std::chrono::system_clock::now().time_since_epoch().count());
 	std::normal_distribution<float> dist2(0, 5.0);
@@ -117,10 +117,10 @@ void layer::onAttach()
 	m_linePlot->data(data2);
 
 	// SCATTER PLOT
-	data.clear();
-	for (float i = 0.0f; i < 10.0f; i+=1.0f)
-		data.push_back(i);
-	m_scatterPlot = newScatterPlot(data, canvas_sz);
+	//data.clear();
+	//for (float i = 0.0f; i < 10.0f; i+=1.0f)
+	//	data.push_back(i);
+	//m_scatterPlot = newScatterPlot(data, canvas_sz);
 
 
 	// framebuffer
@@ -218,6 +218,7 @@ void layer::popup_test()
 		
 		if (m_linePlot)
 			ImGui::Image((void*)m_linePlot->figurePtrID(), m_linePlot->figureSz(), { 0, 1 }, { 1, 0 });
+		printf("%d\n", m_linePlot->figurePtrID());
 
 		if (m_scatterPlot)
 			ImGui::Image((void*)m_scatterPlot->figurePtrID(), m_scatterPlot->figureSz(), { 0, 1 }, { 1, 0 });

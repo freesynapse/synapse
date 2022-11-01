@@ -13,29 +13,46 @@ namespace Syn
     {
         FigureRenderObj::FigureRenderObj(Figure* _parent)
         {
+            SYN_CORE_TRACE("new FigureRenderObj object created.");
+            
             m_parentRawPtr = _parent;
+            m_figureTitle = _parent->m_figureTitle;
             m_figureSizePx = _parent->m_figureSizePx;
 
+            setup_static_shaders();
             initialize();
-            setupStaticShaders();
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::initialize()
         {
-            SYN_CORE_TRACE("new Figure object created.");
-            
             m_framebufferID = "canvas" + std::string(Random::rand_str(16));
             m_framebuffer = API::newFramebuffer(ColorFormat::RGBA16F,
-                                                glm::vec2(m_figureSizePx.x, m_figureSizePx.y),
+                                                glm::vec2(m_figureSizePx.x, m_figureSizePx.y), // m_figureSizePx,
                                                 1, 
                                                 true, 
                                                 false, 
                                                 m_framebufferID);
 
             // default rendering parameters
-            m_figureParamsPtr = MakeRef<figure_params_t>(m_figureSizePx);
+            m_figureParamsPtr = m_parentRawPtr->m_figureParams.get();
 
-            // fonts
+            // title font
+            m_titleFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
+                                        m_figureParamsPtr->title_font_size_px,
+                                        m_shaderFont,
+                                        m_figureParamsPtr->figure_sz_px);
+            m_titleFont->disableUpdateOnResize();
+            m_titleFont->setColor(m_figureParamsPtr->title_color);
+
+            // axis label font
+            m_axisLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
+                                           m_figureParamsPtr->axis_label_font_size_px,
+                                           m_shaderFont,
+                                           m_figureParamsPtr->figure_sz_px);
+            m_axisLabelFont->disableUpdateOnResize();
+            m_axisLabelFont->setColor(m_figureParamsPtr->axis_label_color);
+
+            // tick label font
             m_tickLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
                                             m_figureParamsPtr->ticks_font_size_px,
                                             m_shaderFont,
@@ -43,20 +60,16 @@ namespace Syn
             m_tickLabelFont->disableUpdateOnResize();
             m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);
 
-            m_titleFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
-                                        m_figureParamsPtr->title_size,
-                                        m_shaderFont,
-                                        m_figureParamsPtr->figure_sz_px);
-            m_titleFont->disableUpdateOnResize();
-            m_titleFont->setColor(m_figureParamsPtr->title_color);
 
             //
             m_redrawFlags = FIGURE_REDRAW_ALL;
-            m_redrawFlags &= (~ FIGURE_REDRAW_SELECTION);
+            m_redrawFlags |= (~ FIGURE_REDRAW_SELECTION);
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::render()
         {
+            static auto& renderer = Renderer::get();
+
             if (!m_redrawFlags)
                 return;
             
@@ -66,11 +79,13 @@ namespace Syn
             //
             redraw();
 
-            static auto& renderer = Renderer::get();
             m_framebuffer->bind();
             
             renderer.setClearColor(m_figureParamsPtr->figure_background);
             renderer.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            //m_framebuffer->bindDefaultFramebuffer();
+            //return;
             
             m_shader2D->enable();
             
@@ -93,15 +108,18 @@ namespace Syn
             renderer.drawArrays(m_ticksVertexCount, 0, true, GL_LINES);
 
             // render tick labels
-            m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);
-            float x_step = 0.0f;
-            float x = 0.0f;
-            
+            m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);            
             m_tickLabelFont->beginRenderBlock();
-            for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
-                m_tickLabelFont->addString(m_tickLabelPositionsY[i].x, m_tickLabelPositionsY[i].y, "%s", m_tickLabelsY[i].c_str());
-            for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
-                m_tickLabelFont->addString(m_tickLabelPositionsX[i].x, m_tickLabelPositionsX[i].y, "%s", m_tickLabelsX[i].c_str());
+            if (m_tickLabelPositionsY.size() > 0 && m_tickLabelsY.size() > 0)
+            {
+                for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
+                    m_tickLabelFont->addString(m_tickLabelPositionsY[i].x, m_tickLabelPositionsY[i].y, "%s", m_tickLabelsY[i].c_str());
+            }
+            if (m_tickLabelPositionsX.size() > 0 && m_tickLabelsX.size() > 0)
+            {
+                for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
+                    m_tickLabelFont->addString(m_tickLabelPositionsX[i].x, m_tickLabelPositionsX[i].y, "%s", m_tickLabelsX[i].c_str());
+            }
             m_tickLabelFont->endRenderBlock();
             
             // figure title
@@ -138,6 +156,8 @@ namespace Syn
 
             if (m_redrawFlags &  FIGURE_REDRAW_TICKLABELS || m_redrawFlags & FIGURE_REDRAW_DATA)
             {
+                m_tickLabelsX.clear();  // <-- specific to FigureType::None?
+                
                 m_tickLabelsY.clear();  // X tick labels set in derived class redrawData()
                 redrawTickLabels(&norm_params);
             }
@@ -179,8 +199,43 @@ namespace Syn
 
             if (_fig_params->render_x_ticks)
             {
+                if (_fig_params->figure_type == FigureType::None)       // for now : identical to LINEPLOT and SCATTERPLOT
+                {
+                    float x_plot_min = _fig_params->canvas_origin.x + _fig_params->data_axis_offset.x;
+                    float x_plot_max = _fig_params->canvas_origin.x + _fig_params->x_axis_length - _fig_params->data_axis_offset.x;
+
+                    nice_scale x_tick_params(m_parentRawPtr->m_dataLimX, _fig_params->x_tick_count);
+                    range_converter x_converter({ x_tick_params.lower_bound, m_parentRawPtr->m_dataLimX[1] },
+                                                { x_plot_min, x_plot_max });
+                    float curr_x_val = x_tick_params.lower_bound;
+                    float x_step = x_tick_params.tick_spacing;
+
+                    //
+                    for (size_t i = 0; i < x_tick_params.max_ticks; i++)
+                    {
+                        float x = x_converter.eval(curr_x_val);
+
+                        if (x > x_plot_max)
+                            break;
+                        
+                        glm::vec2 v0 = { x, _fig_params->canvas_origin.y };
+                        glm::vec2 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y };
+                        V.push_back(v0);
+                        V.push_back(v1);
+
+                        // set tick label positions -- n.b.: y axis is inverted for font rendering in pixel space
+                        glm::vec2 x_tick_pos = 
+                        {
+                            v1.x * _fig_params->figure_sz_px.x,
+                            _fig_params->figure_sz_px.y - ((v1.y - _fig_params->tick_labels_offset.y) * _fig_params->figure_sz_px.y) + font_height
+                        };
+                        m_tickLabelPositionsX.push_back(x_tick_pos);
+
+                        curr_x_val += x_step;
+                    }
+                }
                 // x ticks for Histograms
-                if (_fig_params->figure_type == FigureType::Histogram)
+                else if (_fig_params->figure_type == FigureType::Histogram)
                 {
                     /*
                     float x = m_dataPositions[0].x + _fig_params->canvas_origin.x + _fig_params->data_axis_offset.x;
@@ -259,12 +314,13 @@ namespace Syn
                 range_converter converter({ y_tick_params.lower_bound, y_tick_params.upper_bound },
                                           { y_plot_min, y_plot_max });
 
-                float label_width = m_tickLabelFont->getStringWidth("111111"); // TODO : replace this with something dynamic
+                static float char_width_px = m_tickLabelFont->getStringWidth("1");
+                float label_width = num_digits_float(y_tick_params.upper_bound) * char_width_px;
                 float label_height = m_tickLabelFont->getFontHeight() * 0.5f;
                 float curr_y_val = y_tick_params.lower_bound;
                 float y_step = y_tick_params.tick_spacing;
                 //
-                for (size_t i = 0; i < y_tick_params.max_ticks + 1; i++)
+                for (size_t i = 0; i < y_tick_params.max_ticks + 1; i++)    // TODO : why range +1?
                 {
                     float y = converter.eval(curr_y_val);
                     if (y > _fig_params->y_axis_lim[1])
@@ -272,14 +328,15 @@ namespace Syn
 
                     glm::vec2 v0 = { _fig_params->canvas_origin.x, y };
                     glm::vec2 v1 = { _fig_params->canvas_origin.x - _fig_params->tick_length.x, y }; 
+                    
                     V.push_back(v0);
                     V.push_back(v1);
 
                     glm::vec2 y_label_pos =
                     {
-                        (v1.x - _fig_params->tick_labels_offset.x) * _fig_params->figure_sz_px.x - label_width, 
-                        // font_height is further scaled down w/ 0.5 since the normalized range (0..1) is scaled up for font rendering (-1..1)
-                        _fig_params->figure_sz_px.y - (v1.y * _fig_params->figure_sz_px.y) + label_height * 0.5f
+                        (v1.x * _fig_params->figure_sz_px.x) - m_figureParamsPtr->tick_labels_offset_px.x - label_width, 
+                        // font_height is further scaled down w/ 0.75 since the normalized range (0..1) is scaled up for font rendering (-1..1)
+                        _fig_params->figure_sz_px.y - (v1.y * _fig_params->figure_sz_px.y) + label_height * 0.75f
                     };
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
@@ -339,8 +396,9 @@ namespace Syn
                         m_tickLabelsX[i] = "";
                 }
             }
-            else if (_fig_params->figure_type == FigureType::LinePlot || 
-                     _fig_params->figure_type == FigureType::ScatterPlot)
+            //else if (_fig_params->figure_type == FigureType::LinePlot || 
+            //         _fig_params->figure_type == FigureType::ScatterPlot)
+            else
             {
                 nice_scale x_tick_params(m_parentRawPtr->m_dataLimX, _fig_params->x_tick_count);
                 m_tickLabelsX = std::vector<std::string>(m_tickLabelPositionsX.size());
@@ -370,12 +428,13 @@ namespace Syn
                 float tick_label = start_val + i * y_tick_params.tick_spacing;
                 std::stringstream ss;
                 std::setiosflags(std::ios::right);
-                ss << std::setw(6) << std::setprecision(0) << std::fixed << tick_label;
+                //ss << std::setw(6) << std::setprecision(0) << std::fixed << tick_label;
+                ss << std::setw(0) << tick_label;
                 m_tickLabelsY[i] = ss.str();
             }
         }
         //-------------------------------------------------------------------------------
-        void FigureRenderObj::setupStaticShaders()
+        void FigureRenderObj::setup_static_shaders()
         {
             if (m_shaderInitialized)
                 return;
@@ -435,7 +494,39 @@ namespace Syn
 
             m_shaderInitialized = true;
         }
-
+        //-------------------------------------------------------------------------------
+        int FigureRenderObj::num_digits_float(float _f)
+        {
+            int digits = 0;
+            double ori = _f;    //copy of original number
+            long num2  = _f;
+            
+            //count no of digits before floating point
+            while (num2 > 0)
+            {
+                digits++;
+                num2 = num2 / 10;
+            }
+            if(ori == 0)
+                digits = 1;
+            
+            float no_float;
+            no_float = ori * (pow(10, (8 - digits)));
+            long long int total=(long long int)no_float;
+            int no_of_digits, extrazeroes=0;
+            
+            for(int i = 0; i < 16; i++)
+            {
+                int dig;
+                dig = total%10;
+                total = total/10;
+                if(dig != 0)
+                    break;
+                else
+                    extrazeroes++;
+            }
+            no_of_digits = 8 - extrazeroes;
+            return no_of_digits;
+        }
     }
-
 }

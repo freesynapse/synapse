@@ -15,7 +15,7 @@ namespace Syn
         //-------------------------------------------------------------------------------
         void FigureRenderObjBase::initializeBaseClass()
         {
-            m_framebufferID = "hist_canvas" + std::string(Random::rand_str(16));
+            m_framebufferID = "figure_" + std::string(Random::rand_str(16));
             m_framebuffer = API::newFramebuffer(ColorFormat::RGBA16F,
                                                 glm::vec2(m_figureSz.x, m_figureSz.y),
                                                 1, 
@@ -62,6 +62,8 @@ namespace Syn
             renderer.setClearColor(m_figureParamsPtr->canvas_background);
             renderer.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
+            //m_framebuffer->bindDefaultFramebuffer();
+            //return;
             m_shader2D->enable();
             
             // render selection (optional)
@@ -102,8 +104,8 @@ namespace Syn
 
             // render tick labels
             m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);
-            float x_step = 0.0f;
-            float x = 0.0f;
+            //float x_step = 0.0f;
+            //float x = 0.0f;
             
             m_tickLabelFont->beginRenderBlock();
             for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)

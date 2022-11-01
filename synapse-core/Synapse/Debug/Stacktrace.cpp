@@ -126,7 +126,7 @@ namespace Syn
             }
         }
 
-        fprintf(stderr, "\x1b[1;37;41m------------------------------------------------------\x1b[0m\n");
+        fprintf(stderr, "\x1b[1;37;41m------------------- END STACKTRACE -------------------\x1b[0m\n");
 
         fclose(fptr);
         free(messages);

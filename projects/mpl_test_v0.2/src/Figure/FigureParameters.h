@@ -50,7 +50,7 @@ namespace Syn
 
             /* Type of plot, used for rendering options. Not set by user but by 
              * derivations of FigureBase and FigureRenderObjBase.
-            */
+             */
             FigureType figure_type              = FigureType::None;
 
             /* Size of the canvas, used for normalization of coordinates. Set during 
@@ -64,7 +64,7 @@ namespace Syn
             float data_height_px                = -50;
                                         
             /* Space between adjecent data points.
-            */
+             */
             float data_spacing                  = -1;
 
             /* Offset from axes in pixels, for X only first and last data point, and 
@@ -89,7 +89,7 @@ namespace Syn
             glm::vec2 x_axis_lim_px             = { 0, -50 };
             
             /* X axis length -- automatically calculated after normalization.
-            */
+             */
             float x_axis_length                 = 0.0f;
             
             /* The actual X axis coordinates (pixels). Values represent
@@ -100,88 +100,97 @@ namespace Syn
             glm::vec2 y_axis_lim_px             = { 0, -30 };
             
             /* Y axis length -- automatically calculated after normalization.
-            */
+             */
             float y_axis_length                 = 0.0f;
             
             /* Render X axis?
-            */
+             */
             bool render_x_axis                  = true;
 
             /* Render Y axis?
-            */
+             */
             bool render_y_axis                  = true;
 
             /* Length of ticks in pixels, specified separately for each axis.
-            */
+             */
             glm::vec2 tick_length_px            = { 10, 10 };
 
             /* Number of X ticks.
-            */
-            size_t x_tick_count                 = 5;
+             */
+            size_t x_tick_count                 = 2;
 
             /* Render X axis ticks?
-            */
+             */
             bool render_x_ticks                 = true;
 
             /* Number of Y ticks.
-            */
-            size_t y_tick_count                 = 5;
+             */
+            size_t y_tick_count                 = 2;
 
             /* Render Y axis ticks?
-            */
+             */
             bool render_y_ticks                 = true;
 
+            /* Font size of axis labels
+             */
+            float axis_label_font_size_px       = 12.0f;
+
+            /* Render axis labels?
+             */
+            bool render_axis_labels             = true;
+
             /* Ticklabels offset from the lower tick bound, for each axis, respectively.
-            */
-            glm::vec2 tick_labels_offset_px     = { 5, 2 };
+             */
+            glm::vec2 tick_labels_offset_px     = { 5, 10 };
 
             /* Font size of ticklabels.
-            */
+             */
             float ticks_font_size_px            = 12.0f;
 
             /* Render ticklabels?
-            */
+             */
             bool render_ticklabels              = true;
 
             /* Rotation of X axis ticklabels, clock-wise, in degrees.
-            */
+             */
             int rotation_x_ticklabels           = 0;
 
             /* Rotation of Y axis ticklabels, clock-wise, in degrees.
-            */
+             */
             int rotation_y_ticklabels           = 0;
 
             /* Is there a plot title? 
-            */
+             */
             bool render_title                   = true;
 
             /* Font size of plot title
-            */
-            float title_size                    = 16.0f;
+             */
+            float title_font_size_px            = 16.0f;
 
             /* Matches the default ImGui palette.
-            */
+             */
             glm::vec4 tick_color                = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 axis_color                = {   1.0f,   1.0f,   1.0f,  1.0f };
-            glm::vec4 tick_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 title_color               = {   1.0f,   1.0f,   1.0f,  1.0f };
+            glm::vec4 axis_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
+            glm::vec4 tick_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 figure_background         = {   0.0f,   0.0f,   0.0f,  1.0f };
             glm::vec4 stroke_color              = { 0.298f, 0.361f, 0.490f,  1.0f };
 
 
             /*---------------------------------------------------------------------------
-            * HISTOGRAM PARAMETERS
-            *----------------------------------------------------------------------------
-            */
+             * HISTOGRAM PARAMETERS
+             *---------------------------------------------------------------------------
+             */
 
             /* Space between bars in pixels.
             */
             float bar_spacing_px                = 1;
             
             /*---------------------------------------------------------------------------
-            * SCATTER PLOT PARAMETERS
-            *----------------------------------------------------------------------------
-            */
+             * SCATTER PLOT PARAMETERS
+             *---------------------------------------------------------------------------
+             */
 
             /* Size of markers, in pixels on the Y axis. Markers X size is calculated
              * from the X/Y aspect ratio upon normalization.
@@ -194,9 +203,9 @@ namespace Syn
 
             
             /*---------------------------------------------------------------------------
-            * SELECTION (FILL) PARAMETERS
-            *----------------------------------------------------------------------------
-            */
+             * SELECTION (FILL) PARAMETERS
+             *---------------------------------------------------------------------------
+             */
 
             /* Render X selection (i.e. called fillBetweenX).
             */
@@ -206,8 +215,7 @@ namespace Syn
             */
             bool fill_between_y                 = false;
 
-
-            //
+            // 
             figure_params_t(const glm::vec2& _fig_sz_px) : figure_sz_px(_fig_sz_px) {}
         };
 
@@ -240,18 +248,21 @@ namespace Syn
             bool render_x_ticks;
             size_t y_tick_count;
             bool render_y_ticks;
+            float axis_label_font_size_px;
+            bool render_axis_labels;
             glm::vec2 tick_labels_offset;
             float ticks_font_size_px;
             bool render_ticklabels;
             int rotation_x_ticklabels;
             int rotation_y_ticklabels;
             bool render_title;
-            float title_size;
+            float title_font_size_px;
 
             glm::vec4 axis_color;
             glm::vec4 tick_color;
-            glm::vec4 tick_label_color;
             glm::vec4 title_color;
+            glm::vec4 axis_label_color;
+            glm::vec4 tick_label_color;
             glm::vec4 figure_background;
             glm::vec4 stroke_color;
 
@@ -288,7 +299,10 @@ namespace Syn
 
             //
             normalized_params_t() {}    // default constructor
-            normalized_params_t(const std::shared_ptr<figure_params_t>& _params)
+            normalized_params_t(const std::shared_ptr<figure_params_t>& _params)    { __set_normalized_values(_params.get()); }
+            normalized_params_t(figure_params_t* _params)                           { __set_normalized_values(_params); }
+            
+            void __set_normalized_values(figure_params_t* _params)
             {
                 figure_type             = _params->figure_type;
                 figure_sz_px            = _params->figure_sz_px;
@@ -315,7 +329,8 @@ namespace Syn
                 render_x_ticks          = _params->render_x_ticks;
                 y_tick_count            = _params->y_tick_count;
                 render_y_ticks          = _params->render_y_ticks;
-
+                axis_label_font_size_px = _params->axis_label_font_size_px;
+                render_axis_labels      = _params->render_axis_labels;
                 tick_labels_offset      = px_to_fraction(_params->tick_labels_offset_px, AXIS_XY);
                 ticks_font_size_px      = _params->ticks_font_size_px;
                 render_ticklabels       = _params->render_ticklabels;
@@ -323,12 +338,13 @@ namespace Syn
                 rotation_y_ticklabels   = _params->rotation_y_ticklabels;
 
                 render_title            = _params->render_title;
-                title_size              = _params->title_size;
+                title_font_size_px      = _params->title_font_size_px;
 
                 axis_color              = _params->axis_color;
                 tick_color              = _params->tick_color;
-                tick_label_color        = _params->tick_label_color;
                 title_color             = _params->title_color;
+                tick_label_color        = _params->tick_label_color;
+                axis_label_color        = _params->axis_label_color;
                 figure_background       = _params->figure_background;
                 stroke_color            = _params->stroke_color;
 

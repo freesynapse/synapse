@@ -50,10 +50,10 @@ namespace Syn
              */
             void title(const std::string& _title) { m_figureTitle = _title; }
             const std::string& title() { return m_figureTitle; }
-            const glm::vec2& figureSz() const { return m_figureSizePx; }
-            inline GLuint figurePtrID() { return m_renderObjPtr->textureID(); };
-            inline ImVec2 figureSz() { return ImVec2(m_figureSizePx.x, m_figureSizePx.y); };
-            Ref<figure_params_t> params() { return m_renderObjPtr->m_figureParamsPtr; };
+            const glm::vec2& size() const { return m_figureSizePx; }
+            inline GLuint framebufferTexturePtr() { return m_renderObjPtr->m_framebuffer->getColorAttachmentIDn(0); };
+            inline ImVec2 size() { return ImVec2(m_figureSizePx.x, m_figureSizePx.y); };
+            Ref<figure_params_t> params() { return m_figureParams; };
             
 
         private:
@@ -71,6 +71,8 @@ namespace Syn
 
             std::string m_figureTitle = "";
             Ref<FigureRenderObj> m_renderObjPtr = nullptr;
+
+            Ref<figure_params_t> m_figureParams = nullptr;
 
             std::vector<Canvas2D*> m_canvases;
             glm::vec2 m_dataLimX = { 0.0f, 1.0f };

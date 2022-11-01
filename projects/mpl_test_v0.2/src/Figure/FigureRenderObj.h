@@ -64,13 +64,11 @@ namespace Syn
             void redrawSelection(normalized_params_t* _fig_params);
 
             
-            // accessors
-            GLuint textureID() { return m_framebuffer->getFramebufferID(); }
-
             /* Creates temporary shaders for rendering.
              */
         private:
-            void setupStaticShaders();
+            void setup_static_shaders();
+            int num_digits_float(float _f);
 
 
         public:
@@ -82,7 +80,7 @@ namespace Syn
 
             Figure* m_parentRawPtr = nullptr;
             glm::vec2 m_figureSizePx = { 0.0f, 0.0f };
-            Ref<figure_params_t> m_figureParamsPtr = nullptr;
+            figure_params_t* m_figureParamsPtr = nullptr;
             
             Ref<Framebuffer> m_framebuffer = nullptr;
             std::string m_framebufferID = "";
@@ -100,8 +98,9 @@ namespace Syn
             std::vector<std::string> m_tickLabelsX;
             std::vector<std::string> m_tickLabelsY;
 
-            std::shared_ptr<Font> m_tickLabelFont = nullptr;
-            std::shared_ptr<Font> m_titleFont = nullptr;
+            Ref<Font> m_titleFont = nullptr;
+            Ref<Font> m_axisLabelFont = nullptr;
+            Ref<Font> m_tickLabelFont = nullptr;
         };
 
 
