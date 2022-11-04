@@ -107,7 +107,7 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_FRAMEBUFFER
 #define DEBUG_VERTEX_ARRAY
 #define DEBUG_VERTEX_BUFFER
-
+//#define DEBUG_FONT
 // shaders
 //#define DEBUG_SHADER_SETUP
 //#define DEBUG_UNIFORMS
@@ -145,6 +145,7 @@ static constexpr int RETURN_FAILURE = -1;
 	#define DEBUG_OPENGL_API
 	#define DEBUG_PYTHON_EMBEDDING
 	#define DEBUG_THREADPOOL
+	#define DEBUG_FONT
 #endif
 
 

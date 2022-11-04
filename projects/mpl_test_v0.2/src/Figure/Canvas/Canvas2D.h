@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <Synapse/Renderer/Buffers/VertexArray.hpp>
 #include <Synapse/Memory/MemoryTypes.hpp>
+#include "../FigureBase.h"
+
 
 namespace Syn
 {
@@ -12,11 +14,14 @@ namespace Syn
         class Canvas2D
         {
         public:
+            friend class Figure;
+            
+        public:
             Canvas2D() {}
             virtual ~Canvas2D() {}
 
             //
-            virtual void render() = 0;
+            virtual void setData() = 0;
             virtual void redraw() = 0;
 
             virtual const Ref<VertexArray>& vao() const { return m_vaoData; }
@@ -28,6 +33,8 @@ namespace Syn
             virtual const glm::vec2& dataLimY() const { return m_dataLimY; }
 
         protected:
+            Figure* m_parentRawPtr = nullptr;
+            
             glm::vec2 m_dataLimX = { 0.0f, 1.0f };
             glm::vec2 m_dataLimY = { 0.0f, 1.0f };
 

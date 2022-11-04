@@ -79,8 +79,20 @@ void layer::onAttach()
 	m_figure = MakeRef<Figure>(fig_sz);
 
 	std::default_random_engine gen(1); // seed 1 for reproducibility
-	std::normal_distribution<float> dist(10.0, 2.0);
-	int n = 5000;
+	std::normal_distribution<float> dist(5.0, 2.0);
+	int n = 500;
+	std::vector<float> X(n), Y(n);
+	for (int i = 0; i < n; i++)
+	{
+		X[i] = dist(gen);
+		Y[i] = dist(gen);
+	}
+	//X = std::vector<float>({ 1, 0, 2 });
+	//Y = std::vector<float>({ 2, 2, 2 });
+	scatter_params_t params;
+	params.marker_size = 4.0f;
+	params.marker = FigureMarker::Square;
+	m_figure->scatter(X, Y, params);
 
 	
 	// framebuffer

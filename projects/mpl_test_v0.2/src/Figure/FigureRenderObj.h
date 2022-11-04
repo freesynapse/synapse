@@ -14,12 +14,15 @@
 
 
 #define FIGURE_REDRAW_DATA          0b00000001
+#define FIGURE_REDRAW               0b00000001
 #define FIGURE_REDRAW_AXES          0b00000010
 #define FIGURE_REDRAW_TICKS         0b00000100
 #define FIGURE_REDRAW_TICKLABELS    0b00001000
 #define FIGURE_REDRAW_SELECTION     0b00010000
 #define FIGURE_REDRAW_ALL           0b00011111
+#define FIGURE_REDRAW_AUX           0b00001110  // axes, tick, tick labels
 
+#define DEBUG_FIGURE_GRIDLINES
 
 namespace Syn
 {
@@ -33,7 +36,6 @@ namespace Syn
             friend class Figure;
 
         public:
-
             FigureRenderObj(Figure* _parent);
             ~FigureRenderObj() = default;
             
@@ -47,13 +49,12 @@ namespace Syn
              */
             void redraw();
 
-        protected:
-            /* Constructs the frambuffer; requires figure size to be set, i.e. best 
-             * called from derived member.
+        private:
+            /* Constructs the frambuffer; requires figure size to be set. Called from 
+             * parent Figure object.
              */
             void initialize();
 
-        public:
             /* Redraws all figure elements except the data. Since tick positions and 
              * tick labels are dependent on the data, redrawData() of the derived class 
              * must be called beforehand.
@@ -81,6 +82,8 @@ namespace Syn
             Figure* m_parentRawPtr = nullptr;
             glm::vec2 m_figureSizePx = { 0.0f, 0.0f };
             figure_params_t* m_figureParamsPtr = nullptr;
+            glm::vec2 m_localDataLimX = { 0.0f, 1.0f };
+            glm::vec2 m_localDataLimY = { 0.0f, 1.0f };
             
             Ref<Framebuffer> m_framebuffer = nullptr;
             std::string m_framebufferID = "";
@@ -101,6 +104,12 @@ namespace Syn
             Ref<Font> m_titleFont = nullptr;
             Ref<Font> m_axisLabelFont = nullptr;
             Ref<Font> m_tickLabelFont = nullptr;
+
+            //__debug
+            #ifdef DEBUG_FIGURE_GRIDLINES
+                Ref<VertexArray> __debug_vaoGridLines = nullptr;
+                uint32_t __debug_gridLinesVertexCount = 0;
+            #endif
         };
 
 

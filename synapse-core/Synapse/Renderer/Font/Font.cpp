@@ -19,7 +19,9 @@ namespace Syn {
 		// create and load shaders?
 		if (_shader == nullptr)
 		{
-			SYN_CORE_TRACE("using static shaders.");
+			#ifdef DEBUG_FONT
+				SYN_CORE_TRACE("using static shaders.");
+			#endif
 
 			std::string src = R"(
 				#type VERTEX_SHADER
@@ -60,7 +62,9 @@ namespace Syn {
 		else	// no: reuse the ones in the entered programID
 		{
 			m_shader = _shader;
-			SYN_CORE_TRACE("reusing shader ", m_shader->getShaderID());
+			#ifdef DEBUG_FONT
+				SYN_CORE_TRACE("reusing shader ", m_shader->getShaderID());
+			#endif
 		}
 
 		// allocate memory for textures
@@ -122,10 +126,14 @@ namespace Syn {
 			Error::raise_error(nullptr, __func__, "FreeType could not be initialized.");
 			return (RETURN_FAILURE);
 		}
-		SYN_CORE_TRACE("FreeType successfully initialized.")
+		#ifdef DEBUG_FONT
+			SYN_CORE_TRACE("FreeType successfully initialized.")
+		#endif
 
 		// Load the face
-		SYN_CORE_TRACE("loading atlas from '", _filename, "'.");
+		#ifdef DEBUG_FONT
+			SYN_CORE_TRACE("loading atlas from '", _filename, "'.");
+		#endif
 
 		if (FT_New_Face(m_ftLib, _filename, 0, &m_ftFace))
 		{
@@ -262,7 +270,9 @@ namespace Syn {
 		// unbind vertex array
 		glBindVertexArray(0);
 
-		SYN_CORE_TRACE("generated ", m_iTextureWidth, "x", m_iTextureHeight, " text atlas.");
+		#ifdef DEBUG_FONT
+			SYN_CORE_TRACE("generated ", m_iTextureWidth, "x", m_iTextureHeight, " text atlas.");
+		#endif
 
 		return (RETURN_SUCCESS);
 

@@ -13,6 +13,11 @@ namespace Syn
 {
     namespace mplc
     {
+        // forward decls from Canvas/CanvasParameters.h
+        struct scatter_params_t;
+        struct lineplot_params_t;
+        struct hist_params_t;
+
         //-------------------------------------------------------------------------------
         /* ScatterPlot markers
          */
@@ -27,7 +32,7 @@ namespace Syn
         //-------------------------------------------------------------------------------
         /* ScatterPlot markers
          */
-        enum class ScatterPlotMarker
+        enum class FigureMarker
         {
             Square      = 0x01,
             Diamond     = 0x02,
@@ -59,9 +64,9 @@ namespace Syn
             glm::vec2 figure_sz_px              = { 0, 0 };
             
             /* Height of highest data point in pixel-space; if below 0, treated as 
-             * negaive offset from canvas_sz.y.
+             * negaive offset from y_axis_lim_px[1].
              */
-            float data_height_px                = -50;
+            float data_height_px                = 0;
                                         
             /* Space between adjecent data points.
              */
@@ -86,7 +91,7 @@ namespace Syn
              *   [1] :  offset from canvas_sz.x for negative values and offset from 
              *          canvas_origin_px.x for positive values 
              */
-            glm::vec2 x_axis_lim_px             = { 0, -50 };
+            glm::vec2 x_axis_lim_px             = { 0, -30 };
             
             /* X axis length -- automatically calculated after normalization.
              */
@@ -199,7 +204,7 @@ namespace Syn
 
             /* Marker type, as defined above.
              */
-            ScatterPlotMarker scatter_marker    = ScatterPlotMarker::Square;
+            FigureMarker scatter_marker         = FigureMarker::Square;
 
             
             /*---------------------------------------------------------------------------
@@ -215,8 +220,16 @@ namespace Syn
             */
             bool fill_between_y                 = false;
 
-            // 
+            /* Constructors
+             */
             figure_params_t(const glm::vec2& _fig_sz_px) : figure_sz_px(_fig_sz_px) {}
+            figure_params_t() : figure_sz_px({ 0.0f, 0.0f }) {}
+
+            /* Update relevant fields from canvas parameters
+             */
+            void setFromScatterParams(const scatter_params_t& _params);
+            void setFromLinePlotParams(const lineplot_params_t& _params);
+            void setFromHistParams(const hist_params_t& _params);
         };
 
         /* Takes a figure_params_t object and normalizes all pixel values to normalized
@@ -273,7 +286,7 @@ namespace Syn
             float scatter_marker_sz;
             float scatter_marker_y_sz;
             float scatter_marker_x_sz;
-            ScatterPlotMarker scatter_marker;
+            FigureMarker scatter_marker;
 
             // Selection (fill) parameters
             bool fill_between_x;
@@ -307,7 +320,6 @@ namespace Syn
                 figure_type             = _params->figure_type;
                 figure_sz_px            = _params->figure_sz_px;
 
-                data_height             = px_to_fraction(_params->data_height_px, AXIS_Y);
                 data_spacing            = _params->data_spacing;
                 data_axis_offset        = px_to_fraction(_params->data_axis_offset_px, AXIS_XY);
 
@@ -318,6 +330,7 @@ namespace Syn
                 y_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.y + _params->y_axis_lim_px[0], AXIS_Y);
                 y_axis_lim[1]           = px_to_fraction(_params->y_axis_lim_px[1], AXIS_Y);
                 y_axis_length           = y_axis_lim[1] - y_axis_lim[0];
+                data_height             = px_to_fraction(_params->y_axis_lim_px[1] + _params->data_height_px, AXIS_Y);
 
                 render_x_axis           = _params->render_x_axis;
                 render_y_axis           = _params->render_y_axis;
@@ -364,5 +377,7 @@ namespace Syn
             }
         };
 
+        //
+        static figure_params_t rcParams = figure_params_t();
     }
 }

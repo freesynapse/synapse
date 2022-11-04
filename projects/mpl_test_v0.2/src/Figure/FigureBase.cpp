@@ -1,9 +1,6 @@
 
 #include "FigureBase.h"
-
 #include "Canvas/Canvas2D.h"
-#include "Canvas/ScatterPlot2D.h"
-
 
 namespace Syn
 {
@@ -14,7 +11,8 @@ namespace Syn
             glm::vec2 fig_sz = check_fig_size(_fig_sz_px);
             m_figureSizePx = fig_sz;
             
-            m_figureParams = MakeRef<figure_params_t>(fig_sz);
+            m_figureParamsPtr = MakeRef<figure_params_t>(fig_sz);
+            m_axesScalerPtr = MakeRef<AxesScaler>(m_figureParamsPtr.get());
             
             m_renderObjPtr = MakeRef<FigureRenderObj>(this);
         }
@@ -24,20 +22,6 @@ namespace Syn
             for (auto* canvas : m_canvases)
                 delete canvas;
         }
-        //-------------------------------------------------------------------------------
-        void Figure::scatter(const std::vector<float>& _data)
-        {
-            ScatterPlot2D* scatter_plot = new ScatterPlot2D(_data);
-            m_canvases.push_back(scatter_plot);
-        }
-        //-------------------------------------------------------------------------------
-        //void Figure::scatter(const std::vector<int>& _data)
-        //{
-        //    std::vector<float> fdata = std::vector<float>(_data.begin(), _data.end());
-        //    ScatterPlot2D* scatter_plot = new ScatterPlot2D(fdata);
-        //    m_canvases.push_back(scatter_plot);
-        //    update_data_limits(scatter_plot);
-        //}        
         //-------------------------------------------------------------------------------
         void Figure::render()
         {
@@ -50,9 +34,17 @@ namespace Syn
             for (auto* canvas : m_canvases)
             {
                 canvas->redraw();
-                updata_data_limits(canvas);
+                update_data_limits(canvas);
             }
             m_renderObjPtr->redraw();
+        }
+        //-------------------------------------------------------------------------------
+        void Figure::addCanvas(Canvas2D* _canvas_ptr)
+        {
+            m_canvases.push_back(_canvas_ptr);
+            _canvas_ptr->setData();
+            update_data_limits(_canvas_ptr);
+            _canvas_ptr->redraw();
         }
         //-------------------------------------------------------------------------------
         // PRIVATE MEMBER FUNCTIONS
@@ -64,12 +56,23 @@ namespace Syn
             return _fig_sz;
         }
         //-------------------------------------------------------------------------------
-        void Figure::updata_data_limits(Canvas2D* _canvas)
+        void Figure::update_data_limits(Canvas2D* _canvas)
         {
-            m_dataLimX[0] = std::min(m_dataLimX[0], _canvas->dataLimX()[0]);
-            m_dataLimX[1] = std::max(m_dataLimX[1], _canvas->dataLimX()[1]);
-            m_dataLimY[0] = std::min(m_dataLimY[0], _canvas->dataLimY()[0]);
-            m_dataLimY[1] = std::max(m_dataLimY[1], _canvas->dataLimY()[1]);
+            if (m_dataLimX != m_dataLimX_prev)
+            {
+                m_dataLimX[0] = std::min(m_dataLimX[0], _canvas->dataLimX()[0]);
+                m_dataLimX[1] = std::max(m_dataLimX[1], _canvas->dataLimX()[1]);
+                m_dataLimX_prev = m_dataLimX;
+                m_axesScalerPtr->setXLim(m_dataLimX);
+            }
+            if (m_dataLimY != m_dataLimY_prev)
+            {
+                m_dataLimY[0] = std::min(m_dataLimY[0], _canvas->dataLimY()[0]);
+                m_dataLimY[1] = std::max(m_dataLimY[1], _canvas->dataLimY()[1]);
+                m_dataLimY_prev = m_dataLimY;
+                m_axesScalerPtr->setYLim(m_dataLimY);
+            }
+
         }
 
     }
