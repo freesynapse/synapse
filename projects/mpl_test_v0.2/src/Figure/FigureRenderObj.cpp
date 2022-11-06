@@ -25,7 +25,7 @@ namespace Syn
         //-------------------------------------------------------------------------------
         void FigureRenderObj::initialize()
         {
-            m_framebufferID = "canvas" + std::string(Random::rand_str(16));
+            m_framebufferID = "Figure_" + std::string(Random::rand_str(8));
             m_framebuffer = API::newFramebuffer(ColorFormat::RGBA16F,
                                                 glm::vec2(m_figureSizePx.x, m_figureSizePx.y), // m_figureSizePx,
                                                 1, 
@@ -89,20 +89,23 @@ namespace Syn
             
             m_shader2D->enable();
             
-            // render canvas data
-            for (auto* canvas : m_parentRawPtr->m_canvases)
-            {
-                m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->stroke_color);
-                canvas->vao()->bind();
-                renderer.drawArrays(canvas->vertexCount(), 0, true, canvas->OpenGLPrimitive());
-            }
-
             // render grid lines
             #ifdef DEBUG_FIGURE_GRIDLINES
                 m_shader2D->setUniform4fv("u_color", glm::vec4(0.3f));
                 __debug_vaoGridLines->bind();
                 renderer.drawArrays(__debug_gridLinesVertexCount, 0, true, GL_LINES);
             #endif
+
+            // render canvas data
+            for (auto& canvas : m_parentRawPtr->m_canvases)
+            {
+                //Canvas2D* canvas_ptr = canvas.second;
+                //m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->stroke_color);
+                //m_shader2D->setUniform4fv("u_color", canvas_ptr->m_canvasParameters.stroke_color);
+                //canvas_ptr->vao()->bind();
+                //renderer.drawArrays(canvas_ptr->vertexCount(), 0, true, canvas_ptr->OpenGLPrimitive());
+                canvas.second->render(m_shader2D);
+            }
 
             // render axes
             m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->axis_color);
@@ -153,10 +156,10 @@ namespace Syn
             //
             if (m_redrawFlags & FIGURE_REDRAW_DATA) // or FIGURE_REDRAW
             {
-                for (auto* canvas : m_parentRawPtr->m_canvases)
+                for (auto& canvas : m_parentRawPtr->m_canvases)
                 {
                     //m_parentRawPtr->update_data_limits(canvas);   -- instead, data limits are updated for every new plot added
-                    canvas->redraw();
+                    canvas.second->redraw();
                 }
             }
             
@@ -165,7 +168,11 @@ namespace Syn
             // stay as they were.
             if (m_localDataLimX != m_parentRawPtr->m_dataLimX || 
                 m_localDataLimY != m_parentRawPtr->m_dataLimY)
+            {
+                m_localDataLimX = m_parentRawPtr->m_dataLimX;
+                m_localDataLimY = m_parentRawPtr->m_dataLimY;
                 m_redrawFlags |= FIGURE_REDRAW_AUX;
+            }
 
             if (m_redrawFlags & FIGURE_REDRAW_AXES)
                 redrawAxes(&norm_params);
@@ -191,22 +198,22 @@ namespace Syn
         void FigureRenderObj::redrawAxes(normalized_params_t* _fig_params)
         {
             m_axesVertexCount = 4;
-            glm::vec2 V[4] = 
+            glm::vec3 V[4] = 
             {
                 // X 
-                { _fig_params->x_axis_lim[0] - _fig_params->axes_neg_protrusion.x, _fig_params->canvas_origin.y },
-                { _fig_params->x_axis_lim[1], _fig_params->canvas_origin.y },
+                { _fig_params->x_axis_lim[0] - _fig_params->axes_neg_protrusion.x, _fig_params->canvas_origin.y, _fig_params->z_value_aux },
+                { _fig_params->x_axis_lim[1], _fig_params->canvas_origin.y, _fig_params->z_value_aux },
                 // Y
-                { _fig_params->canvas_origin.x, _fig_params->y_axis_lim[0] - _fig_params->axes_neg_protrusion.y },
-                { _fig_params->canvas_origin.x, _fig_params->y_axis_lim[1] },
+                { _fig_params->canvas_origin.x, _fig_params->y_axis_lim[0] - _fig_params->axes_neg_protrusion.y, _fig_params->z_value_aux },
+                { _fig_params->canvas_origin.x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux },
             };
             //
             
             Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_STATIC_DRAW);
             vbo->setBufferLayout({
-                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float2, "a_position" },
+                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
             });
-            vbo->setData((void*)V, sizeof(glm::vec2) * m_axesVertexCount);
+            vbo->setData((void*)V, sizeof(glm::vec3) * m_axesVertexCount);
 
             m_vaoAxes = API::newVertexArray(vbo);
 
@@ -215,12 +222,12 @@ namespace Syn
         //-------------------------------------------------------------------------------
         void FigureRenderObj::redrawTicks(normalized_params_t* _fig_params)
         {
-            std::vector<glm::vec2> V;
-            auto scaler = m_parentRawPtr->axesScalerPtr();
+            std::vector<glm::vec3> V;
+            auto& scaler = m_parentRawPtr->axesScalerPtr();
 
             float font_height = m_tickLabelFont->getFontHeight();
             #ifdef DEBUG_FIGURE_GRIDLINES
-                std::vector<glm::vec2> __debug_vertices;
+                std::vector<glm::vec3> __debug_vertices;
             #endif
 
             if (_fig_params->render_x_ticks)
@@ -256,29 +263,16 @@ namespace Syn
                 // x ticks for 'linear' data
                 else
                 {
-                    //float x_plot_min = _fig_params->canvas_origin.x + _fig_params->data_axis_offset.x;
-                    //float x_plot_max = _fig_params->canvas_origin.x + _fig_params->x_axis_length - _fig_params->data_axis_offset.x;
-                    //nice_scale x_tick_params(m_parentRawPtr->m_dataLimX, _fig_params->x_tick_count);
-                    //range_converter x_converter({ x_tick_params.lower_bound, x_tick_params.upper_bound },
-                    //                            { x_plot_min, x_plot_max });
-                    //float curr_x_val = x_tick_params.lower_bound;
-                    //NiceScale x_tick_params(m_parentRawPtr->dataLimX());
-                    //x_tick_params.__debug_print("x tick params");
-                    //range_converter x_converter({ x_tick_params.nice_lim[0], x_tick_params.nice_lim[1] },
-                    //                            { x_plot_min, x_plot_max });
-                    //float curr_x_val = x_tick_params.lower_bound;
-                    //float x_step = x_tick_params.tick_spacing;
                     float curr_x_val = scaler->x_ticks().lower_bound;
                     float x_step = scaler->x_ticks().tick_spacing;
-                    //
-                    //for (size_t i = 0; i < x_tick_params.max_ticks; i++)
+
+                    // + 1 for including origin
                     for (size_t i = 0; i < scaler->x_ticks().max_ticks + 1; i++)
                     {
-                        //float x = x_converter.eval(curr_x_val);
                         float x = scaler->eval_x(curr_x_val);
 
-                        glm::vec2 v0 = { x, _fig_params->canvas_origin.y };
-                        glm::vec2 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y };
+                        glm::vec3 v0 = { x, _fig_params->canvas_origin.y, _fig_params->z_value_aux };
+                        glm::vec3 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y, _fig_params->z_value_aux };
                         V.push_back(v0);
                         V.push_back(v1);
 
@@ -291,8 +285,8 @@ namespace Syn
                         m_tickLabelPositionsX.push_back(x_tick_pos);
 
                         #ifdef DEBUG_FIGURE_GRIDLINES
-                            __debug_vertices.push_back({ x, _fig_params->canvas_origin.y });
-                            __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1] });
+                            __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
+                            __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
                         #endif
                         
                         curr_x_val += x_step;
@@ -303,28 +297,27 @@ namespace Syn
             // y ticks
             if (_fig_params->render_y_ticks)
             {
-                //float y_plot_min = _fig_params->canvas_origin.y + _fig_params->data_axis_offset.y;
-                //float y_plot_max = _fig_params->data_height;
-                //NiceScale y_tick_params(m_parentRawPtr->m_dataLimY);
-                //range_converter converter({ y_tick_params.lower_bound, y_tick_params.upper_bound },
-                //                          { y_plot_min, y_plot_max });
-
                 static float char_width_px = m_tickLabelFont->getStringWidth("1");
                 float label_width = (num_digits_float(scaler->y_ticks().upper_bound) + 1) * char_width_px;
                 float label_height = m_tickLabelFont->getFontHeight() * 0.5f;
-                //float curr_y_val = y_tick_params.lower_bound;
-                //float y_step = y_tick_params.tick_spacing;
+                
+                /* TODO : could be automated so that scaler->x_tick_start() returns the first normalized x tick
+                 * and scaler->next_x_tick() gives the next, normalized tick. Counters inside of scaler etc.
+                 */
                 float curr_y_val = scaler->y_ticks().lower_bound;
                 float y_step = scaler->y_ticks().tick_spacing;
-                //
-                //for (size_t i = 0; i < y_tick_params.max_ticks + 1; i++)
+
+                // + 1 for including origin
+                static float epsilon = 0.01f;
                 for (size_t i = 0; i < scaler->y_ticks().max_ticks + 1; i++)
                 {
-                    //float y = converter.eval(curr_y_val);
                     float y = scaler->eval_y(curr_y_val);
 
-                    glm::vec2 v0 = { _fig_params->canvas_origin.x, y };
-                    glm::vec2 v1 = { _fig_params->canvas_origin.x - _fig_params->tick_length.x, y }; 
+                    if (y > _fig_params->y_axis_lim[1]+epsilon)
+                        break;
+
+                    glm::vec3 v0 = { _fig_params->canvas_origin.x, y, _fig_params->z_value_aux };
+                    glm::vec3 v1 = { _fig_params->canvas_origin.x - _fig_params->tick_length.x, y, _fig_params->z_value_aux }; 
                     
                     V.push_back(v0);
                     V.push_back(v1);
@@ -338,8 +331,8 @@ namespace Syn
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
                     #ifdef DEBUG_FIGURE_GRIDLINES
-                        __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y });
-                        __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y });
+                        __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
+                        __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
                     #endif
 
                     curr_y_val += y_step;
@@ -350,9 +343,9 @@ namespace Syn
             
             Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_STATIC_DRAW);
             vbo->setBufferLayout({
-                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float2, "a_position" },
+                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
             });
-            vbo->setData((void*)(&V[0]), sizeof(glm::vec2) * m_ticksVertexCount);
+            vbo->setData((void*)(&V[0]), sizeof(glm::vec3) * m_ticksVertexCount);
 
             m_vaoTicks = API::newVertexArray(vbo);
 
@@ -360,9 +353,9 @@ namespace Syn
                 __debug_gridLinesVertexCount = static_cast<uint32_t>(__debug_vertices.size());
                 Ref<VertexBuffer> vbo2 = API::newVertexBuffer(GL_STATIC_DRAW);
                 vbo2->setBufferLayout({
-                    { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float2, "a_position" },
+                    { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
                 });
-                vbo2->setData((void*)(&__debug_vertices[0]), sizeof(glm::vec2) * __debug_gridLinesVertexCount);
+                vbo2->setData((void*)(&__debug_vertices[0]), sizeof(glm::vec3) * __debug_gridLinesVertexCount);
                 __debug_vaoGridLines = API::newVertexArray(vbo2);
             #endif
 
@@ -374,7 +367,7 @@ namespace Syn
         {
             // m_(x/y)TickLabelPositions holds the pixel coordinates of tick positions
 
-            auto scaler = m_parentRawPtr->axesScalerPtr();
+            auto& scaler = m_parentRawPtr->axesScalerPtr();
 
             // x axis
             //
@@ -424,7 +417,7 @@ namespace Syn
                     //float tick_label = start_val + i * x_tick_params.tick_spacing;
                     float tick_label = start_val + i * scaler->x_ticks().tick_spacing;
                     std::stringstream ss;
-                    ss << std::setprecision(2) /*<< std::fixed*/ << tick_label;
+                    ss << std::setprecision(2) << std::fixed << tick_label;
                     std::string label = ss.str();
                     m_tickLabelPositionsX[i].x -= (m_tickLabelFont->getStringWidth("%s", label.c_str()) * 0.5f);
                     m_tickLabelsX[i] = ss.str();
@@ -461,11 +454,11 @@ namespace Syn
             std::string shader_2D_src = R"(
                 #type VERTEX_SHADER
                 #version 430 core
-                layout(location = 0) in vec2 a_position;
+                layout(location = 0) in vec3 a_position;
                 void main()
                 {
-                    vec2 p = 2.0 * a_position - 1.0;
-                    gl_Position = vec4(p, 0.0, 1.0);
+                    vec2 p = 2.0 * a_position.xy - 1.0;
+                    gl_Position = vec4(p.x, p.y, a_position.z, 1.0);
                 }
                 #type FRAGMENT_SHADER
                 #version 430 core

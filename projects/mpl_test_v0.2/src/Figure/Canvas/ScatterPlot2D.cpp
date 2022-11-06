@@ -11,23 +11,24 @@ namespace Syn
     {
         ScatterPlot2D::ScatterPlot2D(Figure* _parent, 
                                      const std::vector<float>& _X, 
-                                     const std::vector<float>& _Y)
+                                     const std::vector<float>& _Y,
+                                     const std::string& _scatter_id)
         {
             m_parentRawPtr = _parent;
-
+            // copy figure parameters
+            memcpy(&m_canvasParameters, m_parentRawPtr->paramsRawPtr(), sizeof(figure_params_t));
+            set_canvas_id(_scatter_id);
             m_dataX = std::vector<float>(_X);
             m_dataY = std::vector<float>(_Y);
+            m_OpenGLPrimitive = GL_TRIANGLES;
         }
         //-------------------------------------------------------------------------------
         void ScatterPlot2D::setData()
         {
-            // limits
-            m_dataLimX = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
-            m_dataLimY = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
-            
             // x and y guaranteed to be of equal length
             SYN_CORE_ASSERT(m_dataX.size() == m_dataY.size(), "X and Y data must be of equal size.");
 
+            // limits initialized in Canvas2D constructor
             for (size_t i = 0; i < m_dataX.size(); i++)
             {
                 m_dataLimX[0] = std::min(m_dataLimX[0], m_dataX[i]);
@@ -35,47 +36,45 @@ namespace Syn
                 m_dataLimY[0] = std::min(m_dataLimY[0], m_dataY[i]);
                 m_dataLimY[1] = std::max(m_dataLimY[1], m_dataY[i]);
             }
+            m_parentRawPtr->updateDataLimits();
+        }
+        //-------------------------------------------------------------------------------
+        void ScatterPlot2D::data(const std::vector<float>& _Y)
+        {
+            m_dataY = std::vector<float>(_Y);
+            m_dataX = std::vector<float>(_Y.size());
+            // create X vector
+            for (size_t i = 0; i < _Y.size(); i++)
+                m_dataX.push_back(static_cast<float>(i));
+            setData();
+        }
+        //-------------------------------------------------------------------------------
+        void ScatterPlot2D::data(const std::vector<float>& _X, const std::vector<float>& _Y)
+        {
+            m_dataX = std::vector<float>(_X);
+            m_dataY = std::vector<float>(_Y);
+            setData();
         }
         //-------------------------------------------------------------------------------
         void ScatterPlot2D::redraw()
         {
-            std::vector<glm::vec2> V;                                    // TODO : !!!
-            normalized_params_t params = normalized_params_t(m_parentRawPtr->paramsPtr());    // alternate constructor needed or something -- everything is calculated twice now, 
+            std::vector<glm::vec3> V;                                    // TODO : !!!
+            //normalized_params_t params = normalized_params_t(m_parentRawPtr->paramsPtr());    // alternate constructor needed or something -- everything is calculated twice now, 
                                                                                 // once here and once in FigureRenderObj.
+            normalized_params_t params = normalized_params_t(m_canvasParameters);
             
-            //float x_plot_min = params.canvas_origin.x + params.data_axis_offset.x;
-            //float x_plot_max = params.canvas_origin.x + params.x_axis_length - params.data_axis_offset.x;
-            //nice_scale x_tick_params(m_parentRawPtr->dataLimX(), params.x_tick_count);
-            //range_converter x_converter({ x_tick_params.lower_bound, x_tick_params.upper_bound },
-            //                            { x_plot_min, x_plot_max });
-            //NiceScale x_tick_params(m_parentRawPtr->dataLimX());
-            //RangeConverter x_converter({ x_tick_params.nice_lim[0], x_tick_params.nice_lim[1] },
-            //                           { x_plot_min, x_plot_max });
-
-            //float y_plot_min = params.canvas_origin.y + params.data_axis_offset.y;
-            //float y_plot_max = params.data_height;
-            //NiceScale y_tick_params(m_parentRawPtr->dataLimY());
-            //RangeConverter y_converter({ y_tick_params.lower_bound, y_tick_params.upper_bound },
-            //                           { y_plot_min, y_plot_max });
-            printf("dataLimX : %f, %f\n", m_parentRawPtr->dataLimX().x, m_parentRawPtr->dataLimX().y);
-            printf("dataLimY : %f, %f\n", m_parentRawPtr->dataLimY().x, m_parentRawPtr->dataLimY().y);
-
             std::vector<glm::vec2> vertices;
             size_t marker_vertex_count = figureMarkerVertices(&params, vertices);
-            auto scaler = m_parentRawPtr->axesScalerPtr();
-            scaler->x_ticks().__debug_print("X ticks");
-            scaler->y_ticks().__debug_print("Y ticks");
+            auto& scaler = m_parentRawPtr->axesScalerPtr();
             //
             for (size_t i = 0; i < m_dataX.size(); i++)
             {
                 // point center
-                //float x = x_converter.eval(m_dataX[i]);
-                //float y = y_converter.eval(m_dataY[i]);
                 float x = scaler->eval_x(m_dataX[i]);
                 float y = scaler->eval_y(m_dataY[i]);
                 // set vertices
                 for (size_t j = 0; j < marker_vertex_count; j++)
-                    V.push_back({ x + vertices[j].x, y + vertices[j].y });
+                    V.push_back({ x + vertices[j].x, y + vertices[j].y, params.z_value_data });
             }
 
             m_vertexCount = static_cast<uint32_t>(V.size());
@@ -83,13 +82,22 @@ namespace Syn
             //
             Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_STATIC_DRAW);
             vbo->setBufferLayout({
-                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float2, "a_position "},
+                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position "},
             });
-            vbo->setData((void*)(&V[0]), sizeof(glm::vec2) * m_vertexCount);
+            vbo->setData((void*)(&V[0]), sizeof(glm::vec3) * m_vertexCount);
 
             m_vaoData = API::newVertexArray(vbo);
 
             Renderer::get().executeRenderCommands();
+        }
+        //-------------------------------------------------------------------------------
+        void ScatterPlot2D::render(const Ref<Shader>& _shader)
+        {
+            static auto& renderer = Renderer::get();
+
+            _shader->setUniform4fv("u_color", m_canvasParameters.stroke_color);
+            m_vaoData->bind();
+            renderer.drawArrays(m_vertexCount, 0, true, m_OpenGLPrimitive);
         }
     }
 }

@@ -13,5 +13,8 @@
 #include "FigureParameters.h"
 #include "FigureBase.h"
 
+#include "Canvas/ScatterPlot2D.h"
+
+
 
 

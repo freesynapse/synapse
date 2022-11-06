@@ -14,13 +14,13 @@
 
 
 #define FIGURE_REDRAW_DATA          0b00000001
-#define FIGURE_REDRAW               0b00000001
 #define FIGURE_REDRAW_AXES          0b00000010
 #define FIGURE_REDRAW_TICKS         0b00000100
 #define FIGURE_REDRAW_TICKLABELS    0b00001000
 #define FIGURE_REDRAW_SELECTION     0b00010000
-#define FIGURE_REDRAW_ALL           0b00011111
 #define FIGURE_REDRAW_AUX           0b00001110  // axes, tick, tick labels
+#define FIGURE_REDRAW_ALL           0b00011111  // all elements
+#define FIGURE_REDRAW               FIGURE_REDRAW_ALL
 
 #define DEBUG_FIGURE_GRIDLINES
 

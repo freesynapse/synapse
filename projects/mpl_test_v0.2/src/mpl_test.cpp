@@ -40,12 +40,20 @@ public:
 	Ref<Shader> m_shader = nullptr;
 
 	Ref<Figure> m_figure = nullptr;
+	std::string m_scatterID = "";
+	std::string m_lineplotID = "";
+
+	std::vector<std::vector<float>> m_data_X;
+	std::vector<std::vector<float>> m_data_Y;
+	int n = 500;
 	
 	// flags
 	bool m_wireframeMode = true;
 	bool m_toggleCulling = false;
 
 	bool open_popup = true;
+	bool add_scatter_data = false;
+	bool add_lineplot_data = false;
 
 };
 class mpl_test_v02 : public Application
@@ -74,13 +82,18 @@ void layer::onAttach()
 	m_font = MakeRef<Font>("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 14.0f);
 	m_font->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// HISTOGRAM
+	//-----------------------------------------------------------------------------------
+	// FIGURE TESTS
+	//-----------------------------------------------------------------------------------
+	//
 	glm::vec2 fig_sz = glm::vec2(480.0f, 320.0f);
 	m_figure = MakeRef<Figure>(fig_sz);
 
+	// SCATTER TEST ---------------------------------------------------------------------
+	//
 	std::default_random_engine gen(1); // seed 1 for reproducibility
 	std::normal_distribution<float> dist(5.0, 2.0);
-	int n = 500;
+
 	std::vector<float> X(n), Y(n);
 	for (int i = 0; i < n; i++)
 	{
@@ -89,12 +102,38 @@ void layer::onAttach()
 	}
 	//X = std::vector<float>({ 1, 0, 2 });
 	//Y = std::vector<float>({ 2, 2, 2 });
-	scatter_params_t params;
-	params.marker_size = 4.0f;
-	params.marker = FigureMarker::Square;
-	m_figure->scatter(X, Y, params);
-
+	scatter_params_t scatter_params;
+	scatter_params.marker_size = 4.0f;
+	scatter_params.marker = FigureMarker::Square;
+	//m_scatterID = m_figure->scatter(X, Y, "TEST", scatter_params);
 	
+	// LINEPLOT TEST --------------------------------------------------------------------
+	//
+	std::vector<float> y;
+	for (int i = 0; i < 20; i++)
+		y.push_back(dist(gen));
+
+	for (int n_ = 0; n_ < 3; n_++)
+	{
+		std::vector<float> y;
+		std::vector<float> x;
+		for (int i = 0; i < n; i++)
+		{
+			y.push_back(dist(gen) + n_ * 100 - 100);
+			x.push_back(static_cast<float>(i+n_*n));
+		}
+		m_data_Y.push_back(y);
+		m_data_X.push_back(x);
+	}
+	lineplot_params_t lineplot_params;
+	//lineplot_params.marker = FigureMarker::Square;
+	//lineplot_params.marker_size = 2.0f;
+	//m_lineplotID = m_figure->lineplot(m_data_X, m_data_Y, "TEST", lineplot_params);
+	m_lineplotID = m_figure->lineplot(m_data_Y, "TEST", lineplot_params);
+	//m_lineplotID = m_figure->lineplot(y, "TEST", lineplot_params);
+	
+
+
 	// framebuffer
 	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
 
@@ -149,9 +188,48 @@ void layer::onUpdate(float _dt)
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
 	m_renderBuffer->bindDefaultFramebuffer();
 
+	if (add_scatter_data)
+	{
+		std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
+		float mu = 0.0f;
+		float sigma = 10.0f;
+		float offset_x = Random::rand_f_r(-100.0f, 100.0f);
+		float offset_y = Random::rand_f_r(-100.0f, 100.0f);
+		std::normal_distribution<float> dist(mu, sigma);
+		std::vector<float> X(n), Y(n);
+		for (int i = 0; i < n; i++)
+		{
+			X[i] = dist(gen) + offset_x;
+			Y[i] = dist(gen) + offset_y;
+		}
+		scatter_params_t params;
+		params.marker_size = 4.0f;
+		params.marker = FigureMarker::Square;
+		params.marker_color = glm::vec4(Random::rand3_f_r(), 0.5f);
+		params.marker = FigureMarker(Random::rand_i_r(0, 7));
+		std::string ID(Random::rand_str(16));
+		m_figure->scatter(X, Y, ID, params);
+		
+		add_scatter_data = false;
+	}
+
+	if (add_lineplot_data)
+	{
+		std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
+		float mu = 0.0f;
+		float sigma = 10.0f;
+		std::normal_distribution<float> dist(mu, sigma);
+		std::vector<float> y;
+		for (int i = 0; i < n; i++)
+			y.push_back(dist(gen));
+		m_data_Y.push_back(y);
+	}
 
 	if (m_figure != nullptr)
+	{
+		//Timer timer("update and render");
 		m_figure->render();
+	}
 
 }
 //---------------------------------------------------------------------------------------
@@ -177,6 +255,32 @@ void layer::popup_test()
 			open_popup = false;
 		}
 		ImGui::SameLine();
+		if (ImGui::Button("Randomize"))
+		{
+			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
+			std::normal_distribution<float> dist(5.0, 2.0);
+			int n = 500;
+			std::vector<float> X(n), Y(n);
+			for (int i = 0; i < n; i++)
+			{
+				X[i] = dist(gen);
+				Y[i] = dist(gen);
+			}
+			m_figure->canvas("TEST")->data(X, Y);
+		}
+		
+		if (ImGui::Button("Add scatter set"))
+		{
+			add_scatter_data = true;
+		}
+		if (ImGui::Button("Add line to set"))
+		{
+			add_lineplot_data = true;
+		}		
+
+		ImGui::Text("");
+		ImGui::Separator();
+		ImGui::Text("data points : %zu", m_figure->dataSize());
 
 		ImGui::EndPopup();
 

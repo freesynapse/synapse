@@ -64,16 +64,16 @@ namespace Syn
                 nice_lim[1] = ceil(lim[1] / tick_spacing) * tick_spacing;
                 set = true;
             }
-            float nice_num(float range, bool round)
+            float nice_num(float _range, bool _round)
             {
                 float exponent;
                 float fraction;
                 float nice_fraction;
 
-                exponent = floor(log10(range));
-                fraction = range / pow(10.f, exponent);
+                exponent = floor(log10(_range));
+                fraction = _range / pow(10.f, exponent);
 
-                if (round) 
+                if (_round) 
                 {   if (fraction < 1.5)
                         nice_fraction = 1;
                     else if (fraction < 3)
@@ -203,6 +203,7 @@ namespace Syn
         public:
             NiceScale m_scalers[2];         // X = 0, Y = 1
             RangeConverter m_converters[2];
+
         };
 
 

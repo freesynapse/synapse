@@ -23,10 +23,10 @@ namespace Syn
          */
         enum class FigureType
         {
-            None        = 0x01,
-            Histogram   = 0x02,
-            LinePlot    = 0x04,
-            ScatterPlot = 0x08,
+            None        = 0,
+            Histogram   = 1,
+            LinePlot    = 2,
+            ScatterPlot = 3,
         };
 
         //-------------------------------------------------------------------------------
@@ -34,13 +34,15 @@ namespace Syn
          */
         enum class FigureMarker
         {
-            Square      = 0x01,
-            Diamond     = 0x02,
-            LTriangle   = 0x04,
-            UTriangle   = 0x08,
-            HLine       = 0x10,
-            VLine       = 0x20,
-            Plus        = 0x40,
+            Square      = 0,
+            Diamond     = 1,
+            LTriangle   = 2,
+            UTriangle   = 3,
+            HLine       = 4,
+            VLine       = 5,
+            Plus        = 6,
+            Dot         = 7,
+            None        = 8,
         };
 
         //-------------------------------------------------------------------------------
@@ -76,6 +78,14 @@ namespace Syn
              * for Y for all data points.
              */
             glm::vec2 data_axis_offset_px       = { 0, 0 };
+
+            /* Data z axis value.
+             */
+            float z_value_data                  = 0.0f;
+
+            /* Plot auxillary z value (axes, gridlines)
+             */
+            float z_value_aux                   = 0.0f;
 
             /* Negative offset in pixels, the amount of backward 'protrusion' of axes 
              * at (0, 0).
@@ -179,7 +189,7 @@ namespace Syn
             glm::vec4 title_color               = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 axis_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 tick_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
-            glm::vec4 figure_background         = {   0.0f,   0.0f,   0.0f,  1.0f };
+            glm::vec4 figure_background         = {   0.0f,   0.0f,   0.0f,  0.7f };
             glm::vec4 stroke_color              = { 0.298f, 0.361f, 0.490f,  1.0f };
 
 
@@ -207,6 +217,16 @@ namespace Syn
             FigureMarker scatter_marker         = FigureMarker::Square;
 
             
+            /*---------------------------------------------------------------------------
+             * LINEPLOT PLOT PARAMETERS
+             *---------------------------------------------------------------------------
+             */
+            
+            /* Line width in pixels (as set by OpenGL).
+             */
+            float line_width_px                 = 1.0f;
+
+
             /*---------------------------------------------------------------------------
              * SELECTION (FILL) PARAMETERS
              *---------------------------------------------------------------------------
@@ -245,6 +265,8 @@ namespace Syn
             float data_height;
             float data_spacing;
             glm::vec2 data_axis_offset;
+            float z_value_data;
+            float z_value_aux;
 
             glm::vec2 canvas_origin;
             glm::vec2 x_axis_lim;
@@ -288,6 +310,9 @@ namespace Syn
             float scatter_marker_x_sz;
             FigureMarker scatter_marker;
 
+            // LinePlot parameters
+            float line_width_px;
+
             // Selection (fill) parameters
             bool fill_between_x;
             bool fill_between_y;
@@ -314,6 +339,7 @@ namespace Syn
             normalized_params_t() {}    // default constructor
             normalized_params_t(const std::shared_ptr<figure_params_t>& _params)    { __set_normalized_values(_params.get()); }
             normalized_params_t(figure_params_t* _params)                           { __set_normalized_values(_params); }
+            normalized_params_t(figure_params_t _params)                            { __set_normalized_values(&_params); }
             
             void __set_normalized_values(figure_params_t* _params)
             {
@@ -322,6 +348,8 @@ namespace Syn
 
                 data_spacing            = _params->data_spacing;
                 data_axis_offset        = px_to_fraction(_params->data_axis_offset_px, AXIS_XY);
+                z_value_data            = _params->z_value_data;
+                z_value_aux             = _params->z_value_aux;
 
                 canvas_origin           = px_to_fraction(_params->canvas_origin_px, AXIS_XY);
                 x_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.x + _params->x_axis_lim_px[0], AXIS_X);
@@ -370,6 +398,8 @@ namespace Syn
                 scatter_marker_x_sz     = scatter_marker_sz * (figure_sz_px.y / figure_sz_px.x);
                 scatter_marker          = _params->scatter_marker;
 
+                // Lineplot parameters
+                line_width_px           = _params->line_width_px;
                 // Selection (fill) parameters
                 fill_between_x          = _params->fill_between_x;
                 fill_between_y          = _params->fill_between_y;

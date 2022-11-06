@@ -20,6 +20,8 @@ namespace Syn
             case FigureMarker::HLine:       return  6;
             case FigureMarker::VLine:       return  6;
             case FigureMarker::Plus:        return 12;
+            case FigureMarker::Dot:         return  0;  // TODO : implement this
+            case FigureMarker::None:        return  0;
             default:                        return  0;
             }
             return 0;
@@ -30,6 +32,10 @@ namespace Syn
         {
             _vertices.clear();
             FigureMarker marker = _params->scatter_marker;
+            
+            if (marker == FigureMarker::None)
+                return 0;
+
             float x_m_sz = _params->scatter_marker_x_sz;
             float y_m_sz = _params->scatter_marker_y_sz;
 
@@ -129,12 +135,15 @@ namespace Syn
         {
             m_paramsPtr = _fig_params;
             normalized_params_t params = normalized_params_t(m_paramsPtr);
-
-            m_converters[0].plot_lim = { params.canvas_origin.x + params.data_axis_offset.x,
-                                         params.canvas_origin.x + params.x_axis_length - params.data_axis_offset.x };
+            
+            m_converters[0].plot_lim = { params.x_axis_lim[0], params.x_axis_lim[1] };
+            //m_converters[0].plot_lim = { params.canvas_origin.x + params.data_axis_offset.x,
+            //                             params.canvas_origin.x + params.x_axis_length - params.data_axis_offset.x };
             m_converters[0].update_plot_range();
-            m_converters[1].plot_lim = { params.canvas_origin.y + params.data_axis_offset.y,
-                                         params.data_height };
+            //m_converters[1].plot_lim = { params.canvas_origin.y + params.data_axis_offset.y,
+            //                             params.data_height };
+            m_converters[1].plot_lim = { params.y_axis_lim[0], params.y_axis_lim[1] };
+
             m_converters[1].update_plot_range();
         }
         //-------------------------------------------------------------------------------

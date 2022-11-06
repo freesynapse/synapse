@@ -18,29 +18,46 @@ namespace Syn
             srand(time(NULL));
             SYN_CORE_TRACE("Random generator initialized.");
         }
-
-        static int rand_i()
-            { return rand(); }
-
+        //
+        static int rand_i() { return rand(); }
+        //
         static int rand_i(int max)
         { 
             if (max < 0)
                 return -(rand() % (abs(max) + 1));
             return rand() % (max + 1); 
         }
-
-        static int rand_i_r(int _lo, int _hi)
-            { return rand() % (_hi - _lo) + _lo; }
-
-        static uint32_t rand_ui()
-            { return s_intDistribution(s_randomEngine); }
-
+        //
+        static int rand_i_r(int _lo, int _hi) { return rand() % (_hi - _lo) + _lo; }
+        //
+        static uint32_t rand_ui() { return s_intDistribution(s_randomEngine); }
+        //
         static uint32_t rand_ui_r(uint32_t _lo=0, uint32_t _hi=std::numeric_limits<uint32_t>::max())
-            { return s_intDistribution(s_randomEngine) % (_hi - _lo) + _lo; }
-
-        static float rand_f()
-            { return s_realDistribution(s_randomEngine) * s_invMaxFloat; }
-
+        { return s_intDistribution(s_randomEngine) % (_hi - _lo) + _lo; }
+        //
+        static float rand_f() { return s_realDistribution(s_randomEngine) * s_invMaxFloat; }
+        //
+        static glm::vec2 rand2_f()
+        { 
+            return glm::vec2(s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat);
+        }
+        //
+        static glm::vec3 rand3_f()
+        { 
+            return glm::vec3(s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat);
+        }
+        //
+        static glm::vec4 rand4_f()
+        { 
+            return glm::vec4(s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat,
+                             s_realDistribution(s_randomEngine) * s_invMaxFloat);
+        }
+        //
         static float rand_f_r(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
         {
             //float r = s_realDistribution(s_randomEngine);
@@ -48,9 +65,30 @@ namespace Syn
             //r = r / div + _lo;
             return s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo;
         }
-
+        //
+        static glm::vec2 rand2_f_r2(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
+        {
+            return glm::vec2(s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo);
+        }
+        //
+        static glm::vec3 rand3_f_r(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
+        {
+            return glm::vec3(s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo);
+        }
+        //
+        static glm::vec4 rand4_f_r(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
+        {
+            return glm::vec4(s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
+                             s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo);
+        }
+        //
         static bool rand_b() { return (rand() % 2 == 0); }
-
+        //
 		static char* rand_str(size_t len)
 		{
 			static char buffer[256];
