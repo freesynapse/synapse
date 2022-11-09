@@ -65,13 +65,13 @@ namespace Syn
             
             std::vector<glm::vec2> vertices;
             size_t marker_vertex_count = figureMarkerVertices(&params, vertices);
-            auto& scaler = m_parentRawPtr->axesScalerPtr();
+            const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
             //
             for (size_t i = 0; i < m_dataX.size(); i++)
             {
                 // point center
-                float x = scaler->eval_x(m_dataX[i]);
-                float y = scaler->eval_y(m_dataY[i]);
+                float x = axes->eval_x(m_dataX[i]);
+                float y = axes->eval_y(m_dataY[i]);
                 // set vertices
                 for (size_t j = 0; j < marker_vertex_count; j++)
                     V.push_back({ x + vertices[j].x, y + vertices[j].y, params.z_value_data });

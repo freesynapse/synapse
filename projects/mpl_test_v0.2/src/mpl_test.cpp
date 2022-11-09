@@ -17,6 +17,37 @@ using namespace Syn::mplc;
 #undef DEBUG_IMGUI_LOG
 
 
+
+void float_sign_dig(float _f, float _n_sig)
+{
+	int h;
+	float l, a, b, c, d, e, i, j, m, f, g;
+	b = _f;
+	c = floor(_f);
+
+	// Counting the no. of digits to the left of decimal point
+	// in the given no.
+	for (i = 0; b >= 1; ++i)
+		b = b / 10;
+
+	d = _n_sig - i;
+	b = _f;
+	b = b * pow(10, d);
+	e = b + 0.5;
+	if ((float)e == (float)ceil(b)) {
+		f = (ceil(b));
+		h = f - 2;
+		if (h % 2 != 0) {
+			e = e - 1;
+		}
+	}
+	j = floor(e);
+	m = pow(10, d);
+	j = j / m;
+	std::cout << "The number after rounding-off is " << j << "\n\n";
+	
+}
+//
 class layer : public Layer
 {
 public:
@@ -92,7 +123,7 @@ void layer::onAttach()
 	// SCATTER TEST ---------------------------------------------------------------------
 	//
 	std::default_random_engine gen(1); // seed 1 for reproducibility
-	std::normal_distribution<float> dist(5.0, 2.0);
+	std::normal_distribution<float> dist(0.0, 5.0);
 
 	std::vector<float> X(n), Y(n);
 	for (int i = 0; i < n; i++)
@@ -132,6 +163,8 @@ void layer::onAttach()
 	m_lineplotID = m_figure->lineplot(m_data_Y, "TEST", lineplot_params);
 	//m_lineplotID = m_figure->lineplot(y, "TEST", lineplot_params);
 	
+	// TEST TICK LABELS!
+	//
 
 
 	// framebuffer

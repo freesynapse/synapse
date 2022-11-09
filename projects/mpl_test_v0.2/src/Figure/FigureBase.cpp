@@ -14,7 +14,7 @@ namespace Syn
             m_figureSizePx = fig_sz;
             
             m_figureParamsPtr = MakeRef<figure_params_t>(fig_sz);
-            m_axesScalerPtr = MakeRef<AxesScaler>(m_figureParamsPtr.get());
+            m_axesPtr = MakeRef<Axes>(m_figureParamsPtr.get());
             
             m_renderObjPtr = MakeRef<FigureRenderObj>(this);
         }
@@ -68,7 +68,7 @@ namespace Syn
                 // on the data
                 NiceScale x_ticks(m_dataLimX);
                 glm::vec2 new_lim = { x_ticks.lower_bound, x_ticks.upper_bound };
-                m_axesScalerPtr->setXLim(new_lim);
+                m_axesPtr->setXLim(new_lim);
             }
             
             if (m_dataLimY != m_dataLimY_prev)
@@ -78,7 +78,7 @@ namespace Syn
                 // on the data
                 NiceScale x_ticks(m_dataLimY);
                 glm::vec2 new_lim = { x_ticks.lower_bound, x_ticks.upper_bound };
-                m_axesScalerPtr->setYLim(new_lim);
+                m_axesPtr->setYLim(new_lim);
             }
             m_renderObjPtr->m_redrawFlags = FIGURE_REDRAW;
         }

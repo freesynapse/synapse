@@ -42,7 +42,6 @@ namespace Syn
                 }
             }
 
-            printf("\nShape = (%d, %d)\n\n", m_maxShape[0], m_maxShape[1]);
             m_parentRawPtr->updateDataLimits();
 
         }
@@ -52,7 +51,7 @@ namespace Syn
             std::vector<glm::vec3> V;
             std::vector<glm::vec3> V_markers;
             normalized_params_t params = normalized_params_t(m_canvasParameters);
-            auto& scaler = m_parentRawPtr->axesScalerPtr();
+            const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
 
             std::vector<glm::vec2> vertices;
             size_t marker_vertex_count = figureMarkerVertices(&params, vertices);
@@ -67,8 +66,8 @@ namespace Syn
                     //          (axis 1; n) would be transparent (alpha=0.0).
                     //
 
-                    glm::vec3 v0 = { scaler->eval_x(m_dataX[m][n-1]), scaler->eval_y(m_dataY[m][n-1]), params.z_value_data };
-                    glm::vec3 v1 = { scaler->eval_x(m_dataX[m][n  ]), scaler->eval_y(m_dataY[m][n  ]), params.z_value_data };
+                    glm::vec3 v0 = { axes->eval_x(m_dataX[m][n-1]), axes->eval_y(m_dataY[m][n-1]), params.z_value_data };
+                    glm::vec3 v1 = { axes->eval_x(m_dataX[m][n  ]), axes->eval_y(m_dataY[m][n  ]), params.z_value_data };
                     V.push_back(v0);
                     V.push_back(v1);
 

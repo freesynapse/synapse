@@ -24,6 +24,7 @@
 
 #define DEBUG_FIGURE_GRIDLINES
 
+
 namespace Syn
 {
     namespace mplc
@@ -71,6 +72,11 @@ namespace Syn
             void setup_static_shaders();
             int num_digits_float(float _f);
 
+            /* Determine number of decimals for tick labels
+             */
+            void format_tick_labels(NiceScale* _ticks,
+                                    const std::vector<glm::vec2>& _label_positions);
+
 
         public:
             // Set by FigureRenderObjBase
@@ -98,8 +104,6 @@ namespace Syn
 
             std::vector<glm::vec2> m_tickLabelPositionsX;
             std::vector<glm::vec2> m_tickLabelPositionsY;
-            std::vector<std::string> m_tickLabelsX;
-            std::vector<std::string> m_tickLabelsY;
 
             Ref<Font> m_titleFont = nullptr;
             Ref<Font> m_axisLabelFont = nullptr;

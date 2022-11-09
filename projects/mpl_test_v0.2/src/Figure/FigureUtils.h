@@ -9,6 +9,10 @@ namespace Syn
 {
     namespace mplc
     {
+        static const int X_AXIS = 0;
+        static const int Y_AXIS = 1;
+        static const int Z_AXIS = 2;
+
         //-------------------------------------------------------------------------------
         /* Converts a ScatterPlotMarker into number of vertices per marker
          */
@@ -28,11 +32,22 @@ namespace Syn
          * VISUALLY PLEASING TICKS
          *-------------------------------------------------------------------------------
          */
+
+        /* Helper struct for rendering tick labels.
+         */
+        struct tick_labels_t
+        {
+            size_t label_count = 0;
+            std::vector<std::string> labels;
+            float max_label_width = 0.0f;
+            float min_label_width = 0.0f;
+        };
+
         class NiceScale
         {
         public: // open member variables
             glm::vec2 lim;
-            size_t max_ticks = 10;
+            size_t max_ticks = 5;
             float tick_spacing;
             float range;
             union
@@ -45,6 +60,7 @@ namespace Syn
                 };
             };
             bool set = false;
+            tick_labels_t tick_labels;
         
         public: // Ctor / Dtor
             NiceScale() {}
@@ -169,10 +185,10 @@ namespace Syn
          *-------------------------------------------------------------------------------
          */
         struct figure_params_t; // forward decl
-        class AxesScaler
+        class Axes
         {
         public:
-            AxesScaler(figure_params_t* _fig_params);
+            Axes(figure_params_t* _fig_params);
 
         public:
             float eval_x(float _val) { return m_converters[0].eval(_val); }
@@ -203,7 +219,6 @@ namespace Syn
         public:
             NiceScale m_scalers[2];         // X = 0, Y = 1
             RangeConverter m_converters[2];
-
         };
 
 
@@ -211,15 +226,13 @@ namespace Syn
          * SMALL UTILITY FUNCTIONS
          *-------------------------------------------------------------------------------
          */
-
-        /* Type deduction function. */
+    
+        /* Type deduction functions 
+         */
         template<typename T_>
         inline bool isIntegralType(T_ _val) { return std::is_integral<T_>::value; }
-        /* Type deduction function. */
         template<typename T_>
         inline bool isFloatingPointType(T_ _val) { return std::is_floating_point<T_>::value; }
-
-
     }
 }
 

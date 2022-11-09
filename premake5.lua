@@ -85,7 +85,6 @@ LibDirs["python"] = "%{wks.location}/../libraries/python3.8/config-3.8-x86_64-li
 include "synapse-core"
 --include "projects/imgui-1.88-test"
 include "projects/mpl_test_v0.2"
-include "projects/mpl_test_v0.1"
 --include "projects/imgui-1.88-tabs"
 --include "projects/pan-and-zoom"
 

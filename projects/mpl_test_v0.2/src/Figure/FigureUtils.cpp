@@ -3,6 +3,7 @@
 
 #include <Synapse/Core.hpp>
 #include "FigureParameters.h"
+#include "FigureRenderObj.h"
 
 
 namespace Syn
@@ -131,7 +132,7 @@ namespace Syn
         //-------------------------------------------------------------------------------
         // AxesScaler MEMBER FUNCTIONS
         //
-        AxesScaler::AxesScaler(figure_params_t* _fig_params)
+        Axes::Axes(figure_params_t* _fig_params)
         {
             m_paramsPtr = _fig_params;
             normalized_params_t params = normalized_params_t(m_paramsPtr);
@@ -146,8 +147,6 @@ namespace Syn
 
             m_converters[1].update_plot_range();
         }
-        //-------------------------------------------------------------------------------
-
     }
 }
 

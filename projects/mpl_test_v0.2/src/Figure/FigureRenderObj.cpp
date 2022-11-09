@@ -69,6 +69,7 @@ namespace Syn
         void FigureRenderObj::render()
         {
             static auto& renderer = Renderer::get();
+            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
 
             if (!m_redrawFlags)
                 return;
@@ -120,15 +121,24 @@ namespace Syn
             // render tick labels
             m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);            
             m_tickLabelFont->beginRenderBlock();
-            if (m_tickLabelPositionsY.size() > 0 && m_tickLabelsY.size() > 0)
+            if (m_tickLabelPositionsY.size())// > 0 && m_tickLabelsY.size() > 0)
             {
+                auto& y_labels  = axes->y_ticks().tick_labels.labels;
                 for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
-                    m_tickLabelFont->addString(m_tickLabelPositionsY[i].x, m_tickLabelPositionsY[i].y, "%s", m_tickLabelsY[i].c_str());
+                    m_tickLabelFont->addString(m_tickLabelPositionsY[i].x, 
+                                               m_tickLabelPositionsY[i].y, 
+                                               "%s", 
+                                               y_labels[i].c_str());
+                                               //m_tickLabelsY[i].c_str());
             }
-            if (m_tickLabelPositionsX.size() > 0 && m_tickLabelsX.size() > 0)
+            if (m_tickLabelPositionsX.size())// > 0 && m_tickLabelsX.size() > 0)
             {
+                auto& x_labels  = axes->x_ticks().tick_labels.labels;
                 for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
-                    m_tickLabelFont->addString(m_tickLabelPositionsX[i].x, m_tickLabelPositionsX[i].y, "%s", m_tickLabelsX[i].c_str());
+                    m_tickLabelFont->addString(m_tickLabelPositionsX[i].x, 
+                                               m_tickLabelPositionsX[i].y, 
+                                               "%s", 
+                                               x_labels[i].c_str());
             }
             m_tickLabelFont->endRenderBlock();
             
@@ -186,8 +196,8 @@ namespace Syn
 
             if (m_redrawFlags &  FIGURE_REDRAW_TICKLABELS || m_redrawFlags & FIGURE_REDRAW_DATA)
             {
-                m_tickLabelsX.clear();                
-                m_tickLabelsY.clear();
+                //m_tickLabelsX.clear();                
+                //m_tickLabelsY.clear();
                 redrawTickLabels(&norm_params);
             }
 
@@ -223,7 +233,7 @@ namespace Syn
         void FigureRenderObj::redrawTicks(normalized_params_t* _fig_params)
         {
             std::vector<glm::vec3> V;
-            auto& scaler = m_parentRawPtr->axesScalerPtr();
+            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
 
             float font_height = m_tickLabelFont->getFontHeight();
             #ifdef DEBUG_FIGURE_GRIDLINES
@@ -263,13 +273,13 @@ namespace Syn
                 // x ticks for 'linear' data
                 else
                 {
-                    float curr_x_val = scaler->x_ticks().lower_bound;
-                    float x_step = scaler->x_ticks().tick_spacing;
+                    float curr_x_val = axes->x_ticks().lower_bound;
+                    float x_step = axes->x_ticks().tick_spacing;
 
                     // + 1 for including origin
-                    for (size_t i = 0; i < scaler->x_ticks().max_ticks + 1; i++)
+                    for (size_t i = 0; i < axes->x_ticks().max_ticks + 1; i++)
                     {
-                        float x = scaler->eval_x(curr_x_val);
+                        float x = axes->eval_x(curr_x_val);
 
                         glm::vec3 v0 = { x, _fig_params->canvas_origin.y, _fig_params->z_value_aux };
                         glm::vec3 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y, _fig_params->z_value_aux };
@@ -285,8 +295,11 @@ namespace Syn
                         m_tickLabelPositionsX.push_back(x_tick_pos);
 
                         #ifdef DEBUG_FIGURE_GRIDLINES
-                            __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
-                            __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
+                            if (i < axes->x_ticks().max_ticks)
+                            {
+                                __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
+                                __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
+                            }
                         #endif
                         
                         curr_x_val += x_step;
@@ -297,21 +310,21 @@ namespace Syn
             // y ticks
             if (_fig_params->render_y_ticks)
             {
-                static float char_width_px = m_tickLabelFont->getStringWidth("1");
-                float label_width = (num_digits_float(scaler->y_ticks().upper_bound) + 1) * char_width_px;
+                //static float char_width_px = m_tickLabelFont->getStringWidth("1");
+                //float label_width = (num_digits_float(axes->y_ticks().upper_bound) + 1) * char_width_px;
                 float label_height = m_tickLabelFont->getFontHeight() * 0.5f;
                 
-                /* TODO : could be automated so that scaler->x_tick_start() returns the first normalized x tick
-                 * and scaler->next_x_tick() gives the next, normalized tick. Counters inside of scaler etc.
+                /* TODO : could be automated so that axes->x_tick_start() returns the first normalized x tick
+                 * and axes->next_x_tick() gives the next, normalized tick. Counters inside of scaler etc.
                  */
-                float curr_y_val = scaler->y_ticks().lower_bound;
-                float y_step = scaler->y_ticks().tick_spacing;
+                float curr_y_val = axes->y_ticks().lower_bound;
+                float y_step = axes->y_ticks().tick_spacing;
 
                 // + 1 for including origin
                 static float epsilon = 0.01f;
-                for (size_t i = 0; i < scaler->y_ticks().max_ticks + 1; i++)
+                for (size_t i = 0; i < axes->y_ticks().max_ticks + 1; i++)
                 {
-                    float y = scaler->eval_y(curr_y_val);
+                    float y = axes->eval_y(curr_y_val);
 
                     if (y > _fig_params->y_axis_lim[1]+epsilon)
                         break;
@@ -324,15 +337,18 @@ namespace Syn
 
                     glm::vec2 y_label_pos =
                     {
-                        (v1.x * _fig_params->figure_sz_px.x) - m_figureParamsPtr->tick_labels_offset_px.x - label_width, 
+                        (v1.x * _fig_params->figure_sz_px.x) - m_figureParamsPtr->tick_labels_offset_px.x, // - label_width, 
                         // font_height is further scaled down w/ 0.75 since the normalized range (0..1) is scaled up for font rendering (-1..1)
                         _fig_params->figure_sz_px.y - (v1.y * _fig_params->figure_sz_px.y) + label_height * 0.75f
                     };
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
                     #ifdef DEBUG_FIGURE_GRIDLINES
-                        __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
-                        __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
+                        if (i < axes->y_ticks().max_ticks)
+                        {
+                            __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
+                            __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
+                        }
                     #endif
 
                     curr_y_val += y_step;
@@ -367,7 +383,7 @@ namespace Syn
         {
             // m_(x/y)TickLabelPositions holds the pixel coordinates of tick positions
 
-            auto& scaler = m_parentRawPtr->axesScalerPtr();
+            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
 
             // x axis
             //
@@ -376,9 +392,10 @@ namespace Syn
 
             if (_fig_params->figure_type == FigureType::Histogram)
             {
+                /*
                 // Not strictly needed now, but perhaps if the API in the future permits manually
                 // setting the tick positions and labels.
-                SYN_CORE_ASSERT((m_tickLabelPositionsX.size()) == m_tickLabelsX.size(), 
+                SYN_CORE_ASSERT((m_tickLabelPositionsX.size()) == axes->x_ticks().labels.label_count, 
                                 "m_tickLabelPositionsX and m_tickLabelsX of different sizes.");
 
                 // check and cache width of labels, offset positions, so that if labels are to wide
@@ -402,25 +419,27 @@ namespace Syn
                     if (sparse_labelling && (i % 3 != 0))
                         m_tickLabelsX[i] = "";
                 }
+                */
             }
             //else if (_fig_params->figure_type == FigureType::LinePlot || 
             //         _fig_params->figure_type == FigureType::ScatterPlot)
             else
             {
-                //NiceScale x_tick_params(m_parentRawPtr->m_dataLimX);
-                m_tickLabelsX = std::vector<std::string>(m_tickLabelPositionsX.size());
+                //m_tickLabelsX = std::vector<std::string>(m_tickLabelPositionsX.size());
 
                 //float start_val = x_tick_params.lower_bound;
-                float start_val = scaler->x_ticks().lower_bound;
+                format_tick_labels(&axes->x_ticks(), m_tickLabelPositionsX);
+                //float start_val = axes->x_ticks().lower_bound;
+                auto& labels = axes->x_ticks().tick_labels.labels;
                 for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
                 {
-                    //float tick_label = start_val + i * x_tick_params.tick_spacing;
-                    float tick_label = start_val + i * scaler->x_ticks().tick_spacing;
-                    std::stringstream ss;
-                    ss << std::setprecision(2) << std::fixed << tick_label;
-                    std::string label = ss.str();
-                    m_tickLabelPositionsX[i].x -= (m_tickLabelFont->getStringWidth("%s", label.c_str()) * 0.5f);
-                    m_tickLabelsX[i] = ss.str();
+                    //float tick_label = start_val + i * axes->x_ticks().tick_spacing;
+                    //std::stringstream ss;
+                    //ss << std::setprecision(2) << std::fixed << tick_label;
+                    //std::string label = ss.str();
+                    //m_tickLabelPositionsX[i].x -= (m_tickLabelFont->getStringWidth("%s", label.c_str()) * 0.5f);
+                    //m_tickLabelsX[i] = ss.str();
+                    m_tickLabelPositionsX[i].x -= m_tickLabelFont->getStringWidth("%s", labels[i].c_str()) * 0.5f;
                 }
             }
 
@@ -429,19 +448,23 @@ namespace Syn
             //NiceScale y_tick_params(m_parentRawPtr->m_dataLimY);
             
             // initialize empty vector        
-            m_tickLabelsY = std::vector<std::string>(m_tickLabelPositionsY.size());
+            //m_tickLabelsY = std::vector<std::string>(m_tickLabelPositionsY.size());
             
+            format_tick_labels(&axes->y_ticks(), m_tickLabelPositionsY);
             //float start_val = y_tick_params.lower_bound;
-            float start_val = scaler->y_ticks().lower_bound;
+            //float start_val = axes->y_ticks().lower_bound;
+            auto& labels = axes->y_ticks().tick_labels.labels;
             for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
             {
                 //float tick_label = start_val + i * y_tick_params.tick_spacing;
-                float tick_label = start_val + i * scaler->y_ticks().tick_spacing;
-                std::stringstream ss;
-                std::setiosflags(std::ios::right);
+                //float tick_label = start_val + i * axes->y_ticks().tick_spacing;
+                //std::stringstream ss;
+                //std::setiosflags(std::ios::right);
                 //ss << std::setw(6) << std::setprecision(0) << std::fixed << tick_label;
-                ss << std::setw(3) << tick_label;
-                m_tickLabelsY[i] = ss.str();
+                //ss << std::setw(3) << tick_label;
+                //m_tickLabelsY[i] = ss.str();
+                //m_tickLabelPositionsY[i].x -= axes->y_ticks().tick_labels.min_label_width;
+                m_tickLabelPositionsY[i].x -= m_tickLabelFont->getStringWidth("%s", labels[i].c_str());
             }
         }
         //-------------------------------------------------------------------------------
@@ -539,5 +562,34 @@ namespace Syn
             no_of_digits = 8 - extrazeroes;
             return no_of_digits;
         }
+        //-------------------------------------------------------------------------------
+        void FigureRenderObj::format_tick_labels(NiceScale* _ticks,
+                                                 const std::vector<glm::vec2>& _label_positions)
+        {
+            tick_labels_t labels;
+                        
+            float range = _ticks->range;
+            int log_10 = (int)(ceil(log10(abs(range))));
+            int k = log_10 + (log_10 < 0 ? 4 : 0);
+
+            float lo_bound = _ticks->lower_bound;
+            for (size_t i = 0; i < _label_positions.size(); i++)
+            {
+                float tick_label = lo_bound + i * _ticks->tick_spacing;
+                std::stringstream ss;
+                ss << std::setprecision(k) << tick_label;
+                std::string fmt_label = ss.str();
+                labels.labels.push_back(fmt_label);
+                float label_width = m_tickLabelFont->getStringWidth(fmt_label.c_str());
+                labels.max_label_width = std::min(labels.min_label_width, 
+                                                  label_width);
+                labels.max_label_width = std::max(labels.max_label_width, 
+                                                  label_width);
+            }
+
+            labels.label_count = _label_positions.size();
+            _ticks->tick_labels = labels;
+        }
+
     }
 }

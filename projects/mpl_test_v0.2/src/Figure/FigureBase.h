@@ -131,7 +131,7 @@ namespace Syn
             figure_params_t* paramsRawPtr() { return m_figureParamsPtr.get(); }
             void setRedrawFlags(uint32_t _flags) { m_renderObjPtr->m_redrawFlags = _flags; }
             void addRedrawFlags(uint32_t _flags) { m_renderObjPtr->m_redrawFlags |= _flags; }
-            const Ref<AxesScaler>& axesScalerPtr() { return m_axesScalerPtr; }
+            const Ref<Axes>& axesPtr() { return m_axesPtr; }
             const glm::vec2& dataLimX() { return m_dataLimX; }
             const glm::vec2& dataLimY() { return m_dataLimY; }
             // Canvas-related accessors
@@ -163,7 +163,7 @@ namespace Syn
             std::string m_figureTitle = "";
 
             Ref<FigureRenderObj> m_renderObjPtr = nullptr;
-            Ref<AxesScaler> m_axesScalerPtr = nullptr;
+            Ref<Axes> m_axesPtr = nullptr;
 
             Ref<figure_params_t> m_figureParamsPtr = nullptr;
 

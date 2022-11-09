@@ -318,9 +318,9 @@ namespace Syn
             bool fill_between_y;
 
             // Converts pixel-space to normalized space [0.0f ... 1.0f].
-            #define AXIS_X      (figure_sz_px.x)
-            #define AXIS_Y      (figure_sz_px.y)
-            #define AXIS_XY     (figure_sz_px)
+            #define AXIS_X_SZ   (figure_sz_px.x)
+            #define AXIS_Y_SZ   (figure_sz_px.y)
+            #define AXIS_XY_SZ  (figure_sz_px)
 
             #define ORIGIN_X    (canvas_origin.x)
             #define ORIGIN_Y    (canvas_origin.y)
@@ -347,32 +347,32 @@ namespace Syn
                 figure_sz_px            = _params->figure_sz_px;
 
                 data_spacing            = _params->data_spacing;
-                data_axis_offset        = px_to_fraction(_params->data_axis_offset_px, AXIS_XY);
+                data_axis_offset        = px_to_fraction(_params->data_axis_offset_px, AXIS_XY_SZ);
                 z_value_data            = _params->z_value_data;
                 z_value_aux             = _params->z_value_aux;
 
-                canvas_origin           = px_to_fraction(_params->canvas_origin_px, AXIS_XY);
-                x_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.x + _params->x_axis_lim_px[0], AXIS_X);
-                x_axis_lim[1]           = px_to_fraction(_params->x_axis_lim_px[1], AXIS_X);
+                canvas_origin           = px_to_fraction(_params->canvas_origin_px, AXIS_XY_SZ);
+                x_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.x + _params->x_axis_lim_px[0], AXIS_X_SZ);
+                x_axis_lim[1]           = px_to_fraction(_params->x_axis_lim_px[1], AXIS_X_SZ);
                 x_axis_length           = x_axis_lim[1] - x_axis_lim[0];
-                y_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.y + _params->y_axis_lim_px[0], AXIS_Y);
-                y_axis_lim[1]           = px_to_fraction(_params->y_axis_lim_px[1], AXIS_Y);
+                y_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.y + _params->y_axis_lim_px[0], AXIS_Y_SZ);
+                y_axis_lim[1]           = px_to_fraction(_params->y_axis_lim_px[1], AXIS_Y_SZ);
                 y_axis_length           = y_axis_lim[1] - y_axis_lim[0];
-                data_height             = px_to_fraction(_params->y_axis_lim_px[1] + _params->data_height_px, AXIS_Y);
+                data_height             = px_to_fraction(_params->y_axis_lim_px[1] + _params->data_height_px, AXIS_Y_SZ);
 
                 render_x_axis           = _params->render_x_axis;
                 render_y_axis           = _params->render_y_axis;
 
-                axes_neg_protrusion     = px_to_fraction(_params->axes_neg_protrusion_px, AXIS_XY);
+                axes_neg_protrusion     = px_to_fraction(_params->axes_neg_protrusion_px, AXIS_XY_SZ);
 
-                tick_length             = px_to_fraction(_params->tick_length_px, AXIS_XY);
+                tick_length             = px_to_fraction(_params->tick_length_px, AXIS_XY_SZ);
                 x_tick_count            = _params->x_tick_count;
                 render_x_ticks          = _params->render_x_ticks;
                 y_tick_count            = _params->y_tick_count;
                 render_y_ticks          = _params->render_y_ticks;
                 axis_label_font_size_px = _params->axis_label_font_size_px;
                 render_axis_labels      = _params->render_axis_labels;
-                tick_labels_offset      = px_to_fraction(_params->tick_labels_offset_px, AXIS_XY);
+                tick_labels_offset      = px_to_fraction(_params->tick_labels_offset_px, AXIS_XY_SZ);
                 ticks_font_size_px      = _params->ticks_font_size_px;
                 render_ticklabels       = _params->render_ticklabels;
                 rotation_x_ticklabels   = _params->rotation_x_ticklabels;
@@ -390,10 +390,10 @@ namespace Syn
                 stroke_color            = _params->stroke_color;
 
                 // Histogram parameters
-                bar_spacing             = px_to_fraction(_params->bar_spacing_px, AXIS_X);
+                bar_spacing             = px_to_fraction(_params->bar_spacing_px, AXIS_X_SZ);
 
                 // ScatterPlot parameters
-                scatter_marker_sz       = px_to_fraction(_params->scatter_marker_sz_px, AXIS_Y);
+                scatter_marker_sz       = px_to_fraction(_params->scatter_marker_sz_px, AXIS_Y_SZ);
                 scatter_marker_y_sz     = scatter_marker_sz;
                 scatter_marker_x_sz     = scatter_marker_sz * (figure_sz_px.y / figure_sz_px.x);
                 scatter_marker          = _params->scatter_marker;
