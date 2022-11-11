@@ -112,10 +112,21 @@ namespace Syn
                                         const std::string& _lineplot_id,
                                         lineplot_params_t _params=lineplot_params_t());
 
+            /* Histogram over data, showing the distribution. Two functions are available,
+             * where the bin count is specified or not.
+             */
+            const std::string& histogram(const std::vector<float>& _data,
+                                         const std::string& _histogram_id,
+                                         histogram_params_t _params=histogram_params_t());
+            //
+            const std::string& histogram(const std::vector<float>& _data,
+                                         const std::string& _histogram_id,
+                                         size_t _bin_count,
+                                         histogram_params_t _params=histogram_params_t());
 
         
         private:
-            void add_canvas(const std::string& _canvas_id, Canvas2D* _canvas);
+            bool add_canvas(const std::string& _canvas_id, Canvas2D* _canvas);
 
             /*---------------------------------------------------------------------------
              * Accessors

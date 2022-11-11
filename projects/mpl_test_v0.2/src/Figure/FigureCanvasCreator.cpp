@@ -3,6 +3,7 @@
 #include "Canvas/Canvas2D.h"
 #include "Canvas/ScatterPlot2D.h"
 #include "Canvas/LinePlot2D.h"
+#include "Canvas/Histogram2D.h"
 
 
 namespace Syn
@@ -14,8 +15,8 @@ namespace Syn
          *-------------------------------------------------------------------------------
          */
 
-        /* Provided _Y values plotted against X [0 .. _Y.shape[0]]
-         */
+        //Provided _Y values plotted against X [0 .. _Y.shape[0]]
+        //
         const std::string& Figure::scatter(const std::vector<float>& _Y, 
                              const std::string& _scatter_id,
                              scatter_params_t _params)
@@ -28,8 +29,8 @@ namespace Syn
             return scatter(X, _Y, _scatter_id, _params);
         }
         //-------------------------------------------------------------------------------    
-        /* Both _X and _Y values are provided
-         */
+        // Both _X and _Y values are provided
+        //
         const std::string& Figure::scatter(const std::vector<float>& _X, 
                                            const std::vector<float>& _Y, 
                                            const std::string& _scatter_id,
@@ -38,8 +39,10 @@ namespace Syn
             ScatterPlot2D* scatter_plot = new ScatterPlot2D(this, _X, _Y, _scatter_id);
             scatter_plot->m_parentRawPtr = this;
             scatter_plot->m_canvasParameters.setFromScatterParams(_params);
-            add_canvas(scatter_plot->canvasID(), scatter_plot);
-
+            bool res = add_canvas(scatter_plot->canvasID(), scatter_plot);
+            if (!res)
+                delete scatter_plot;
+                
             return scatter_plot->canvasID();
         }
 
@@ -47,7 +50,6 @@ namespace Syn
          * 2D scatter plots
          *-------------------------------------------------------------------------------
          */
-
         const std::string& Figure::lineplot(const std::vector<float>& _Y,
                                             const std::string& _lineplot_id,
                                             lineplot_params_t _params)
@@ -95,8 +97,8 @@ namespace Syn
             return lineplot(X, Y, _lineplot_id, _params);
         }
         //-------------------------------------------------------------------------------    
-        /* Base case : this is called by all above.
-         */
+        // Base case : this is called by all above
+        //
         const std::string& Figure::lineplot(const std::vector<std::vector<float>>& _X,
                                             const std::vector<std::vector<float>>& _Y,
                                             const std::string& _lineplot_id,
@@ -105,9 +107,43 @@ namespace Syn
             LinePlot2D* line_plot = new LinePlot2D(this, _X, _Y, _lineplot_id);
             line_plot->m_parentRawPtr = this;
             line_plot->m_canvasParameters.setFromLinePlotParams(_params);
-            add_canvas(line_plot->canvasID(), line_plot);
+            bool res = add_canvas(line_plot->canvasID(), line_plot);
+            if (!res)
+                delete line_plot;
 
             return line_plot->canvasID();
+        }
+        /*-------------------------------------------------------------------------------
+         * 2D histogram
+         *-------------------------------------------------------------------------------
+         */
+        const std::string& Figure::histogram(const std::vector<float>& _data,
+                                             const std::string& _histogram_id,
+                                             histogram_params_t _params)
+        {
+            Histogram2D* histogram = new Histogram2D(this, _data, _histogram_id);
+            histogram->m_parentRawPtr = this;
+            histogram->m_canvasParameters.setFromHistParams(_params);
+            bool res = add_canvas(histogram->canvasID(), histogram);
+            if (!res)
+                delete histogram;
+
+            return histogram->canvasID();
+        }
+        //-------------------------------------------------------------------------------    
+        const std::string& Figure::histogram(const std::vector<float>& _data,
+                                             const std::string& _histogram_id,
+                                             size_t _bin_count,
+                                             histogram_params_t _params)
+        {
+            Histogram2D* histogram = new Histogram2D(this, _data, _histogram_id, _bin_count);
+            histogram->m_parentRawPtr = this;
+            histogram->m_canvasParameters.setFromHistParams(_params);
+            bool res = add_canvas(histogram->canvasID(), histogram);
+            if (!res)
+                delete histogram;
+
+            return histogram->canvasID();
         }
 
     }

@@ -16,7 +16,8 @@ namespace Syn
         // forward decls from Canvas/CanvasParameters.h
         struct scatter_params_t;
         struct lineplot_params_t;
-        struct hist_params_t;
+        struct histogram_params_t;
+        struct stemplot_params_t;
 
         //-------------------------------------------------------------------------------
         /* ScatterPlot markers
@@ -27,6 +28,7 @@ namespace Syn
             Histogram   = 1,
             LinePlot    = 2,
             ScatterPlot = 3,
+            StemPlot    = 4,
         };
 
         //-------------------------------------------------------------------------------
@@ -249,7 +251,7 @@ namespace Syn
              */
             void setFromScatterParams(const scatter_params_t& _params);
             void setFromLinePlotParams(const lineplot_params_t& _params);
-            void setFromHistParams(const hist_params_t& _params);
+            void setFromHistParams(const histogram_params_t& _params);
         };
 
         /* Takes a figure_params_t object and normalizes all pixel values to normalized

@@ -17,36 +17,6 @@ using namespace Syn::mplc;
 #undef DEBUG_IMGUI_LOG
 
 
-
-void float_sign_dig(float _f, float _n_sig)
-{
-	int h;
-	float l, a, b, c, d, e, i, j, m, f, g;
-	b = _f;
-	c = floor(_f);
-
-	// Counting the no. of digits to the left of decimal point
-	// in the given no.
-	for (i = 0; b >= 1; ++i)
-		b = b / 10;
-
-	d = _n_sig - i;
-	b = _f;
-	b = b * pow(10, d);
-	e = b + 0.5;
-	if ((float)e == (float)ceil(b)) {
-		f = (ceil(b));
-		h = f - 2;
-		if (h % 2 != 0) {
-			e = e - 1;
-		}
-	}
-	j = floor(e);
-	m = pow(10, d);
-	j = j / m;
-	std::cout << "The number after rounding-off is " << j << "\n\n";
-	
-}
 //
 class layer : public Layer
 {
@@ -73,6 +43,7 @@ public:
 	Ref<Figure> m_figure = nullptr;
 	std::string m_scatterID = "";
 	std::string m_lineplotID = "";
+	std::string m_histID = "";
 
 	std::vector<std::vector<float>> m_data_X;
 	std::vector<std::vector<float>> m_data_Y;
@@ -136,7 +107,7 @@ void layer::onAttach()
 	scatter_params_t scatter_params;
 	scatter_params.marker_size = 4.0f;
 	scatter_params.marker = FigureMarker::Square;
-	//m_scatterID = m_figure->scatter(X, Y, "TEST", scatter_params);
+	//m_scatterID = m_figure->scatter(X, Y, "SCATTER", scatter_params);
 	
 	// LINEPLOT TEST --------------------------------------------------------------------
 	//
@@ -159,12 +130,15 @@ void layer::onAttach()
 	lineplot_params_t lineplot_params;
 	//lineplot_params.marker = FigureMarker::Square;
 	//lineplot_params.marker_size = 2.0f;
-	//m_lineplotID = m_figure->lineplot(m_data_X, m_data_Y, "TEST", lineplot_params);
-	m_lineplotID = m_figure->lineplot(m_data_Y, "TEST", lineplot_params);
-	//m_lineplotID = m_figure->lineplot(y, "TEST", lineplot_params);
+	//m_lineplotID = m_figure->lineplot(m_data_X, m_data_Y, "TEST_LINE", lineplot_params);
+	//m_lineplotID = m_figure->lineplot(m_data_Y, "TEST_LINE", lineplot_params);
+	//m_lineplotID = m_figure->lineplot(y, "TEST_LINE", lineplot_params);
 	
-	// TEST TICK LABELS!
+	// HISTOGRAM TEST -------------------------------------------------------------------
 	//
+	histogram_params_t hist_params;
+	m_histID = m_figure->histogram(Y, "TEST_HIST", 10);
+
 
 
 	// framebuffer
@@ -255,7 +229,9 @@ void layer::onUpdate(float _dt)
 		std::vector<float> y;
 		for (int i = 0; i < n; i++)
 			y.push_back(dist(gen));
-		m_data_Y.push_back(y);
+		m_figure->canvas("TEST_LINE")->data(y);
+
+		add_lineplot_data = false;
 	}
 
 	if (m_figure != nullptr)
@@ -270,7 +246,6 @@ void layer::popup_test()
 {
 	static ImGuiIO& io = ImGui::GetIO();
 	static ImVec2 size = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
-	static int n = 1000;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 	ImGui::SetNextWindowPos(size, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -288,28 +263,39 @@ void layer::popup_test()
 			open_popup = false;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Randomize"))
+		/*
+		if (ImGui::Button("Rand scatter"))
 		{
 			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
 			std::normal_distribution<float> dist(5.0, 2.0);
-			int n = 500;
 			std::vector<float> X(n), Y(n);
 			for (int i = 0; i < n; i++)
 			{
 				X[i] = dist(gen);
 				Y[i] = dist(gen);
 			}
-			m_figure->canvas("TEST")->data(X, Y);
+			m_figure->canvas("TEST_SCATTER")->data(X, Y);
 		}
 		
-		if (ImGui::Button("Add scatter set"))
+		if (ImGui::Button("Add scatter data"))
 		{
 			add_scatter_data = true;
 		}
-		if (ImGui::Button("Add line to set"))
+		if (ImGui::Button("Rand line"))
+		{
+			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
+			std::normal_distribution<float> dist(5.0, 2.0);
+			std::vector<float> Y;
+			for (int i = 0; i < n; i++)
+				Y.push_back(dist(gen));
+			m_figure->canvas("TEST_LINE")->data(Y);
+
+		}
+		if (ImGui::Button("Add line data"))
 		{
 			add_lineplot_data = true;
-		}		
+		}
+		*/		
 
 		ImGui::Text("");
 		ImGui::Separator();

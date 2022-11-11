@@ -245,6 +245,7 @@ namespace Syn
                 // x ticks for Histograms
                 if (_fig_params->figure_type == FigureType::Histogram)
                 {
+                    //float x = 
                     /*
                     float x = m_dataPositions[0].x + _fig_params->canvas_origin.x + _fig_params->data_axis_offset.x;
 

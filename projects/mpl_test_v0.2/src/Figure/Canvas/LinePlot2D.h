@@ -22,6 +22,13 @@ namespace Syn
             virtual void redraw() override;
             virtual void render(const Ref<Shader>& _shader) override;
 
+            virtual void data(const std::vector<float>& _Y) override;
+            virtual void data(const std::vector<float>& _X, 
+                              const std::vector<float>& _Y) override;
+            virtual void data(const std::vector<std::vector<float>>& _Y) override;
+            virtual void data(const std::vector<std::vector<float>>& _X, 
+                              const std::vector<std::vector<float>>& _Y) override;
+
             // accessors
             /* Returns the max shape of the data. The number of rows are expected to be
              * equal for X and Y (axis 0). However, the length of individual column 

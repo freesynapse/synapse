@@ -10,6 +10,7 @@ namespace Syn
     {
         void figure_params_t::setFromScatterParams(const scatter_params_t& _params)
         {
+            figure_type = _params.type;
             scatter_marker = _params.marker;
             scatter_marker_sz_px = _params.marker_size;
             x_tick_count = _params.x_tick_count;
@@ -19,6 +20,7 @@ namespace Syn
         //-------------------------------------------------------------------------------
         void figure_params_t::setFromLinePlotParams(const lineplot_params_t& _params)
         {
+            figure_type = _params.type;
             scatter_marker = _params.marker;
             scatter_marker_sz_px = _params.marker_size;
             line_width_px = _params.line_width_px;
@@ -26,5 +28,12 @@ namespace Syn
             x_tick_count = _params.x_tick_count;
             y_tick_count = _params.y_tick_count;
         }
+        //-------------------------------------------------------------------------------
+        void figure_params_t::setFromHistParams(const histogram_params_t& _params)
+        {
+            figure_type = _params.type;
+            
+        }
+
     }
 }

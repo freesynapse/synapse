@@ -42,10 +42,26 @@ namespace Syn
             m_renderObjPtr->redraw();
         }
         //-------------------------------------------------------------------------------
-        void Figure::add_canvas(const std::string& _canvas_id, Canvas2D* _canvas_ptr)
+        bool Figure::add_canvas(const std::string& _canvas_id, Canvas2D* _canvas_ptr)
         {
+            bool histogram_present = false;
+            for (const auto& it : m_canvases)
+            {
+                if (it.second->m_canvasParameters.figure_type == FigureType::Histogram)
+                {
+                    histogram_present = true;
+                    return false;
+                }
+            }
+
+            if (_canvas_ptr->m_canvasParameters.figure_type == FigureType::Histogram &&
+                !m_canvases.empty())
+                return false;
+
             m_canvases.insert({ _canvas_id, _canvas_ptr });
             _canvas_ptr->setData();
+            m_figureParamsPtr->figure_type = _canvas_ptr->m_canvasParameters.figure_type;
+            return true;
             //updateDataLimits(); // called by setData().
         }
         //-------------------------------------------------------------------------------

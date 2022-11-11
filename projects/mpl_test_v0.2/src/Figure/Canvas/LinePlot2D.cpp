@@ -46,6 +46,44 @@ namespace Syn
 
         }
         //-------------------------------------------------------------------------------
+        void LinePlot2D::data(const std::vector<float>& _Y)
+        {
+            std::vector<std::vector<float>> Y;
+            Y.push_back(_Y);
+            data(Y);
+        }
+        //-------------------------------------------------------------------------------
+        void LinePlot2D::data(const std::vector<float>& _X, const std::vector<float>& _Y)
+        {
+            std::vector<std::vector<float>> X, Y;
+            X.push_back(_X);
+            Y.push_back(_Y);
+            data(X, Y);
+        }
+        //-------------------------------------------------------------------------------
+        void LinePlot2D::data(const std::vector<std::vector<float>>& _Y)
+        {
+            m_dataX = std::vector<std::vector<float>>();
+            m_dataY = std::vector<std::vector<float>>(_Y);
+            for (size_t i = 0; i < _Y.size(); i++)
+            {
+                std::vector<float> X;
+                for (size_t j = 0; j < _Y[i].size(); j++)
+                    X.push_back(static_cast<float>(j));
+                m_dataX.push_back(X);
+            }
+            setData();
+        }
+        //-------------------------------------------------------------------------------
+        void LinePlot2D::data(const std::vector<std::vector<float>>& _X, 
+                              const std::vector<std::vector<float>>& _Y)
+        {
+            clear_data(m_dataX, m_dataY);
+            m_dataX = std::vector<std::vector<float>>(_X);
+            m_dataY = std::vector<std::vector<float>>(_Y);
+            setData();
+        }
+        //-------------------------------------------------------------------------------
         void LinePlot2D::redraw()
         {
             std::vector<glm::vec3> V;

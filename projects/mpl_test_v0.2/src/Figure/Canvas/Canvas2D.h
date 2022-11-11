@@ -28,6 +28,8 @@ namespace Syn
             // Virtual accessors -- to be populated by children
             virtual void data(const std::vector<float>&) {}
             virtual void data(const std::vector<float>&, const std::vector<float>&) {}
+            virtual void data(const std::vector<std::vector<float>>&) {}
+            virtual void data(const std::vector<std::vector<float>>&, const std::vector<std::vector<float>>&) {}
             virtual std::pair<std::vector<float>, std::vector<float>> data() { return {}; }
 
             //
@@ -67,6 +69,13 @@ namespace Syn
                 else
                     m_canvasID = _id;
             }
+            /* Clears the X/Y data vectors
+             */
+            void clear_data(std::vector<float> _d0) { _d0.clear(); }
+            void clear_data(std::vector<float> _d0, std::vector<float>& _d1) { _d0.clear(); _d1.clear(); }
+            void clear_data(std::vector<std::vector<float>> _d0) { _d0.clear(); }
+            void clear_data(std::vector<std::vector<float>> _d0, std::vector<std::vector<float>>& _d1) { _d0.clear(); _d1.clear(); }
+            
 
         protected:
             Figure* m_parentRawPtr = nullptr;
