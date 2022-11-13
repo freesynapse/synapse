@@ -137,7 +137,7 @@ void layer::onAttach()
 	// HISTOGRAM TEST -------------------------------------------------------------------
 	//
 	histogram_params_t hist_params;
-	m_histID = m_figure->histogram(Y, "TEST_HIST", 10);
+	m_histID = m_figure->histogram(Y, "TEST_HIST", 30);
 
 
 

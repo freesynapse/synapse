@@ -33,6 +33,7 @@ namespace Syn
         private:
             std::vector<float> m_data;
             size_t m_binCount;
+            float m_bins_dx = 0.0f;
             std::map<float, size_t> m_bins;
         };
     }

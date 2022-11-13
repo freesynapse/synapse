@@ -71,18 +71,14 @@ namespace Syn
             float z = params.z_value_data;
             float x_offset = 0.5f * params.bar_spacing;
             //
-            for (auto& this_bin : m_bins)
+            //for (auto& this_bin : m_bins)
             for (auto this_bin = m_bins.begin(); this_bin != m_bins.end(); this_bin++)
             {
-                auto next_bin = std::next(this_bin);
-                if (next_bin == m_bins.end())
-                    break;
-
                 x0 = axes->eval_x(this_bin->first) + x_offset;
-                x1 = axes->eval_x(next_bin->first) - x_offset;
+                x1 = axes->eval_x(this_bin->first + m_bins_dx) - x_offset;
 
-                x0 = x + (0.5f * params.bar_spacing);
-                x1 = x + x_step - (0.5f * params.bar_spacing);
+                //x0 = x + (0.5f * params.bar_spacing);
+                //x1 = x + x_step - (0.5f * params.bar_spacing);
                 y0 = axes->eval_y(0.0f);
                 y1 = axes->eval_y(static_cast<float>(this_bin->second));
                 V.push_back({ x0, y0, z }); V.push_back({ x1, y0, z }); V.push_back({ x1, y1, z }); // 0, 1, 2
@@ -133,6 +129,7 @@ namespace Syn
             }
             
             m_binCount = m_bins.size();
+            m_bins_dx = dx;
         }
 
     }

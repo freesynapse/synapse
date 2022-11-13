@@ -234,6 +234,7 @@ namespace Syn
         {
             std::vector<glm::vec3> V;
             static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+            static float epsilon = 0.01f;
 
             float font_height = m_tickLabelFont->getFontHeight();
             #ifdef DEBUG_FIGURE_GRIDLINES
@@ -242,77 +243,44 @@ namespace Syn
 
             if (_fig_params->render_x_ticks)
             {
-                // x ticks for Histograms
-                if (_fig_params->figure_type == FigureType::Histogram)
+                float curr_x_val = axes->x_ticks().lower_bound;
+                float x_step = axes->x_ticks().tick_spacing;
+                //
+                for (size_t i = 0; i < axes->x_ticks().max_ticks; i++)
                 {
-                    //float x = 
-                    /*
-                    float x = m_dataPositions[0].x + _fig_params->canvas_origin.x + _fig_params->data_axis_offset.x;
+                    float x = axes->eval_x(curr_x_val);
 
-                    for (size_t i = 0; i < m_dataPositions.size(); i++)
+                    if (x > _fig_params->x_axis_lim[1] + epsilon)
+                        break;
+
+                    glm::vec3 v0 = { x, _fig_params->canvas_origin.y, _fig_params->z_value_aux };
+                    glm::vec3 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y, _fig_params->z_value_aux };
+                    V.push_back(v0);
+                    V.push_back(v1);
+
+                    // set tick label positions -- n.b.: y axis is inverted for font rendering in pixel space
+                    glm::vec2 x_tick_pos = 
                     {
-                        glm::vec2 v0 = { x, _fig_params->canvas_origin.y };
-                        glm::vec2 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y };
-                        V.push_back(v0);
-                        V.push_back(v1);            
+                        v1.x * _fig_params->figure_sz_px.x,
+                        _fig_params->figure_sz_px.y - ((v1.y - _fig_params->tick_labels_offset.y) * _fig_params->figure_sz_px.y) + font_height
+                    };
+                    m_tickLabelPositionsX.push_back(x_tick_pos);
 
-                        // set tick label positions -- n.b.: y axis is inverted for font rendering in pixel space
-                        glm::vec2 x_tick_pos = 
+                    #ifdef DEBUG_FIGURE_GRIDLINES
+                        if (i > 0 && i < axes->x_ticks().max_ticks - 1)
                         {
-                            v1.x * _fig_params->figure_sz_px.x,
-                            _fig_params->figure_sz_px.y - ((v1.y - _fig_params->tick_labels_offset.y) * _fig_params->figure_sz_px.y) + font_height
-                        };
-                        m_tickLabelPositionsX.push_back(x_tick_pos);
-
-                        x += _fig_params->data_spacing;
-                    }
-                    // For histograms, the last tick should be removed since ticks are drawn in between
-                    // the data, and otherwise tick label positions will be off by 1.
-                    m_tickLabelPositionsX.pop_back();
-                    */
-                }
-                // x ticks for 'linear' data
-                else
-                {
-                    float curr_x_val = axes->x_ticks().lower_bound;
-                    float x_step = axes->x_ticks().tick_spacing;
-
-                    // + 1 for including origin
-                    for (size_t i = 0; i < axes->x_ticks().max_ticks + 1; i++)
-                    {
-                        float x = axes->eval_x(curr_x_val);
-
-                        glm::vec3 v0 = { x, _fig_params->canvas_origin.y, _fig_params->z_value_aux };
-                        glm::vec3 v1 = { x, _fig_params->canvas_origin.y - _fig_params->tick_length.y, _fig_params->z_value_aux };
-                        V.push_back(v0);
-                        V.push_back(v1);
-
-                        // set tick label positions -- n.b.: y axis is inverted for font rendering in pixel space
-                        glm::vec2 x_tick_pos = 
-                        {
-                            v1.x * _fig_params->figure_sz_px.x,
-                            _fig_params->figure_sz_px.y - ((v1.y - _fig_params->tick_labels_offset.y) * _fig_params->figure_sz_px.y) + font_height
-                        };
-                        m_tickLabelPositionsX.push_back(x_tick_pos);
-
-                        #ifdef DEBUG_FIGURE_GRIDLINES
-                            if (i < axes->x_ticks().max_ticks)
-                            {
-                                __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
-                                __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
-                            }
-                        #endif
-                        
-                        curr_x_val += x_step;
-                    }
+                            __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
+                            __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
+                        }
+                    #endif
+                    
+                    curr_x_val += x_step;
                 }
             }
 
             // y ticks
             if (_fig_params->render_y_ticks)
             {
-                //static float char_width_px = m_tickLabelFont->getStringWidth("1");
-                //float label_width = (num_digits_float(axes->y_ticks().upper_bound) + 1) * char_width_px;
                 float label_height = m_tickLabelFont->getFontHeight() * 0.5f;
                 
                 /* TODO : could be automated so that axes->x_tick_start() returns the first normalized x tick
@@ -321,9 +289,8 @@ namespace Syn
                 float curr_y_val = axes->y_ticks().lower_bound;
                 float y_step = axes->y_ticks().tick_spacing;
 
-                // + 1 for including origin
-                static float epsilon = 0.01f;
-                for (size_t i = 0; i < axes->y_ticks().max_ticks + 1; i++)
+                //
+                for (size_t i = 0; i < axes->y_ticks().max_ticks; i++)
                 {
                     float y = axes->eval_y(curr_y_val);
 
@@ -345,7 +312,7 @@ namespace Syn
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
                     #ifdef DEBUG_FIGURE_GRIDLINES
-                        if (i < axes->y_ticks().max_ticks)
+                        if (i > 0 && i < axes->y_ticks().max_ticks)
                         {
                             __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
                             __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
@@ -391,82 +358,20 @@ namespace Syn
             float data_spacing_px = _fig_params->data_spacing * _fig_params->figure_sz_px.x;
             float histogram_adj = (_fig_params->figure_type == FigureType::Histogram ? data_spacing_px * 0.5f : 0.0f);
 
-            if (_fig_params->figure_type == FigureType::Histogram)
-            {
-                /*
-                // Not strictly needed now, but perhaps if the API in the future permits manually
-                // setting the tick positions and labels.
-                SYN_CORE_ASSERT((m_tickLabelPositionsX.size()) == axes->x_ticks().labels.label_count, 
-                                "m_tickLabelPositionsX and m_tickLabelsX of different sizes.");
-
-                // check and cache width of labels, offset positions, so that if labels are to wide
-                // they can be omitted.
-                bool sparse_labelling = false;
-                bool reported = false;
-                for (size_t i = 0; i < m_tickLabelsX.size(); i++)
-                {
-                    std::string label = m_tickLabelsX[i];
-                    float label_width = m_tickLabelFont->getStringWidth("%s", label.c_str());
-                    m_tickLabelPositionsX[i].x = m_tickLabelPositionsX[i].x - (label_width * 0.5f) + histogram_adj; 
-                    if (label_width + 6 > data_spacing_px)
-                    {
-                        if (!reported) { SYN_CORE_WARNING("FIX ME: x tick labels wider than bars."); reported = true; }
-                        sparse_labelling = true;
-                    }
-                }
-                // label omission
-                for (size_t i = 0; i < m_tickLabelsX.size(); i++)
-                {
-                    if (sparse_labelling && (i % 3 != 0))
-                        m_tickLabelsX[i] = "";
-                }
-                */
-            }
-            //else if (_fig_params->figure_type == FigureType::LinePlot || 
-            //         _fig_params->figure_type == FigureType::ScatterPlot)
-            else
-            {
-                //m_tickLabelsX = std::vector<std::string>(m_tickLabelPositionsX.size());
-
-                //float start_val = x_tick_params.lower_bound;
-                format_tick_labels(&axes->x_ticks(), m_tickLabelPositionsX);
-                //float start_val = axes->x_ticks().lower_bound;
-                auto& labels = axes->x_ticks().tick_labels.labels;
-                for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
-                {
-                    //float tick_label = start_val + i * axes->x_ticks().tick_spacing;
-                    //std::stringstream ss;
-                    //ss << std::setprecision(2) << std::fixed << tick_label;
-                    //std::string label = ss.str();
-                    //m_tickLabelPositionsX[i].x -= (m_tickLabelFont->getStringWidth("%s", label.c_str()) * 0.5f);
-                    //m_tickLabelsX[i] = ss.str();
-                    m_tickLabelPositionsX[i].x -= m_tickLabelFont->getStringWidth("%s", labels[i].c_str()) * 0.5f;
-                }
-            }
+            format_tick_labels(&axes->x_ticks(), m_tickLabelPositionsX);
+            auto& x_labels = axes->x_ticks().tick_labels.labels;
+            //
+            for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
+                m_tickLabelPositionsX[i].x -= m_tickLabelFont->getStringWidth("%s", x_labels[i].c_str()) * 0.5f;
 
             // y axis
-            //
-            //NiceScale y_tick_params(m_parentRawPtr->m_dataLimY);
-            
-            // initialize empty vector        
-            //m_tickLabelsY = std::vector<std::string>(m_tickLabelPositionsY.size());
-            
+            //            
             format_tick_labels(&axes->y_ticks(), m_tickLabelPositionsY);
-            //float start_val = y_tick_params.lower_bound;
-            //float start_val = axes->y_ticks().lower_bound;
-            auto& labels = axes->y_ticks().tick_labels.labels;
+            auto& y_labels = axes->y_ticks().tick_labels.labels;
+            //
             for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
-            {
-                //float tick_label = start_val + i * y_tick_params.tick_spacing;
-                //float tick_label = start_val + i * axes->y_ticks().tick_spacing;
-                //std::stringstream ss;
-                //std::setiosflags(std::ios::right);
-                //ss << std::setw(6) << std::setprecision(0) << std::fixed << tick_label;
-                //ss << std::setw(3) << tick_label;
-                //m_tickLabelsY[i] = ss.str();
-                //m_tickLabelPositionsY[i].x -= axes->y_ticks().tick_labels.min_label_width;
-                m_tickLabelPositionsY[i].x -= m_tickLabelFont->getStringWidth("%s", labels[i].c_str());
-            }
+                m_tickLabelPositionsY[i].x -= m_tickLabelFont->getStringWidth("%s", y_labels[i].c_str());
+
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::setup_static_shaders()
