@@ -132,7 +132,7 @@ private:
     bool m_interactiveMode = false;         // selections possible for this histogram?
     std::pair<T, T> m_currInterval = { 0, 0 };
     std::pair<T, T> m_prevInterval = { -1, -1 };
-    Ref<VertexArray> m_vaoSelection = nullptr;
+    Ref<VertexArray> m_vaoFill = nullptr;
     std::vector<float> m_xTickPositionsX;   // used for selection, populated in redraw()
     float m_xTickInterval = 0.0f;
 

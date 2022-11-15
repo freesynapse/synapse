@@ -9,6 +9,7 @@
 
 #include "FigureParameters.h"
 #include "FigureRenderObj.h"
+#include "FigureUtils.h"
 #include "Canvas/CanvasParameters.h"
 
 
@@ -149,9 +150,35 @@ namespace Syn
             const std::unordered_map<std::string, Canvas2D*>& canvases() { return m_canvases; }
             Canvas2D* canvas(const std::string& _canvas_id);
             size_t dataSize() { return m_canvasesDataSize; }
-            //
-            float __debug_update_time() { float t = __debug_update_timer; __debug_update_timer = 0.0f; return t; }
-
+            // aux rendering control (grid lines, selections, etc.)
+            void enableGridLines() { m_renderObjPtr->m_auxRenderFlags |= FIGURE_RENDER_GRIDLINES; }
+            void disableGridLines() { m_renderObjPtr->m_auxRenderFlags &= (~FIGURE_RENDER_GRIDLINES); }
+            void fill(int _axis, const glm::vec2& _lim)
+            {
+                if (_axis == X_AXIS)    m_renderObjPtr->m_fillLimX = _lim;
+                else                    m_renderObjPtr->m_fillLimY = _lim;
+                m_renderObjPtr->m_auxRenderFlags |= (_axis == X_AXIS ? FIGURE_RENDER_FILL_X : FIGURE_RENDER_FILL_Y);
+                m_renderObjPtr->m_redrawFlags |= FIGURE_REDRAW_FILL;
+            }
+            void disableFill(int _axis)
+            {
+                if (_axis == X_AXIS)    m_renderObjPtr->m_fillLimX = { 1.0f, -1.0f };
+                else                    m_renderObjPtr->m_fillLimY = { 1.0f, -1.0f };
+                m_renderObjPtr->m_auxRenderFlags &= (_axis == X_AXIS ? (~FIGURE_RENDER_FILL_X) : (~FIGURE_RENDER_FILL_Y));
+                m_renderObjPtr->m_redrawFlags &= (~FIGURE_REDRAW_FILL);
+            }
+            void fillBetweenX(const glm::vec2& _lim)
+            {
+                m_renderObjPtr->m_fillLimX = _lim;
+                m_renderObjPtr->m_auxRenderFlags |= FIGURE_RENDER_FILL_X;
+                m_renderObjPtr->m_redrawFlags |= FIGURE_REDRAW_FILL;
+            }
+            void fillBetweenY(const glm::vec2& _lim)
+            {
+                m_renderObjPtr->m_fillLimY = _lim;
+                m_renderObjPtr->m_auxRenderFlags |= FIGURE_RENDER_FILL_Y;
+                m_renderObjPtr->m_redrawFlags |= FIGURE_REDRAW_FILL;
+            }
 
 
         /*-------------------------------------------------------------------------------

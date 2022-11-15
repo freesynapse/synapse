@@ -63,7 +63,7 @@ namespace Syn
 
             //
             m_redrawFlags = FIGURE_REDRAW_ALL;
-            m_redrawFlags |= (~ FIGURE_REDRAW_SELECTION);
+            m_redrawFlags &= (~FIGURE_REDRAW_FILL);
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::render()
@@ -72,11 +72,7 @@ namespace Syn
             static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
 
             if (!m_redrawFlags)
-                return;
-            
-            //SYN_CORE_ASSERT(m_figureParamsPtr->figure_type != FigureType::None, 
-            //                "Figure type must be set by Figure class instance.");
-            
+                return;            
             //
             redraw();
 
@@ -91,22 +87,24 @@ namespace Syn
             m_shader2D->enable();
             
             // render grid lines
-            #ifdef DEBUG_FIGURE_GRIDLINES
+            if (m_auxRenderFlags & FIGURE_RENDER_GRIDLINES)
+            {
                 m_shader2D->setUniform4fv("u_color", glm::vec4(0.3f));
-                __debug_vaoGridLines->bind();
-                renderer.drawArrays(__debug_gridLinesVertexCount, 0, true, GL_LINES);
-            #endif
+                m_vaoGridLines->bind();
+                renderer.drawArrays(m_gridLinesVertexCount, 0, true, GL_LINES);
+            }
+
+            // render selection
+            if (m_auxRenderFlags & FIGURE_RENDER_FILL)
+            {
+                m_shader2D->setUniform4fv("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 0.2f));
+                m_vaoFill->bind();
+                renderer.drawArrays(m_fillVertexCount, 0, true, GL_TRIANGLES);
+            }
 
             // render canvas data
             for (auto& canvas : m_parentRawPtr->m_canvases)
-            {
-                //Canvas2D* canvas_ptr = canvas.second;
-                //m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->stroke_color);
-                //m_shader2D->setUniform4fv("u_color", canvas_ptr->m_canvasParameters.stroke_color);
-                //canvas_ptr->vao()->bind();
-                //renderer.drawArrays(canvas_ptr->vertexCount(), 0, true, canvas_ptr->OpenGLPrimitive());
                 canvas.second->render(m_shader2D);
-            }
 
             // render axes
             m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->axis_color);
@@ -121,7 +119,7 @@ namespace Syn
             // render tick labels
             m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);            
             m_tickLabelFont->beginRenderBlock();
-            if (m_tickLabelPositionsY.size())// > 0 && m_tickLabelsY.size() > 0)
+            if (m_tickLabelPositionsY.size())
             {
                 auto& y_labels  = axes->y_ticks().tick_labels.labels;
                 for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
@@ -129,9 +127,8 @@ namespace Syn
                                                m_tickLabelPositionsY[i].y, 
                                                "%s", 
                                                y_labels[i].c_str());
-                                               //m_tickLabelsY[i].c_str());
             }
-            if (m_tickLabelPositionsX.size())// > 0 && m_tickLabelsX.size() > 0)
+            if (m_tickLabelPositionsX.size())
             {
                 auto& x_labels  = axes->x_ticks().tick_labels.labels;
                 for (size_t i = 0; i < m_tickLabelPositionsX.size(); i++)
@@ -194,12 +191,11 @@ namespace Syn
                 redrawTicks(&norm_params);
             }
 
-            if (m_redrawFlags &  FIGURE_REDRAW_TICKLABELS || m_redrawFlags & FIGURE_REDRAW_DATA)
-            {
-                //m_tickLabelsX.clear();                
-                //m_tickLabelsY.clear();
+            if (m_redrawFlags & FIGURE_REDRAW_TICKLABELS || m_redrawFlags & FIGURE_REDRAW_DATA)
                 redrawTickLabels(&norm_params);
-            }
+
+            if (m_redrawFlags & FIGURE_REDRAW_FILL)
+                redrawFill(&norm_params);
 
             //
             m_redrawFlags = 0;
@@ -237,9 +233,7 @@ namespace Syn
             static float epsilon = 0.01f;
 
             float font_height = m_tickLabelFont->getFontHeight();
-            #ifdef DEBUG_FIGURE_GRIDLINES
-                std::vector<glm::vec3> __debug_vertices;
-            #endif
+            std::vector<glm::vec3> grid_V;
 
             if (_fig_params->render_x_ticks)
             {
@@ -266,13 +260,12 @@ namespace Syn
                     };
                     m_tickLabelPositionsX.push_back(x_tick_pos);
 
-                    #ifdef DEBUG_FIGURE_GRIDLINES
-                        if (i > 0 && i < axes->x_ticks().max_ticks)
-                        {
-                            __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
-                            __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
-                        }
-                    #endif
+                    // grid lines
+                    if (m_auxRenderFlags & FIGURE_RENDER_GRIDLINES && i > 0 && i < axes->x_ticks().max_ticks)
+                    {
+                        grid_V.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
+                        grid_V.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
+                    }  
                     
                     curr_x_val += x_step;
                 }
@@ -311,14 +304,13 @@ namespace Syn
                     };
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
-                    #ifdef DEBUG_FIGURE_GRIDLINES
-                        if (i > 0 && i < axes->y_ticks().max_ticks - 1)
-                        {
-                            __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
-                            __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
-                        }
-                    #endif
-
+                    // grid lines
+                    if (m_auxRenderFlags & FIGURE_RENDER_GRIDLINES && i > 0 && i < axes->y_ticks().max_ticks - 1)
+                    {
+                        grid_V.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
+                        grid_V.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });
+                    }
+                
                     curr_y_val += y_step;
                 }
             }
@@ -333,15 +325,16 @@ namespace Syn
 
             m_vaoTicks = API::newVertexArray(vbo);
 
-            #ifdef DEBUG_FIGURE_GRIDLINES
-                __debug_gridLinesVertexCount = static_cast<uint32_t>(__debug_vertices.size());
+            if (m_auxRenderFlags & FIGURE_RENDER_GRIDLINES)
+            {
+                m_gridLinesVertexCount = static_cast<uint32_t>(grid_V.size());
                 Ref<VertexBuffer> vbo2 = API::newVertexBuffer(GL_STATIC_DRAW);
                 vbo2->setBufferLayout({
                     { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
                 });
-                vbo2->setData((void*)(&__debug_vertices[0]), sizeof(glm::vec3) * __debug_gridLinesVertexCount);
-                __debug_vaoGridLines = API::newVertexArray(vbo2);
-            #endif
+                vbo2->setData((void*)(&grid_V[0]), sizeof(glm::vec3) * m_gridLinesVertexCount);
+                m_vaoGridLines = API::newVertexArray(vbo2);
+            }
 
             Renderer::get().executeRenderCommands();
 
@@ -372,6 +365,59 @@ namespace Syn
             for (size_t i = 0; i < m_tickLabelPositionsY.size(); i++)
                 m_tickLabelPositionsY[i].x -= m_tickLabelFont->getStringWidth("%s", y_labels[i].c_str());
 
+        }
+        //-------------------------------------------------------------------------------
+        void FigureRenderObj::redrawFill(normalized_params_t* _fig_params)
+        {
+            std::vector<glm::vec3> V;
+            static auto& renderer = Renderer::get();
+            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+
+            if (m_auxRenderFlags & FIGURE_RENDER_FILL_X)
+            {
+                if (m_fillLimX[0] < m_fillLimX[1])
+                {
+                    float x0 = axes->eval_x(m_fillLimX[0]);
+                    float x1 = axes->eval_x(m_fillLimX[1]);
+                    float y0 = _fig_params->y_axis_lim[0];
+                    float y1 = _fig_params->y_axis_lim[1];
+                    float z  = _fig_params->z_value_aux;
+                    V.push_back({ x0, y0, z }); // 0
+                    V.push_back({ x1, y0, z }); // 1
+                    V.push_back({ x1, y1, z }); // 2
+                    V.push_back({ x1, y1, z }); // 2
+                    V.push_back({ x0, y1, z }); // 3
+                    V.push_back({ x0, y0, z }); // 0
+                }
+            }
+
+            if (m_auxRenderFlags & FIGURE_RENDER_FILL_Y)
+            {
+                if (m_fillLimY[0] < m_fillLimY[1])
+                {
+                    float x0 = _fig_params->x_axis_lim[0];
+                    float x1 = _fig_params->x_axis_lim[1];
+                    float y0 = axes->eval_y(m_fillLimY[0]);
+                    float y1 = axes->eval_y(m_fillLimY[1]);
+                    float z  = _fig_params->z_value_aux;
+                    V.push_back({ x0, y0, z }); // 0
+                    V.push_back({ x1, y0, z }); // 1
+                    V.push_back({ x1, y1, z }); // 2
+                    V.push_back({ x1, y1, z }); // 2
+                    V.push_back({ x0, y1, z }); // 3
+                    V.push_back({ x0, y0, z }); // 0
+                }
+            }
+            m_fillVertexCount = static_cast<uint32_t>(V.size());
+            Ref<VertexBuffer> vbo = API::newVertexBuffer(GL_STATIC_DRAW);
+            vbo->setBufferLayout({
+                { VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float3, "a_position" },
+            });
+            vbo->setData((void*)&(V[0]), sizeof(glm::vec3) * m_fillVertexCount);
+
+            m_vaoFill = API::newVertexArray(vbo);
+
+            renderer.executeRenderCommands();
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::setup_static_shaders()
@@ -433,40 +479,6 @@ namespace Syn
             ShaderLibrary::add(m_shaderFont);
 
             m_shaderInitialized = true;
-        }
-        //-------------------------------------------------------------------------------
-        int FigureRenderObj::num_digits_float(float _f)
-        {
-            int digits = 0;
-            double ori = _f;    //copy of original number
-            long num2  = _f;
-            
-            //count no of digits before floating point
-            while (num2 > 0)
-            {
-                digits++;
-                num2 = num2 / 10;
-            }
-            if(ori == 0)
-                digits = 1;
-            
-            float no_float;
-            no_float = ori * (pow(10, (8 - digits)));
-            long long int total=(long long int)no_float;
-            int no_of_digits, extrazeroes=0;
-            
-            for(int i = 0; i < 8; i++)
-            {
-                int dig;
-                dig = total%10;
-                total = total/10;
-                if(dig != 0)
-                    break;
-                else
-                    extrazeroes++;
-            }
-            no_of_digits = 8 - extrazeroes;
-            return no_of_digits;
         }
         //-------------------------------------------------------------------------------
         void FigureRenderObj::format_tick_labels(NiceScale* _ticks,

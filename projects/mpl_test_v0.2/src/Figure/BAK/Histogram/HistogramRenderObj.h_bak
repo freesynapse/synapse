@@ -85,7 +85,7 @@ namespace Syn
             //bool m_interactiveMode = false;         // selections possible for this histogram?
             //std::pair<float, float> m_currSelectionX = { 0, 0 };
             //std::pair<float, float> m_prevSelectionX = { -1, -1 };
-            //Ref<VertexArray> m_vaoSelection = nullptr;
+            //Ref<VertexArray> m_vaoFill = nullptr;
             //std::vector<float> m_xTickPositionsX;   // used for selection, populated in redraw()
             //float m_tickIntervalX = 0.0f;
 

@@ -17,12 +17,15 @@
 #define FIGURE_REDRAW_AXES          0b00000010
 #define FIGURE_REDRAW_TICKS         0b00000100
 #define FIGURE_REDRAW_TICKLABELS    0b00001000
-#define FIGURE_REDRAW_SELECTION     0b00010000
+#define FIGURE_REDRAW_FILL          0b00010000
 #define FIGURE_REDRAW_AUX           0b00001110  // axes, tick, tick labels
 #define FIGURE_REDRAW_ALL           0b00011111  // all elements
 #define FIGURE_REDRAW               FIGURE_REDRAW_ALL
 
-#define DEBUG_FIGURE_GRIDLINES
+#define FIGURE_RENDER_GRIDLINES     0b00000001
+#define FIGURE_RENDER_FILL          0b00000110
+#define FIGURE_RENDER_FILL_X        0b00000010
+#define FIGURE_RENDER_FILL_Y        0b00000100
 
 
 namespace Syn
@@ -63,14 +66,13 @@ namespace Syn
             void redrawAxes(normalized_params_t* _fig_params);
             void redrawTicks(normalized_params_t* _fig_params);
             void redrawTickLabels(normalized_params_t* _fig_params);
-            void redrawSelection(normalized_params_t* _fig_params);
+            void redrawFill(normalized_params_t* _fig_params);
 
             
+        private:
             /* Creates temporary shaders for rendering.
              */
-        private:
             void setup_static_shaders();
-            int num_digits_float(float _f);
 
             /* Determine number of decimals for tick labels
              */
@@ -96,6 +98,7 @@ namespace Syn
             std::string m_figureTitle = "";
 
             uint32_t m_redrawFlags = FIGURE_REDRAW_ALL;
+            uint32_t m_auxRenderFlags = FIGURE_RENDER_GRIDLINES;
 
             Ref<VertexArray> m_vaoAxes = nullptr;
             uint32_t m_axesVertexCount = 0;
@@ -109,11 +112,13 @@ namespace Syn
             Ref<Font> m_axisLabelFont = nullptr;
             Ref<Font> m_tickLabelFont = nullptr;
 
-            //__debug
-            #ifdef DEBUG_FIGURE_GRIDLINES
-                Ref<VertexArray> __debug_vaoGridLines = nullptr;
-                uint32_t __debug_gridLinesVertexCount = 0;
-            #endif
+            // auxilliary objects
+            Ref<VertexArray> m_vaoGridLines = nullptr;
+            uint32_t m_gridLinesVertexCount = 0;
+            glm::vec2 m_fillLimX = { 1.0f, -1.0f };
+            glm::vec2 m_fillLimY = { 1.0f, -1.0f };
+            Ref<VertexArray> m_vaoFill = nullptr;
+            uint32_t m_fillVertexCount = 0;
         };
 
 

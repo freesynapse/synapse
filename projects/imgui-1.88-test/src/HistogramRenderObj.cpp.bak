@@ -21,7 +21,7 @@ void HistogramRenderObj<T>::render()
     
     // render selection
     m_shaderCanvas->setUniform4fv("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 0.25f));
-    m_vaoSelection->bind();
+    m_vaoFill->bind();
     renderer.drawArrays(6, 0, true, GL_TRIANGLES);
 
     // render data
@@ -457,7 +457,7 @@ void HistogramRenderObj<T>::redrawSelection(normalized_params_t* _hist_params)
     });
     vbo->setData((void*)vertices, sizeof(glm::vec2) * 6);
 
-    m_vaoSelection = API::newVertexArray(vbo);
+    m_vaoFill = API::newVertexArray(vbo);
     Renderer::get().executeRenderCommands();
 }
 //---------------------------------------------------------------------------------------

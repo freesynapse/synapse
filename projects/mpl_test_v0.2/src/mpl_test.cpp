@@ -310,6 +310,12 @@ void layer::popup_test()
 		{
 			m_figure->canvas("TEST_HIST")->__debug_print();
 		}
+		ImGui::SameLine();
+		if (ImGui::Button("select"))
+		{
+			m_figure->fillBetweenX({ -10.0f, 10.0f });
+			m_figure->fillBetweenY({  10.0f, 20.0f });
+		}
 
 		ImGui::Text("");
 		ImGui::Separator();
