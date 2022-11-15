@@ -2,13 +2,14 @@
 #include <imgui/imgui.h>
 #include <Synapse.hpp>
 #include <Synapse/SynapseMain.hpp>
+#include <SynapseAddons/Figure/Figure.h>
 
 #include <map>
 #include <chrono>
 
 #include "imgui/imgui_internal.h"
 
-#include "Figure/Figure.h"
+//#include "Figure/Figure.h"
 
 
 using namespace Syn;

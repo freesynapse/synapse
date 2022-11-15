@@ -3,6 +3,8 @@
 
 #include "pch.hpp"
 
+#include "SynapseAddons/Figure/Figure.h"
+
 #include "SynapseAddons/Voxel/Types.hpp"
 #include "SynapseAddons/Voxel/Utility.hpp"
 #include "SynapseAddons/Voxel/VxNoise.hpp"
