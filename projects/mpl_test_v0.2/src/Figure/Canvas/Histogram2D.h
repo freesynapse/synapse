@@ -22,10 +22,13 @@ namespace Syn
             virtual void redraw() override;
             virtual void render(const Ref<Shader>& _shader) override;
 
-            virtual void data(const std::vector<float>& _Y) override;
-
+            virtual void data(const std::vector<float>& _data) override;
+            
+            virtual void __debug_print() override;
+            
             // histogram-specific
             void nbins(size_t _n) { m_binCount = _n; }
+            size_t nbins() { return m_binCount; }
 
         protected:
             virtual void setupBins(const glm::vec2& _lim);

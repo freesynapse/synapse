@@ -92,8 +92,8 @@ namespace Syn
                 m_dataLimY_prev = m_dataLimY;
                 // the scaler needs to be updated from the resulting NiceScale that depends
                 // on the data
-                NiceScale x_ticks(m_dataLimY);
-                glm::vec2 new_lim = { x_ticks.lower_bound, x_ticks.upper_bound };
+                NiceScale y_ticks(m_dataLimY);
+                glm::vec2 new_lim = { y_ticks.lower_bound, y_ticks.upper_bound };
                 m_axesPtr->setYLim(new_lim);
             }
             m_renderObjPtr->m_redrawFlags = FIGURE_REDRAW;

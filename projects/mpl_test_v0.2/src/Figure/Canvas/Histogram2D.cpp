@@ -23,12 +23,13 @@ namespace Syn
         void Histogram2D::setData()
         {
             glm::vec2 lim = { std::numeric_limits<float>::max(), 
-                                std::numeric_limits<float>::min() };
+                              std::numeric_limits<float>::min() };
             for (size_t i = 0; i < m_data.size(); i++)
             {
                 lim[0] = std::min(lim[0], m_data[i]);
                 lim[1] = std::max(lim[1], m_data[i]);
             }
+            m_dataLimX = lim;   // X limits
 
             setupBins(lim);
 
@@ -40,9 +41,9 @@ namespace Syn
                 std::prev(m_bins.upper_bound(val))->second++;                
             }
 
-            // limits on canvas (for rendering)
-            m_dataLimX = { m_bins.begin()->first, m_bins.rbegin()->first };
-            m_dataLimY[0] = 0.0f;
+            // Y limits
+            //m_dataLimX = { m_bins.begin()->first, m_bins.rbegin()->first };
+            m_dataLimY = { 0.0f, std::numeric_limits<float>::min() };
             for (const auto& bin : m_bins)
                 m_dataLimY[1] = std::max(m_dataLimY[1], static_cast<float>(bin.second));
             
@@ -108,14 +109,15 @@ namespace Syn
             renderer.drawArrays(m_vertexCount, 0, true, m_OpenGLPrimitive);
         }
         //-------------------------------------------------------------------------------
-        void Histogram2D::data(const std::vector<float>& _Y)
+        void Histogram2D::data(const std::vector<float>& _data)
         {
-
+            m_data = std::vector<float>(_data);
+            setData();
         }
         //-------------------------------------------------------------------------------
         void Histogram2D::setupBins(const glm::vec2& _lim)
         {
-            m_bins.clear();
+            m_bins = std::map<float, size_t>();
             if (m_binCount == 0)
                 m_binCount = static_cast<size_t>(_lim[1] - _lim[0]) + 1;
             
@@ -128,9 +130,16 @@ namespace Syn
                 x += dx;
             }
             
-            m_binCount = m_bins.size();
             m_bins_dx = dx;
         }
+        //-------------------------------------------------------------------------------
+        void Histogram2D::__debug_print()
+        {
+            printf("--------------------- HISTOGRAM ----------------------\n");
+            printf("    X lim : %.2f, %.2f\n", m_dataLimX[0], m_dataLimX[1]);
+            printf("    Y lim : %.2f, %.2f\n", m_dataLimY[0], m_dataLimY[1]);
+            m_parentRawPtr->axesPtr()->__debug_print();
 
+        }
     }
 }

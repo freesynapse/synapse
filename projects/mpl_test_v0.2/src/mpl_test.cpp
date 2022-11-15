@@ -295,7 +295,21 @@ void layer::popup_test()
 		{
 			add_lineplot_data = true;
 		}
-		*/		
+		*/
+		if (ImGui::Button("Rand hist"))
+		{
+			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
+			std::normal_distribution<float> dist(0.0, 20.0);
+			std::vector<float> Y;
+			for (int i = 0; i < n; i++)
+				Y.push_back(dist(gen));
+			m_figure->canvas("TEST_HIST")->data(Y);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("debug"))
+		{
+			m_figure->canvas("TEST_HIST")->__debug_print();
+		}
 
 		ImGui::Text("");
 		ImGui::Separator();

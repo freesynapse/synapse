@@ -246,7 +246,7 @@ namespace Syn
                 float curr_x_val = axes->x_ticks().lower_bound;
                 float x_step = axes->x_ticks().tick_spacing;
                 //
-                for (size_t i = 0; i < axes->x_ticks().max_ticks; i++)
+                for (size_t i = 0; i < axes->x_ticks().max_ticks + 1; i++)
                 {
                     float x = axes->eval_x(curr_x_val);
 
@@ -267,7 +267,7 @@ namespace Syn
                     m_tickLabelPositionsX.push_back(x_tick_pos);
 
                     #ifdef DEBUG_FIGURE_GRIDLINES
-                        if (i > 0 && i < axes->x_ticks().max_ticks - 1)
+                        if (i > 0 && i < axes->x_ticks().max_ticks)
                         {
                             __debug_vertices.push_back({ x, _fig_params->canvas_origin.y, _fig_params->z_value_aux });
                             __debug_vertices.push_back({ x, _fig_params->y_axis_lim[1], _fig_params->z_value_aux });
@@ -288,9 +288,9 @@ namespace Syn
                  */
                 float curr_y_val = axes->y_ticks().lower_bound;
                 float y_step = axes->y_ticks().tick_spacing;
-
+                
                 //
-                for (size_t i = 0; i < axes->y_ticks().max_ticks; i++)
+                for (size_t i = 0; i < axes->y_ticks().max_ticks + 1; i++)
                 {
                     float y = axes->eval_y(curr_y_val);
 
@@ -312,7 +312,7 @@ namespace Syn
                     m_tickLabelPositionsY.push_back(y_label_pos);
 
                     #ifdef DEBUG_FIGURE_GRIDLINES
-                        if (i > 0 && i < axes->y_ticks().max_ticks)
+                        if (i > 0 && i < axes->y_ticks().max_ticks - 1)
                         {
                             __debug_vertices.push_back({ _fig_params->x_axis_lim[0], y, _fig_params->z_value_aux });
                             __debug_vertices.push_back({ _fig_params->x_axis_lim[1], y, _fig_params->z_value_aux });

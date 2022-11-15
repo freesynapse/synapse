@@ -31,6 +31,7 @@ namespace Syn
             virtual void data(const std::vector<std::vector<float>>&) {}
             virtual void data(const std::vector<std::vector<float>>&, const std::vector<std::vector<float>>&) {}
             virtual std::pair<std::vector<float>, std::vector<float>> data() { return {}; }
+            virtual void __debug_print() {}
 
             //
         protected:
