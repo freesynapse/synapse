@@ -16,7 +16,6 @@ namespace Syn
             SYN_CORE_TRACE("new FigureRenderObj object created.");
             
             m_parentRawPtr = _parent;
-            m_figureTitle = _parent->m_figureTitle;
             m_figureSizePx = _parent->m_figureSizePx;
 
             setup_static_shaders();
@@ -69,7 +68,7 @@ namespace Syn
         void FigureRenderObj::render()
         {
             static auto& renderer = Renderer::get();
-            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+            auto& axes = m_parentRawPtr->axesPtr();
 
             if (!m_redrawFlags)
                 return;            
@@ -94,14 +93,6 @@ namespace Syn
                 renderer.drawArrays(m_gridLinesVertexCount, 0, true, GL_LINES);
             }
 
-            // render selection
-            if (m_auxRenderFlags & FIGURE_RENDER_FILL)
-            {
-                m_shader2D->setUniform4fv("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 0.2f));
-                m_vaoFill->bind();
-                renderer.drawArrays(m_fillVertexCount, 0, true, GL_TRIANGLES);
-            }
-
             // render canvas data
             for (auto& canvas : m_parentRawPtr->m_canvases)
                 canvas.second->render(m_shader2D);
@@ -110,6 +101,14 @@ namespace Syn
             m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->axis_color);
             m_vaoAxes->bind();
             renderer.drawArrays(m_axesVertexCount, 0, true, GL_LINES);
+
+            // render fill
+            if (m_auxRenderFlags & FIGURE_RENDER_FILL)
+            {
+                m_shader2D->setUniform4fv("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 0.2f));
+                m_vaoFill->bind();
+                renderer.drawArrays(m_fillVertexCount, 0, true, GL_TRIANGLES);
+            }
 
             // render ticks
             m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->tick_color);
@@ -140,7 +139,7 @@ namespace Syn
             m_tickLabelFont->endRenderBlock();
             
             // figure title
-            const char* title = m_figureTitle.c_str();
+            const char* title = m_parentRawPtr->title().c_str();
             float title_height = m_titleFont->getFontHeight();
             float title_width = m_titleFont->getStringWidth("%s", title);
             glm::vec2 title_pos =
@@ -229,7 +228,7 @@ namespace Syn
         void FigureRenderObj::redrawTicks(normalized_params_t* _fig_params)
         {
             std::vector<glm::vec3> V;
-            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+            auto& axes = m_parentRawPtr->axesPtr();
             static float epsilon = 0.01f;
 
             float font_height = m_tickLabelFont->getFontHeight();
@@ -344,7 +343,7 @@ namespace Syn
         {
             // m_(x/y)TickLabelPositions holds the pixel coordinates of tick positions
 
-            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+            auto& axes = m_parentRawPtr->axesPtr();
 
             // x axis
             //
@@ -371,7 +370,7 @@ namespace Syn
         {
             std::vector<glm::vec3> V;
             static auto& renderer = Renderer::get();
-            static const Ref<Axes>& axes = m_parentRawPtr->axesPtr();
+            auto& axes = m_parentRawPtr->axesPtr();
 
             if (m_auxRenderFlags & FIGURE_RENDER_FILL_X)
             {

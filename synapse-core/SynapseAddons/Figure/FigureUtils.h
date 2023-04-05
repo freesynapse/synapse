@@ -47,9 +47,10 @@ namespace Syn
         {
         public: // open member variables
             glm::vec2 lim;
-            size_t max_ticks = 5;
+            size_t max_ticks = 7;
             float tick_spacing;
             float range;
+            bool nice_scale = true;
             union
             {
                 glm::vec2 nice_lim;
@@ -64,58 +65,18 @@ namespace Syn
         
         public: // Ctor / Dtor
             NiceScale() {}
-            NiceScale(const glm::vec2& _lim)
+            NiceScale(const glm::vec2& _lim, bool _nice_scale)
             {   
                 lim = _lim;
+                nice_scale = _nice_scale;
                 calculate();
             }
             ~NiceScale() = default;
 
         public: // member variables
-            void calculate()
-            {
-                range = nice_num(lim[1] - lim[0], false);
-                tick_spacing = nice_num(range / (static_cast<float>(max_ticks) - 1.0f), true);
-                nice_lim[0] = floor(lim[0] / tick_spacing) * tick_spacing;
-                nice_lim[1] = ceil(lim[1] / tick_spacing) * tick_spacing;
-                // update parameters
-                max_ticks = static_cast<size_t>(upper_bound - lower_bound) / static_cast<size_t>(tick_spacing);
-                if (nice_lim[0] == 0.0f)
-                    max_ticks++;
-                range = nice_lim[1] - nice_lim[0];
-                set = true;
-            }
-            float nice_num(float _range, bool _round)
-            {
-                float exponent;
-                float fraction;
-                float nice_fraction;
-
-                exponent = floor(log10(_range));
-                fraction = _range / pow(10.f, exponent);
-
-                if (_round) 
-                {   if (fraction < 1.5)
-                        nice_fraction = 1;
-                    else if (fraction < 3)
-                        nice_fraction = 2;
-                    else if (fraction < 7)
-                        nice_fraction = 5;
-                    else
-                        nice_fraction = 10;
-                } 
-                else 
-                {   if (fraction <= 1)
-                        nice_fraction = 1;
-                    else if (fraction <= 2)
-                        nice_fraction = 2;
-                    else if (fraction <= 5)
-                        nice_fraction = 5;
-                    else
-                        nice_fraction = 10;
-                }
-                return nice_fraction * pow(10, exponent);                
-            }
+            void calculate();
+            float nice_num(float _range, bool _round);
+            //
             void set_lim(const glm::vec2& _lim)
             {
                 lim = _lim;
@@ -212,23 +173,13 @@ namespace Syn
             NiceScale& x_ticks() { return m_scalers[0]; }
             NiceScale& y_ticks() { return m_scalers[1]; }
 
-            void setXLim(const glm::vec2& _x_lim)
-            {
-                m_scalers[0] = NiceScale(_x_lim);
-                m_converters[0].xy_lim = m_scalers[0].nice_lim;
-                m_converters[0].update_xy_range();
-            }
-            void setYLim(const glm::vec2& _y_lim)
-            {
-                m_scalers[1] = NiceScale(_y_lim);
-                m_converters[1].xy_lim = m_scalers[1].nice_lim;
-                m_converters[1].update_xy_range();
-            }
-            void setLim(const glm::vec2& _x_lim, const glm::vec2& _y_lim)
-            {
-                setXLim(_x_lim);
-                setYLim(_y_lim);
-            }
+            void setXLim(const glm::vec2& _x_lim, bool _x_nice_scale);
+            void setYLim(const glm::vec2& _y_lim, bool _y_nice_scale);
+            //void setLim(const glm::vec2& _x_lim, const glm::vec2& _y_lim)
+            //{
+            //    setXLim(_x_lim);
+            //    setYLim(_y_lim);
+            //}
             void __debug_print(const std::string& _info="")
             {
                 printf("-------------------- AXES OBJECT ---------------------\n");

@@ -122,7 +122,8 @@ namespace Syn
                 m_binCount = static_cast<size_t>(_lim[1] - _lim[0]) + 1;
             
             float x = _lim[0];
-            float dx = (_lim[1] - _lim[0]) / (m_binCount - 1);
+            // TODO : make dynamic?!
+            float dx = 1.0f;//(_lim[1] - _lim[0]) / (m_binCount - 1);
 
             while (x <= _lim[1])
             {

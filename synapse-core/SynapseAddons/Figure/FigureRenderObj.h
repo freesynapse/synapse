@@ -95,7 +95,7 @@ namespace Syn
             
             Ref<Framebuffer> m_framebuffer = nullptr;
             std::string m_framebufferID = "";
-            std::string m_figureTitle = "";
+            //std::string m_figureTitle = ""; -- retrieved from parent Figure obj
 
             uint32_t m_redrawFlags = FIGURE_REDRAW_ALL;
             uint32_t m_auxRenderFlags = FIGURE_RENDER_GRIDLINES;

@@ -39,6 +39,7 @@ namespace Syn
             glm::vec4 line_color;
             size_t x_tick_count;
             size_t y_tick_count;
+            bool x_nice_scale;
 
             lineplot_params_t(FigureType _type=FigureType::LinePlot,
                               float _line_width_px=rcParams.line_width_px,
@@ -46,14 +47,16 @@ namespace Syn
                               float _marker_size=rcParams.scatter_marker_sz_px,
                               const glm::vec4& _line_color=rcParams.stroke_color,
                               size_t _x_tick_count=rcParams.x_tick_count,
-                              size_t _y_tick_count=rcParams.y_tick_count) :
+                              size_t _y_tick_count=rcParams.y_tick_count,
+                              bool _x_nice_scale=false) :
                 type(_type),
                 line_width_px(_line_width_px),
                 marker(_marker),
                 marker_size(_marker_size),
                 line_color(_line_color),
                 x_tick_count(_x_tick_count),
-                y_tick_count(_y_tick_count)
+                y_tick_count(_y_tick_count),
+                x_nice_scale(_x_nice_scale)
             {}
         };
         //

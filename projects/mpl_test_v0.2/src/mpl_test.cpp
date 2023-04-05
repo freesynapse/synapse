@@ -41,22 +41,24 @@ public:
 
 	Ref<Shader> m_shader = nullptr;
 
-	Ref<Figure> m_figure = nullptr;
+	Ref<Figure> m_figScatter = nullptr;
+	Ref<Figure> m_figLineplot = nullptr;
+	Ref<Figure> m_figHist = nullptr;
 	std::string m_scatterID = "";
 	std::string m_lineplotID = "";
 	std::string m_histID = "";
 
 	std::vector<std::vector<float>> m_data_X;
 	std::vector<std::vector<float>> m_data_Y;
-	int n = 500;
+	int n = 10000;
+	int dn = 1000;
 	
 	// flags
 	bool m_wireframeMode = true;
 	bool m_toggleCulling = false;
 
 	bool open_popup = true;
-	bool add_scatter_data = false;
-	bool add_lineplot_data = false;
+	bool toggle_random_plots = false;
 
 };
 class mpl_test_v02 : public Application
@@ -89,57 +91,91 @@ void layer::onAttach()
 	// FIGURE TESTS
 	//-----------------------------------------------------------------------------------
 	//
-	glm::vec2 fig_sz = glm::vec2(480.0f, 320.0f);
-	m_figure = MakeRef<Figure>(fig_sz);
+	static glm::vec2 fig_sz = { 750, 300 };
+	
+	int n = 40;
+	std::vector<float> x_(n);
+	
+	for (int i = 0; i < n; i++)
+		x_[i] = static_cast<float>(i);
+	
+	int n_start = 20;
+	int n_cp = 10;
+	std::vector<float> x1(n_cp);
+	SYN_CORE_ASSERT(n_start + n_cp < n);
+	memcpy((void*)(&x1[0]), (void*)(&x_[n_start]), sizeof(float) * n_cp);
+	
+	for (int i = 0; i < n_cp; i++)
+		printf("x[%d] = %.1f\n", i, x1[i]);
+
+
+
+
 
 	// SCATTER TEST ---------------------------------------------------------------------
 	//
 	std::default_random_engine gen(1); // seed 1 for reproducibility
 	std::normal_distribution<float> dist(0.0, 5.0);
-
-	std::vector<float> X(n), Y(n);
-	for (int i = 0; i < n; i++)
-	{
-		X[i] = dist(gen);
-		Y[i] = dist(gen);
-	}
-	//X = std::vector<float>({ 1, 0, 2 });
-	//Y = std::vector<float>({ 2, 2, 2 });
-	scatter_params_t scatter_params;
-	scatter_params.marker_size = 4.0f;
-	scatter_params.marker = FigureMarker::Square;
-	//m_scatterID = m_figure->scatter(X, Y, "SCATTER", scatter_params);
+	//
+	//std::vector<float> X(n), Y(n);
+	//for (int i = 0; i < n; i++)
+	//{
+	//	X[i] = dist(gen);
+	//	Y[i] = dist(gen);
+	//}
+	////X = std::vector<float>({ 1, 0, 2 });
+	////Y = std::vector<float>({ 2, 2, 2 });
+	//m_figScatter = MakeRef<Figure>(fig_sz);
+	//scatter_params_t scatter_params;
+	//scatter_params.marker_size = 4.0f;
+	//scatter_params.marker = FigureMarker::Square;
+	//m_scatterID = m_figScatter->scatter(X, Y, "SCATTER", scatter_params);
 	
 	// LINEPLOT TEST --------------------------------------------------------------------
 	//
-	std::vector<float> y;
-	for (int i = 0; i < 20; i++)
-		y.push_back(dist(gen));
+	std::vector<float> x, y;
+	//for (int i = 0; i < 20; i++)
+	//	y.push_back(dist(gen));
 
-	for (int n_ = 0; n_ < 3; n_++)
+	//for (int n_ = 0; n_ < 3; n_++)
+	//{
+	//	std::vector<float> y;
+	//	std::vector<float> x;
+	//	for (int i = 0; i < n; i++)
+	//	{
+	//		y.push_back(dist(gen) + n_ * 100 - 100);
+	//		x.push_back(static_cast<float>(i+n_*n));
+	//	}
+	//	m_data_Y.push_back(y);
+	//	m_data_X.push_back(x);
+	//}
+	int n1 = 21402;
+	for (int i = 0; i < n1; i++)
 	{
-		std::vector<float> y;
-		std::vector<float> x;
-		for (int i = 0; i < n; i++)
-		{
-			y.push_back(dist(gen) + n_ * 100 - 100);
-			x.push_back(static_cast<float>(i+n_*n));
-		}
-		m_data_Y.push_back(y);
-		m_data_X.push_back(x);
+		y.push_back(dist(gen));
+		x.push_back(static_cast<float>(i));
 	}
+	m_data_Y.push_back(y);
+	m_data_X.push_back(x);
+	
+	m_figLineplot = MakeRef<Figure>(fig_sz);
 	lineplot_params_t lineplot_params;
+	lineplot_params.x_nice_scale = false;
+	lineplot_params.line_width_px = 1.0f;
 	//lineplot_params.marker = FigureMarker::Square;
 	//lineplot_params.marker_size = 2.0f;
-	//m_lineplotID = m_figure->lineplot(m_data_X, m_data_Y, "TEST_LINE", lineplot_params);
-	//m_lineplotID = m_figure->lineplot(m_data_Y, "TEST_LINE", lineplot_params);
-	//m_lineplotID = m_figure->lineplot(y, "TEST_LINE", lineplot_params);
+	m_figLineplot->title("test title");
+	m_lineplotID = m_figLineplot->lineplot(m_data_X, m_data_Y, "LINE", lineplot_params);
+	//m_lineplotID = m_figLineplot->lineplot(m_data_Y, "LINE", lineplot_params);
+	//m_lineplotID = m_figLineplot->lineplot(y, "LINE", lineplot_params);
 	
 	// HISTOGRAM TEST -------------------------------------------------------------------
 	//
+	m_figHist = MakeRef<Figure>(fig_sz);
 	histogram_params_t hist_params;
-	m_histID = m_figure->histogram(Y, "TEST_HIST", 30);
-
+	m_histID = m_figHist->histogram(m_data_Y[0], "HIST", 30);
+	//m_figHist->fill(X_AXIS, { -20.0f, 20.0f });
+	m_figHist->fillBetweenX({ -20.0f, 20.0f });
 
 
 	// framebuffer
@@ -196,50 +232,30 @@ void layer::onUpdate(float _dt)
 	// ...and we're done! hand-off to ImGui to render the texture (scene) in the viewport pane.
 	m_renderBuffer->bindDefaultFramebuffer();
 
-	if (add_scatter_data)
+	if (toggle_random_plots)
 	{
 		std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
-		float mu = 0.0f;
-		float sigma = 10.0f;
-		float offset_x = Random::rand_f_r(-100.0f, 100.0f);
-		float offset_y = Random::rand_f_r(-100.0f, 100.0f);
-		std::normal_distribution<float> dist(mu, sigma);
-		std::vector<float> X(n), Y(n);
+		std::normal_distribution<float> dist(0.0, 20.0);
+
+		std::vector<float> x, y;
 		for (int i = 0; i < n; i++)
 		{
-			X[i] = dist(gen) + offset_x;
-			Y[i] = dist(gen) + offset_y;
-		}
-		scatter_params_t params;
-		params.marker_size = 4.0f;
-		params.marker = FigureMarker::Square;
-		params.marker_color = glm::vec4(Random::rand3_f_r(), 0.5f);
-		params.marker = FigureMarker(Random::rand_i_r(0, 7));
-		std::string ID(Random::rand_str(16));
-		m_figure->scatter(X, Y, ID, params);
-		
-		add_scatter_data = false;
-	}
-
-	if (add_lineplot_data)
-	{
-		std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
-		float mu = 0.0f;
-		float sigma = 10.0f;
-		std::normal_distribution<float> dist(mu, sigma);
-		std::vector<float> y;
-		for (int i = 0; i < n; i++)
+			x.push_back(static_cast<float>(i));
 			y.push_back(dist(gen));
-		m_figure->canvas("TEST_LINE")->data(y);
-
-		add_lineplot_data = false;
+		}
+		//m_figScatter->canvas("SCATTER")->data(x, y);
+		//m_figLineplot->canvas("LINE")->data(y);
+		m_figLineplot->data(x, y);
+		m_figHist->data(y);
+		//m_figHist->canvas("HIST")->data(y);
 	}
 
-	if (m_figure != nullptr)
-	{
-		//Timer timer("update and render");
-		m_figure->render();
-	}
+	//if (m_figScatter != nullptr)	
+	//	m_figScatter->render();
+	if (m_figLineplot != nullptr)	
+		m_figLineplot->render();
+	if (m_figHist != nullptr)
+		m_figHist->render();
 
 }
 //---------------------------------------------------------------------------------------
@@ -248,15 +264,22 @@ void layer::popup_test()
 	static ImGuiIO& io = ImGui::GetIO();
 	static ImVec2 size = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
 
+	static glm::vec2 interval = { -20.0f, 20.0f };
+	static glm::vec2 prev_interval = interval;
+
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 	ImGui::SetNextWindowPos(size, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowSize(ImVec2(500.0f, 850.0f), ImGuiCond_Appearing);
-
+	ImGui::SetNextWindowSize(ImVec2(800.0f, 850.0f), ImGuiCond_Appearing);
+	
 	ImGui::OpenPopup("modal_popup");
 	if (ImGui::BeginPopupModal("modal_popup", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		if (m_figure)
-			ImGui::Image((void*)m_figure->framebufferTexturePtr(), m_figure->size(), { 0, 1 }, { 1, 0 });
+		//if (m_figScatter != nullptr)
+		//	ImGui::Image((void*)m_figScatter->framebufferTexturePtr(), m_figScatter->size(), { 0, 1 }, { 1, 0 });
+		if (m_figLineplot != nullptr)
+			ImGui::Image((void*)m_figLineplot->framebufferTexturePtr(), m_figLineplot->size(), { 0, 1 }, { 1, 0 });
+		if (m_figHist != nullptr)
+			ImGui::Image((void*)m_figHist->framebufferTexturePtr(), m_figHist->size(), { 0, 1 }, { 1, 0 });
 
 		if (ImGui::Button("Close"))
 		{
@@ -264,63 +287,33 @@ void layer::popup_test()
 			open_popup = false;
 		}
 		ImGui::SameLine();
-		/*
-		if (ImGui::Button("Rand scatter"))
+		if (ImGui::Button("Toggle random"))
 		{
-			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
-			std::normal_distribution<float> dist(5.0, 2.0);
-			std::vector<float> X(n), Y(n);
-			for (int i = 0; i < n; i++)
-			{
-				X[i] = dist(gen);
-				Y[i] = dist(gen);
-			}
-			m_figure->canvas("TEST_SCATTER")->data(X, Y);
-		}
-		
-		if (ImGui::Button("Add scatter data"))
-		{
-			add_scatter_data = true;
-		}
-		if (ImGui::Button("Rand line"))
-		{
-			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
-			std::normal_distribution<float> dist(5.0, 2.0);
-			std::vector<float> Y;
-			for (int i = 0; i < n; i++)
-				Y.push_back(dist(gen));
-			m_figure->canvas("TEST_LINE")->data(Y);
-
-		}
-		if (ImGui::Button("Add line data"))
-		{
-			add_lineplot_data = true;
-		}
-		*/
-		if (ImGui::Button("Rand hist"))
-		{
-			std::default_random_engine gen(std::chrono::system_clock::now().time_since_epoch().count());
-			std::normal_distribution<float> dist(0.0, 20.0);
-			std::vector<float> Y;
-			for (int i = 0; i < n; i++)
-				Y.push_back(dist(gen));
-			m_figure->canvas("TEST_HIST")->data(Y);
+			toggle_random_plots = !toggle_random_plots;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("debug"))
-		{
-			m_figure->canvas("TEST_HIST")->__debug_print();
-		}
+		if (ImGui::Button("up"))
+			n += dn;
 		ImGui::SameLine();
-		if (ImGui::Button("select"))
+		if (ImGui::Button("do"))
+			n -= dn;
+		// select interval hist
+		if (ImGui::Button("lo <")) { interval[0] -= 1.0f; }
+		ImGui::SameLine();
+		if (ImGui::Button("lo >")) { interval[0] += 1.0f; }
+		ImGui::SameLine();
+		if (ImGui::Button("hi <")) { interval[1] -= 1.0f; }
+		ImGui::SameLine();
+		if (ImGui::Button("hi >")) { interval[1] += 1.0f; }
+		// update if needed
+		if (interval != prev_interval)
 		{
-			m_figure->fillBetweenX({ -10.0f, 10.0f });
-			m_figure->fillBetweenY({  10.0f, 20.0f });
+			m_figHist->fillBetweenX(interval);
+			prev_interval = interval;
 		}
 
-		ImGui::Text("");
-		ImGui::Separator();
-		ImGui::Text("data points : %zu", m_figure->dataSize());
+		// prototype
+
 
 		ImGui::EndPopup();
 

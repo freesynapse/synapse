@@ -51,6 +51,9 @@ namespace Syn
             virtual const std::string& canvasID() const { return m_canvasID; }
             virtual const size_t size() const { return 0; };
 
+            //
+            virtual const void printCanvasParameters() { m_canvasParameters.printParameters(); }
+
         protected:
             /* Function for checking the validity of a canvas ID
              */

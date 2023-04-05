@@ -130,6 +130,68 @@ namespace Syn
             return vertex_count;
         }
         //-------------------------------------------------------------------------------
+        // NiceScale MEMBER FUNCTIONS
+        //
+        void NiceScale::calculate()
+        {
+            if (nice_scale)
+                range = nice_num(lim[1] - lim[0], false);
+            else
+                range = lim[1] - lim[0];
+
+            tick_spacing = nice_num(range / (static_cast<float>(max_ticks) - 1.0f), true);
+
+            if (nice_scale)
+            {
+                nice_lim[0] = floor(lim[0] / tick_spacing) * tick_spacing;
+                nice_lim[1] = ceil(lim[1] / tick_spacing) * tick_spacing;
+            }
+            else
+            {
+                nice_lim[0] = (lim[0] / tick_spacing) * tick_spacing;
+                nice_lim[1] = (lim[1] / tick_spacing) * tick_spacing;
+            }
+            
+            // update parameters
+            max_ticks = static_cast<size_t>(upper_bound - lower_bound) / static_cast<size_t>(tick_spacing);
+            if (nice_lim[0] == 0.0f)
+                max_ticks++;
+            range = nice_lim[1] - nice_lim[0];
+            set = true;
+        }
+        //-------------------------------------------------------------------------------
+        float NiceScale::nice_num(float _range, bool _round)
+        {
+            float exponent;
+            float fraction;
+            float nice_fraction;
+
+            exponent = floor(log10(_range));
+            fraction = _range / pow(10.f, exponent);
+
+            if (_round) 
+            {   if (fraction < 1.5)
+                    nice_fraction = 1;
+                else if (fraction < 3)
+                    nice_fraction = 2;
+                else if (fraction < 7)
+                    nice_fraction = 5;
+                else
+                    nice_fraction = 10;
+            } 
+            else 
+            {   if (fraction <= 1)
+                    nice_fraction = 1;
+                else if (fraction <= 2)
+                    nice_fraction = 2;
+                else if (fraction <= 5)
+                    nice_fraction = 5;
+                else
+                    nice_fraction = 10;
+            }
+            return nice_fraction * pow(10, exponent);                
+        }
+        //-------------------------------------------------------------------------------
         // AxesScaler MEMBER FUNCTIONS
         //
         Axes::Axes(figure_params_t* _fig_params)
@@ -146,6 +208,20 @@ namespace Syn
             m_converters[1].plot_lim = { params.y_axis_lim[0], params.y_axis_lim[1] };
 
             m_converters[1].update_plot_range();
+        }
+        //-------------------------------------------------------------------------------
+        void Axes::setXLim(const glm::vec2& _x_lim, bool _x_nice_scale)
+        {
+            m_scalers[0] = NiceScale(_x_lim, _x_nice_scale);
+            m_converters[0].xy_lim = m_scalers[0].nice_lim;
+            m_converters[0].update_xy_range();
+        }
+        //-------------------------------------------------------------------------------
+        void Axes::setYLim(const glm::vec2& _y_lim, bool _y_nice_scale)
+        {
+            m_scalers[1] = NiceScale(_y_lim, _y_nice_scale);
+            m_converters[1].xy_lim = m_scalers[1].nice_lim;
+            m_converters[1].update_xy_range();
         }
     }
 }

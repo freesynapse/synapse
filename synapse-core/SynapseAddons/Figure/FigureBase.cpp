@@ -71,20 +71,28 @@ namespace Syn
             m_dataLimY = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
             
             m_canvasesDataSize = 0;
+            bool x_nice_scale = true;
+            bool y_nice_scale = true;
             for (auto& canvas : m_canvases)
             {
                 update_data_limits_canvas(canvas.second);
                 m_canvasesDataSize += canvas.second->size();
+                // update nice scale properties from canvases
+                x_nice_scale &= canvas.second->m_canvasParameters.x_nice_scale;
+                y_nice_scale &= canvas.second->m_canvasParameters.y_nice_scale;
             }
+            // update Figure behaviour
+            m_figureParamsPtr->x_nice_scale = x_nice_scale;
+            m_figureParamsPtr->y_nice_scale = y_nice_scale;
 
             if (m_dataLimX != m_dataLimX_prev)
             {
                 m_dataLimX_prev = m_dataLimX;
                 // the scaler needs to be updated from the resulting NiceScale that depends
                 // on the data
-                NiceScale x_ticks(m_dataLimX);
+                NiceScale x_ticks(m_dataLimX, x_nice_scale);
                 glm::vec2 new_lim = { x_ticks.lower_bound, x_ticks.upper_bound };
-                m_axesPtr->setXLim(new_lim);
+                m_axesPtr->setXLim(new_lim, x_nice_scale);
             }
             
             if (m_dataLimY != m_dataLimY_prev)
@@ -92,9 +100,9 @@ namespace Syn
                 m_dataLimY_prev = m_dataLimY;
                 // the scaler needs to be updated from the resulting NiceScale that depends
                 // on the data
-                NiceScale y_ticks(m_dataLimY);
+                NiceScale y_ticks(m_dataLimY, y_nice_scale);
                 glm::vec2 new_lim = { y_ticks.lower_bound, y_ticks.upper_bound };
-                m_axesPtr->setYLim(new_lim);
+                m_axesPtr->setYLim(new_lim, y_nice_scale);
             }
             m_renderObjPtr->m_redrawFlags = FIGURE_REDRAW;
         }
@@ -108,7 +116,6 @@ namespace Syn
             SYN_CORE_WARNING("Canvas with id '", _canvas_id, "' not found.");
             return nullptr;
         }
-
         //-------------------------------------------------------------------------------
         // PRIVATE MEMBER FUNCTIONS
         //        

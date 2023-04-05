@@ -28,7 +28,7 @@ namespace Syn
 
             return scatter(X, _Y, _scatter_id, _params);
         }
-        //-------------------------------------------------------------------------------    
+        //-------------------------------------------------------------------------------
         // Both _X and _Y values are provided
         //
         const std::string& Figure::scatter(const std::vector<float>& _X, 
@@ -47,7 +47,7 @@ namespace Syn
         }
 
         /*-------------------------------------------------------------------------------
-         * 2D scatter plots
+         * 2D line plots
          *-------------------------------------------------------------------------------
          */
         const std::string& Figure::lineplot(const std::vector<float>& _Y,
@@ -65,7 +65,7 @@ namespace Syn
 
             return lineplot(X, Y, _lineplot_id, _params);
         }
-        //-------------------------------------------------------------------------------    
+        //-------------------------------------------------------------------------------
         const std::string& Figure::lineplot(const std::vector<float>& _X,
                                             const std::vector<float>& _Y,
                                             const std::string& _lineplot_id,
@@ -78,7 +78,7 @@ namespace Syn
 
             return lineplot(X, Y, _lineplot_id, _params);
         }
-        //-------------------------------------------------------------------------------    
+        //-------------------------------------------------------------------------------
         const std::string& Figure::lineplot(const std::vector<std::vector<float>>& _Y,
                                             const std::string& _lineplot_id,
                                             lineplot_params_t _params)
@@ -96,7 +96,7 @@ namespace Syn
             
             return lineplot(X, Y, _lineplot_id, _params);
         }
-        //-------------------------------------------------------------------------------    
+        //-------------------------------------------------------------------------------
         // Base case : this is called by all above
         //
         const std::string& Figure::lineplot(const std::vector<std::vector<float>>& _X,
@@ -130,7 +130,7 @@ namespace Syn
 
             return histogram->canvasID();
         }
-        //-------------------------------------------------------------------------------    
+        //-------------------------------------------------------------------------------
         const std::string& Figure::histogram(const std::vector<float>& _data,
                                              const std::string& _histogram_id,
                                              size_t _bin_count,
@@ -145,6 +145,49 @@ namespace Syn
 
             return histogram->canvasID();
         }
+        /*-------------------------------------------------------------------------------
+         * Canvas data update accessors
+         *-------------------------------------------------------------------------------
+         */
+        void Figure::data(const std::vector<float>& _Y)
+        {
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            if (canvas)
+                canvas->data(_Y);
+        }
+        //-------------------------------------------------------------------------------
+        void Figure::data(const std::vector<float>& _X, const std::vector<float>& _Y)
+        {
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            if (canvas)
+                canvas->data(_X, _Y);
+        }
+        //-------------------------------------------------------------------------------
+        void Figure::data(const std::vector<std::vector<float>>& _Y)
+        {
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            if (canvas)
+                canvas->data(_Y);
+        }
+        //-------------------------------------------------------------------------------
+        void Figure::data(const std::vector<std::vector<float>>& _X, 
+                          const std::vector<std::vector<float>>& _Y)
+        {
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            if (canvas)
+                canvas->data(_X, _Y);
+        }
+        //-------------------------------------------------------------------------------
+        Canvas2D* Figure::get_single_canvas(const std::string& _caller_func)
+        {
+            if (m_canvases.size() != 1)
+            {
+                SYN_CORE_WARNING("m_canvases.size() != 1 : called from ", _caller_func, ".");
+                return nullptr;
+            }
+            return m_canvases.begin()->second;
+        }
+
 
     }
 }

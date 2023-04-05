@@ -29,13 +29,13 @@ namespace Syn
     //-----------------------------------------------------------------------------------
     void Stacktracer::critical_error_handler(int sig_num, siginfo_t * info, void * ucontext)
     {
-        sig_ucontext_t * uc = (sig_ucontext_t *)ucontext;
+        sig_ucontext_t* uc = (sig_ucontext_t *)ucontext;
 
         void* caller_address;
         #if defined(__i386__) // gcc specific
-            caller_address = (void *) uc->uc_mcontext.eip; // EIP: x86 specific
+            caller_address = (void*)uc->uc_mcontext.eip; // EIP: x86 specific
         #elif defined(__x86_64__) // gcc specific
-            caller_address = (void *) uc->uc_mcontext.rip; // RIP: x86_64 specific
+            caller_address = (void*)uc->uc_mcontext.rip; // RIP: x86_64 specific
         #else
             #error Unsupported architecture. // TODO: Add support for other arch.
         #endif

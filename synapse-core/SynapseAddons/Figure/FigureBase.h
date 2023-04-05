@@ -48,12 +48,12 @@ namespace Syn
             void update() { this->redraw(); }
 
             /* Updates the Figure data limits after redrawing all canvases.
-                */
+             */
             void updateDataLimits();
 
 
             /*---------------------------------------------------------------------------
-             * Canvas2D creation functions (FigureBaseCanvas.cpp)
+             * Canvas2D creation functions (FigureCanvasCreator.cpp)
              *---------------------------------------------------------------------------
              */
             
@@ -125,6 +125,18 @@ namespace Syn
                                          size_t _bin_count,
                                          histogram_params_t _params=histogram_params_t());
 
+            /* General accessors into the Canvas2D if only one canvas is present, for 
+             * updating data. Calls the data() functions of the canvas.
+             *
+             * (FigureCanvasCreator.cpp)
+             */
+            void data(const std::vector<float>&);
+            void data(const std::vector<float>&, const std::vector<float>&);
+            void data(const std::vector<std::vector<float>>&);
+            void data(const std::vector<std::vector<float>>&, const std::vector<std::vector<float>>&);
+        private:
+            Canvas2D* get_single_canvas(const std::string& _caller_func);
+            //std::pair<std::vector<float>, std::vector<float>> data() { return {}; }
         
         private:
             bool add_canvas(const std::string& _canvas_id, Canvas2D* _canvas);

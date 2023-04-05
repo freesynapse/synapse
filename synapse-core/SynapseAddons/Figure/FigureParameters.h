@@ -30,6 +30,18 @@ namespace Syn
             ScatterPlot = 3,
             StemPlot    = 4,
         };
+        static const char* figureTypeStr(FigureType _type)
+        {
+            switch(_type)
+            {
+            case FigureType::None:          return "None";
+            case FigureType::Histogram:     return "Histogram";
+            case FigureType::LinePlot:      return "LinePlot";
+            case FigureType::ScatterPlot:   return "ScatterPlot";
+            case FigureType::StemPlot:      return "StemPlot";
+            default:                        return "Unknown FigureType";
+            }
+        }
 
         //-------------------------------------------------------------------------------
         /* ScatterPlot markers
@@ -46,7 +58,22 @@ namespace Syn
             Dot         = 7,
             None        = 8,
         };
-
+        static const char* figureMarkerStr(FigureMarker _marker)
+        {
+            switch(_marker)
+            {
+                case FigureMarker::Square:      return "Square";
+                case FigureMarker::Diamond:     return "Diamond";
+                case FigureMarker::LTriangle:   return "LTriangle";
+                case FigureMarker::UTriangle:   return "UTriangle";
+                case FigureMarker::HLine:       return "HLine";
+                case FigureMarker::VLine:       return "VLine";
+                case FigureMarker::Plus:        return "Plus";
+                case FigureMarker::Dot:         return "Dot";
+                case FigureMarker::None:        return "None";
+                default:                        return "Unknown FigureMarker";
+            }
+        }
         //-------------------------------------------------------------------------------
         /* Histogram parameters. Default values are set, but are encouraged to change.
          */
@@ -104,6 +131,11 @@ namespace Syn
              *          canvas_origin_px.x for positive values 
              */
             glm::vec2 x_axis_lim_px             = { 0, -30 };
+
+            /* Flag to determine the scaler of the X axis: should the axis extend to the
+             * last data point (X-coordinate) or should a NiceScale be applied?
+             */
+            bool x_nice_scale                   = true;
             
             /* X axis length -- automatically calculated after normalization.
              */
@@ -116,6 +148,11 @@ namespace Syn
              */
             glm::vec2 y_axis_lim_px             = { 0, -30 };
             
+            /* Flag to determine the scaler of the Y axis: should the axis extend to the
+             * last data point (Y-coordinate) or should a NiceScale be applied?
+             */
+            bool y_nice_scale                   = true;
+
             /* Y axis length -- automatically calculated after normalization.
              */
             float y_axis_length                 = 0.0f;
@@ -252,6 +289,10 @@ namespace Syn
             void setFromScatterParams(const scatter_params_t& _params);
             void setFromLinePlotParams(const lineplot_params_t& _params);
             void setFromHistParams(const histogram_params_t& _params);
+
+            /* Debug (somewhat)
+             */
+            void printParameters();
         };
 
         /* Takes a figure_params_t object and normalizes all pixel values to normalized
@@ -272,8 +313,10 @@ namespace Syn
 
             glm::vec2 canvas_origin;
             glm::vec2 x_axis_lim;
+            bool x_nice_scale;
             float x_axis_length;
             glm::vec2 y_axis_lim;
+            bool y_nice_scale;
             float y_axis_length;
             bool render_x_axis;
             bool render_y_axis;
@@ -356,9 +399,11 @@ namespace Syn
                 canvas_origin           = px_to_fraction(_params->canvas_origin_px, AXIS_XY_SZ);
                 x_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.x + _params->x_axis_lim_px[0], AXIS_X_SZ);
                 x_axis_lim[1]           = px_to_fraction(_params->x_axis_lim_px[1], AXIS_X_SZ);
+                x_nice_scale            = _params->x_nice_scale;
                 x_axis_length           = x_axis_lim[1] - x_axis_lim[0];
                 y_axis_lim[0]           = px_to_fraction(_params->canvas_origin_px.y + _params->y_axis_lim_px[0], AXIS_Y_SZ);
                 y_axis_lim[1]           = px_to_fraction(_params->y_axis_lim_px[1], AXIS_Y_SZ);
+                y_nice_scale            = _params->y_nice_scale;
                 y_axis_length           = y_axis_lim[1] - y_axis_lim[0];
                 data_height             = px_to_fraction(_params->y_axis_lim_px[1] + _params->data_height_px, AXIS_Y_SZ);
 

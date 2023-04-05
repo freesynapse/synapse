@@ -27,6 +27,9 @@ namespace Syn
             SYN_CORE_ASSERT(m_dataX.size() == m_dataY.size(), 
                             "number of rows of X and Y data expected to be of equal length.");
             
+            m_dataLimX = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
+            m_dataLimY = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
+
             for (int i = 0; i < m_maxShape[0]; i++)
             {
                 SYN_CORE_ASSERT(m_dataX[i].size() == m_dataY[i].size(),
@@ -144,7 +147,7 @@ namespace Syn
         {
             static auto& renderer = Renderer::get();
 
-            static float line_width = m_canvasParameters.line_width_px;
+            float line_width = m_canvasParameters.line_width_px;
             if (line_width != 1.0f)
                 renderer.setLineWidth(line_width);
 
