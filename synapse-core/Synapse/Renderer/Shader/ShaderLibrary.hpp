@@ -26,7 +26,7 @@ namespace Syn {
 			static Ref<Shader> s_defaultInstance = createDefaultShader();
 			return s_defaultInstance;
 		}
-		
+		//
 		static inline Ref<Shader> get(const std::string& _name)
 		{
 			if (!exists(_name) || !s_shaders[_name]->isLoaded())
@@ -36,7 +36,14 @@ namespace Syn {
 			}
 			return s_shaders[_name];
 		}
-		
+		//
+		static inline Ref<Shader> getShader(const std::string& _name)
+		{
+			if (!exists(_name) || !s_shaders[_name]->isLoaded())
+				return nullptr;
+			return s_shaders[_name];
+		}
+		//
 		static const void debugListShaders();
 		static std::unordered_map<std::string, Ref<Shader>> debugGetShaders() { return s_shaders; }
 

@@ -16,7 +16,8 @@
 namespace Syn
 {
     namespace mplc
-    {
+    {        
+        //
         class Canvas2D; // forward decl
 
         /* The Figure base class, which all plots inherits from. The Figure is the main, 
@@ -227,6 +228,107 @@ namespace Syn
             glm::vec2 m_dataLimY        = {  0.0f,  1.0f };
             glm::vec2 m_dataLimY_prev   = { -1.0f, -1.0f };
         };
+
+
+        // namespace global instances
+        //
+        extern Ref<Font> ss_title_font;
+        extern Ref<Font> ss_axis_label_font;
+        extern Ref<Font> ss_tick_label_font;
+        extern Ref<Shader> ss_mplc_shader_2D;
+        extern Ref<Shader> ss_mplc_shader_font;
+
+        /* Library initialization : if not called all Canvas class instances have their
+         * own instances of fonts etc. Hint: use this to save resources.
+         */
+        static void mplc_init(const glm::vec2& _fig_sz_px=rcParams.figure_sz_px)
+        {
+            // update global figure size
+            if (_fig_sz_px != rcParams.figure_sz_px)
+                rcParams.figure_sz_px = _fig_sz_px;
+
+            // set static shaders
+            //
+
+            // geometry shader
+            std::string shader_2D_src = R"(
+                #type VERTEX_SHADER
+                #version 430 core
+                layout(location = 0) in vec3 a_position;
+                void main()
+                {
+                    vec2 p = 2.0 * a_position.xy - 1.0;
+                    gl_Position = vec4(p.x, p.y, a_position.z, 1.0);
+                }
+                #type FRAGMENT_SHADER
+                #version 430 core
+                uniform vec4 u_color;
+                layout(location = 0) out vec4 f_color;
+                void main() 
+                { 
+                    f_color = u_color;
+                }
+            )";
+            FileIOHandler::write_buffer_to_file("./mplc_shader_2D.glsl", shader_2D_src);
+            ss_mplc_shader_2D = API::newShader("./mplc_shader_2D.glsl");
+            ShaderLibrary::add("mplc_shader_2D", ss_mplc_shader_2D);
+            
+            // font shader
+            std::string figure_font_src = R"(
+                #type VERTEX_SHADER
+                #version 330 core
+                layout(location = 0) in vec4 a_position;
+                out vec2 f_tex_pos;
+                void main()
+                {
+                    gl_Position = vec4(a_position.xy, 0.0f, 1.0f);
+                    f_tex_pos = a_position.zw;
+                }
+                #type FRAGMENT_SHADER
+                #version 330 core
+                in vec2 f_tex_pos;
+                out vec4 out_color;
+                uniform sampler2D u_texture_sampler;
+                uniform vec4 u_color;
+                void main()
+                {
+                    float a = texture2D(u_texture_sampler, f_tex_pos).r;
+                    //float alpha = a;
+                    //if (a > 0.5)
+                    //    alpha = 1.0;
+                    //out_color = vec4(u_color.rgb, alpha);
+                    out_color = vec4(u_color.rgb, a * 1.5);
+                }
+            )";
+            FileIOHandler::write_buffer_to_file("./mplc_shader_font.glsl", figure_font_src);
+            ss_mplc_shader_font = API::newShader("./mplc_shader_font.glsl");
+            ShaderLibrary::add("mplc_shader_font", ss_mplc_shader_font);
+            
+            
+            // global fonts for reuse
+            //
+            // title
+            ss_title_font = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf",
+                                         rcParams.title_font_size_px,
+                                         ss_mplc_shader_font,
+                                         rcParams.figure_sz_px);
+            ss_title_font->disableUpdateOnResize();
+            
+            // axis labels
+            ss_axis_label_font = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf",
+                                              rcParams.axis_label_font_size_px,
+                                              ss_mplc_shader_font,
+                                              rcParams.figure_sz_px);
+            ss_axis_label_font->disableUpdateOnResize();
+            
+            // tick labels
+            ss_tick_label_font = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf",
+                                              rcParams.tick_label_font_size_px,
+                                              ss_mplc_shader_font,
+                                              rcParams.figure_sz_px);
+            ss_tick_label_font->disableUpdateOnResize();
+        }
+
     }
 }
 

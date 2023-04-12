@@ -57,7 +57,7 @@ namespace Syn
             /* Constructs the frambuffer; requires figure size to be set. Called from 
              * parent Figure object.
              */
-            void initialize();
+            void init();
 
             /* Redraws all figure elements except the data. Since tick positions and 
              * tick labels are dependent on the data, redrawData() of the derived class 

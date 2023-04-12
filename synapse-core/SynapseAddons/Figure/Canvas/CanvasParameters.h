@@ -18,7 +18,7 @@ namespace Syn
             scatter_params_t(FigureType _type=FigureType::ScatterPlot,
                              FigureMarker _marker=rcParams.scatter_marker,
                              float _marker_size=rcParams.scatter_marker_sz_px,
-                             const glm::vec4& _marker_color=rcParams.stroke_color,
+                             const glm::vec4& _marker_color=rcParams.data_color,
                              size_t _x_tick_count=rcParams.x_tick_count,
                              size_t _y_tick_count=rcParams.y_tick_count) :
                 type(_type),
@@ -45,7 +45,7 @@ namespace Syn
                               float _line_width_px=rcParams.line_width_px,
                               FigureMarker _marker=FigureMarker::None,
                               float _marker_size=rcParams.scatter_marker_sz_px,
-                              const glm::vec4& _line_color=rcParams.stroke_color,
+                              const glm::vec4& _line_color=rcParams.data_color,
                               size_t _x_tick_count=rcParams.x_tick_count,
                               size_t _y_tick_count=rcParams.y_tick_count,
                               bool _x_nice_scale=false) :

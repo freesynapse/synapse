@@ -55,7 +55,7 @@ public:
 
         // fonts
         m_tickLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
-                                       m_histParamsPtr->ticks_font_size_px,
+                                       m_histParamsPtr->tick_label_font_size_px,
                                        m_shaderFont,
                                        m_histParamsPtr->figure_sz_px);        
         m_tickLabelFont->disableUpdateOnResize();

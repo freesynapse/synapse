@@ -158,14 +158,14 @@ namespace Syn
         //-------------------------------------------------------------------------------
         void Figure::data(const std::vector<float>& _X, const std::vector<float>& _Y)
         {
-            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _X, const std::vector<float>& _Y)");
             if (canvas)
                 canvas->data(_X, _Y);
         }
         //-------------------------------------------------------------------------------
         void Figure::data(const std::vector<std::vector<float>>& _Y)
         {
-            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<std::vector<float>>& _Y)");
             if (canvas)
                 canvas->data(_Y);
         }
@@ -173,7 +173,7 @@ namespace Syn
         void Figure::data(const std::vector<std::vector<float>>& _X, 
                           const std::vector<std::vector<float>>& _Y)
         {
-            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<float>& _Y)");
+            Canvas2D* canvas = get_single_canvas("void Figure::data(const std::vector<std::vector<float>>& _X, const std::vector<std::vector<float>>& _X)");
             if (canvas)
                 canvas->data(_X, _Y);
         }

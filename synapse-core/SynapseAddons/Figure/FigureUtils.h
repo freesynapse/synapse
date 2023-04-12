@@ -94,7 +94,7 @@ namespace Syn
             }
             void __debug_print(const std::string& _info="")
             {
-                printf(">>>> nice_scale\n");
+                printf("------------------------- NiceScale -------------------------\n");
                 if (_info != "")
                     printf("    %s\n", _info.c_str());
                 printf("    size_t  max_ticks         =    %zu\n",  max_ticks);
@@ -146,7 +146,7 @@ namespace Syn
             void update_plot_range()    { plot_range = plot_lim[1] - plot_lim[0]; }
             void __debug_print(const std::string& _info="")
             {
-                printf(">>>> converter\n");
+                printf("------------------------- RangeConverter -------------------------\n");
                 if (_info != "")
                     printf("%s\n", _info.c_str());
                 printf("    vec2  xy_lim              =    %.2f, %.2f\n", xy_lim[0], xy_lim[1]);

@@ -111,6 +111,9 @@ void layer::onAttach()
 
 
 
+	// init static stuff
+	mplc_init(fig_sz);
+
 
 	// SCATTER TEST ---------------------------------------------------------------------
 	//

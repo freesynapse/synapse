@@ -8,6 +8,10 @@ namespace Syn
 {
     namespace mplc
     {
+        // global namespace instance
+        figure_params_t rcParams = figure_params_t();
+
+        //-------------------------------------------------------------------------------
         void figure_params_t::setFromScatterParams(const scatter_params_t& _params)
         {
             figure_type = _params.type;
@@ -15,7 +19,7 @@ namespace Syn
             scatter_marker_sz_px = _params.marker_size;
             x_tick_count = _params.x_tick_count;
             y_tick_count = _params.y_tick_count;
-            stroke_color = _params.marker_color;
+            data_color = _params.marker_color;
         }
         //-------------------------------------------------------------------------------
         void figure_params_t::setFromLinePlotParams(const lineplot_params_t& _params)
@@ -24,7 +28,7 @@ namespace Syn
             scatter_marker = _params.marker;
             scatter_marker_sz_px = _params.marker_size;
             line_width_px = _params.line_width_px;
-            stroke_color = _params.line_color;
+            data_color = _params.line_color;
             x_tick_count = _params.x_tick_count;
             y_tick_count = _params.y_tick_count;
             x_nice_scale = _params.x_nice_scale;
@@ -64,7 +68,7 @@ namespace Syn
             printf("%-32s        :        %.2f\n", "axis_label_font_size_px", axis_label_font_size_px);
             printf("%-32s        :        %s\n", "render_axis_labels", render_axis_labels ? "true" : "false");
             printf("%-32s        :        (%.2f, %.2f)\n", "tick_labels_offset_px", tick_labels_offset_px.x, tick_labels_offset_px.y);
-            printf("%-32s        :        %.2f\n", "ticks_font_size_px", ticks_font_size_px);
+            printf("%-32s        :        %.2f\n", "tick_label_font_size_px", tick_label_font_size_px);
             printf("%-32s        :        %s\n", "render_ticklabels", render_ticklabels ? "true" : "false");
             printf("%-32s        :        %d\n", "rotation_x_ticklabels", rotation_x_ticklabels);
             printf("%-32s        :        %d\n", "rotation_y_ticklabels", rotation_y_ticklabels);
@@ -76,7 +80,8 @@ namespace Syn
             printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "axis_label_color", axis_label_color.r, axis_label_color.g, axis_label_color.b, axis_label_color.a);
             printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "tick_label_color", tick_label_color.r, tick_label_color.g, tick_label_color.b, tick_label_color.a);
             printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "figure_background", figure_background.r, figure_background.g, figure_background.b, figure_background.a);
-            printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "stroke_color", stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a);
+            printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "data_color", data_color.r, data_color.g, data_color.b, data_color.a);
+            printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "fill_between_color", fill_between_color.r, fill_between_color.g, fill_between_color.b, fill_between_color.a);
             if (figure_type == FigureType::Histogram)
                 printf("%-32s        :        %.2f\n", "bar_spacing_px", bar_spacing_px);
             if (figure_type == FigureType::ScatterPlot)

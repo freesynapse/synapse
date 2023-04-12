@@ -104,7 +104,7 @@ namespace Syn
         void Histogram2D::render(const Ref<Shader>& _shader)
         {
             static auto& renderer = Renderer::get();
-            _shader->setUniform4fv("u_color", m_canvasParameters.stroke_color);
+            _shader->setUniform4fv("u_color", m_canvasParameters.data_color);
             m_vaoData->bind();
             renderer.drawArrays(m_vertexCount, 0, true, m_OpenGLPrimitive);
         }

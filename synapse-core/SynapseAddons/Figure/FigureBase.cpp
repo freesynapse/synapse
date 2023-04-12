@@ -8,6 +8,13 @@ namespace Syn
 {
     namespace mplc
     {
+        // global namespace instances
+        Ref<Font> ss_title_font          = nullptr;
+        Ref<Font> ss_axis_label_font     = nullptr;
+        Ref<Font> ss_tick_label_font     = nullptr;
+        Ref<Shader> ss_mplc_shader_2D    = nullptr;
+        Ref<Shader> ss_mplc_shader_font  = nullptr;
+        //-------------------------------------------------------------------------------
         Figure::Figure(const glm::vec2& _fig_sz_px)
         {
             glm::vec2 fig_sz = check_fig_size(_fig_sz_px);
@@ -122,7 +129,7 @@ namespace Syn
         glm::vec2 Figure::check_fig_size(const glm::vec2& _fig_sz)
         {
             if (_fig_sz.x <= 0 || _fig_sz.y <= 0)
-                return FIGURE_DEFUALT_SIZE; // in FigureParameters.h
+                return rcParams.figure_sz_px; // in FigureParameters.h
             return _fig_sz;
         }
         //-------------------------------------------------------------------------------

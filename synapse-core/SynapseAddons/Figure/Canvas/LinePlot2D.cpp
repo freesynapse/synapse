@@ -151,7 +151,7 @@ namespace Syn
             if (line_width != 1.0f)
                 renderer.setLineWidth(line_width);
 
-            _shader->setUniform4fv("u_color", m_canvasParameters.stroke_color);
+            _shader->setUniform4fv("u_color", m_canvasParameters.data_color);
             m_vaoData->bind();
             renderer.drawArrays(m_vertexCount, 0, true, m_OpenGLPrimitive);
 

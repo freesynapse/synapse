@@ -13,18 +13,16 @@ namespace Syn
     {
         FigureRenderObj::FigureRenderObj(Figure* _parent)
         {
-            SYN_CORE_TRACE("new FigureRenderObj object created.");
-            
             m_parentRawPtr = _parent;
             m_figureSizePx = _parent->m_figureSizePx;
 
             setup_static_shaders();
-            initialize();
+            init();
         }
         //-------------------------------------------------------------------------------
-        void FigureRenderObj::initialize()
+        void FigureRenderObj::init()
         {
-            m_framebufferID = "Figure_" + std::string(Random::rand_str(8));
+            m_framebufferID = "mplc_Figure_" + std::string(Random::rand_str(8));
             m_framebuffer = API::newFramebuffer(ColorFormat::RGBA16F,
                                                 glm::vec2(m_figureSizePx.x, m_figureSizePx.y), // m_figureSizePx,
                                                 1, 
@@ -35,30 +33,46 @@ namespace Syn
             // default rendering parameters
             m_figureParamsPtr = m_parentRawPtr->m_figureParamsPtr.get();
 
+            // will be nullptrs if mplc_init() is not called
+            m_titleFont = ss_title_font;
+            m_axisLabelFont = ss_axis_label_font;
+            m_tickLabelFont = ss_tick_label_font;
+
             // title font
-            m_titleFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
-                                        m_figureParamsPtr->title_font_size_px,
-                                        m_shaderFont,
-                                        m_figureParamsPtr->figure_sz_px);
-            m_titleFont->disableUpdateOnResize();
-            m_titleFont->setColor(m_figureParamsPtr->title_color);
+            if (ss_title_font == nullptr || m_parentRawPtr->paramsRawPtr()->figure_sz_px != rcParams.figure_sz_px)
+            {
+                m_titleFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
+                                            m_figureParamsPtr->title_font_size_px,
+                                            m_shaderFont,
+                                            m_figureParamsPtr->figure_sz_px);
+                m_titleFont->disableUpdateOnResize();
+            }
+            else
+                m_titleFont = ss_title_font;
 
             // axis label font
-            m_axisLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
-                                           m_figureParamsPtr->axis_label_font_size_px,
-                                           m_shaderFont,
-                                           m_figureParamsPtr->figure_sz_px);
-            m_axisLabelFont->disableUpdateOnResize();
-            m_axisLabelFont->setColor(m_figureParamsPtr->axis_label_color);
+            if (ss_axis_label_font == nullptr || m_parentRawPtr->paramsRawPtr()->figure_sz_px != rcParams.figure_sz_px)
+            {
+                m_axisLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
+                                            m_figureParamsPtr->axis_label_font_size_px,
+                                            m_shaderFont,
+                                            m_figureParamsPtr->figure_sz_px);
+                m_axisLabelFont->disableUpdateOnResize();
+            }
+            else
+                m_axisLabelFont = ss_axis_label_font;
 
             // tick label font
-            m_tickLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
-                                            m_figureParamsPtr->ticks_font_size_px,
-                                            m_shaderFont,
-                                            m_figureParamsPtr->figure_sz_px);        
-            m_tickLabelFont->disableUpdateOnResize();
-            m_tickLabelFont->setColor(m_figureParamsPtr->tick_label_color);
-
+            if (ss_tick_label_font == nullptr || m_parentRawPtr->paramsRawPtr()->figure_sz_px != rcParams.figure_sz_px)
+            {
+                m_tickLabelFont = API::newFont("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 
+                                                m_figureParamsPtr->tick_label_font_size_px,
+                                                m_shaderFont,
+                                                m_figureParamsPtr->figure_sz_px);        
+                m_tickLabelFont->disableUpdateOnResize();
+            }
+            else
+                m_tickLabelFont = ss_tick_label_font;
 
             //
             m_redrawFlags = FIGURE_REDRAW_ALL;
@@ -105,7 +119,7 @@ namespace Syn
             // render fill
             if (m_auxRenderFlags & FIGURE_RENDER_FILL)
             {
-                m_shader2D->setUniform4fv("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 0.2f));
+                m_shader2D->setUniform4fv("u_color", m_figureParamsPtr->fill_between_color);
                 m_vaoFill->bind();
                 renderer.drawArrays(m_fillVertexCount, 0, true, GL_TRIANGLES);
             }
@@ -425,57 +439,68 @@ namespace Syn
                 return;
 
             // set static shader (for now)
-            std::string shader_2D_src = R"(
-                #type VERTEX_SHADER
-                #version 430 core
-                layout(location = 0) in vec3 a_position;
-                void main()
-                {
-                    vec2 p = 2.0 * a_position.xy - 1.0;
-                    gl_Position = vec4(p.x, p.y, a_position.z, 1.0);
-                }
-                #type FRAGMENT_SHADER
-                #version 430 core
-                uniform vec4 u_color;
-                layout(location = 0) out vec4 f_color;
-                void main() 
-                { 
-                    f_color = u_color;
-                }
-            )";
-            FileIOHandler::write_buffer_to_file("./shader_2D.glsl", shader_2D_src);
-            m_shader2D = API::newShader("./shader_2D.glsl");
-            ShaderLibrary::add(m_shader2D);
-
-            std::string figure_font_src = R"(
-                #type VERTEX_SHADER
-                #version 330 core
-                layout(location = 0) in vec4 a_position;
-                out vec2 f_tex_pos;
-                void main()
-                {
-                    gl_Position = vec4(a_position.xy, 0.0f, 1.0f);
-                    f_tex_pos = a_position.zw;
-                }
-                #type FRAGMENT_SHADER
-                #version 330 core
-                in vec2 f_tex_pos;
-                out vec4 out_color;
-                uniform sampler2D u_texture_sampler;
-                uniform vec4 u_color;
-                void main()
-                {
-                    float a = texture2D(u_texture_sampler, f_tex_pos).r;
-                    //float alpha = a;
-                    //if (a > 0.5)
-                    //    alpha = 1.0;
-                    //out_color = vec4(u_color.rgb, alpha);
-                    out_color = vec4(u_color.rgb, a * 1.5);
-                }
-            )";
-            FileIOHandler::write_buffer_to_file("./figure_font_shader.glsl", figure_font_src);
-            m_shaderFont = API::newShader("./figure_font_shader.glsl");
-            ShaderLibrary::add(m_shaderFont);
+            if (ShaderLibrary::getShader("mplc_shader_2D") == nullptr)
+            {
+                std::string shader_2D_src = R"(
+                    #type VERTEX_SHADER
+                    #version 430 core
+                    layout(location = 0) in vec3 a_position;
+                    void main()
+                    {
+                        vec2 p = 2.0 * a_position.xy - 1.0;
+                        gl_Position = vec4(p.x, p.y, a_position.z, 1.0);
+                    }
+                    #type FRAGMENT_SHADER
+                    #version 430 core
+                    uniform vec4 u_color;
+                    layout(location = 0) out vec4 f_color;
+                    void main() 
+                    { 
+                        f_color = u_color;
+                    }
+                )";
+                FileIOHandler::write_buffer_to_file("./mplc_shader_2D.glsl", shader_2D_src);
+                m_shader2D = API::newShader("./mplc_shader_2D.glsl");
+                ShaderLibrary::add("mplc_shader_2D", m_shader2D);
+            }
+            else
+                m_shader2D = ShaderLibrary::get("mplc_shader_2D");
+            
+            //
+            if (ShaderLibrary::getShader("mplc_shader_font") == nullptr)
+            {
+                std::string figure_font_src = R"(
+                    #type VERTEX_SHADER
+                    #version 330 core
+                    layout(location = 0) in vec4 a_position;
+                    out vec2 f_tex_pos;
+                    void main()
+                    {
+                        gl_Position = vec4(a_position.xy, 0.0f, 1.0f);
+                        f_tex_pos = a_position.zw;
+                    }
+                    #type FRAGMENT_SHADER
+                    #version 330 core
+                    in vec2 f_tex_pos;
+                    out vec4 out_color;
+                    uniform sampler2D u_texture_sampler;
+                    uniform vec4 u_color;
+                    void main()
+                    {
+                        float a = texture2D(u_texture_sampler, f_tex_pos).r;
+                        //float alpha = a;
+                        //if (a > 0.5)
+                        //    alpha = 1.0;
+                        //out_color = vec4(u_color.rgb, alpha);
+                        out_color = vec4(u_color.rgb, a * 1.5);
+                    }
+                )";
+                FileIOHandler::write_buffer_to_file("./mplc_shader_font.glsl", figure_font_src);
+                m_shaderFont = API::newShader("./mplc_shader_font.glsl");
+                ShaderLibrary::add("mplc_shader_font", m_shaderFont);
+            }
+            else
+                m_shaderFont = ShaderLibrary::get("mplc_shader_font");
 
             m_shaderInitialized = true;
         }

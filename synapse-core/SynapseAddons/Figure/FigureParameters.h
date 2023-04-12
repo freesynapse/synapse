@@ -1,14 +1,15 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "imgui/imgui_internal.h"
+#include "Synapse/Memory/MemoryTypes.hpp"
 
 #include "FigureUtils.h"
 
-
-// global defaults
-#define FIGURE_DEFUALT_SIZE (glm::vec2(420.0f, 280.0f))
-
+//
 namespace Syn
 {
     namespace mplc
@@ -92,7 +93,7 @@ namespace Syn
             /* Size of the canvas, used for normalization of coordinates. Set during 
              * construction.
              */
-            glm::vec2 figure_sz_px              = { 0, 0 };
+            glm::vec2 figure_sz_px              = glm::vec2(420.0f, 280.0f);
             
             /* Height of highest data point in pixel-space; if below 0, treated as 
              * negaive offset from y_axis_lim_px[1].
@@ -199,7 +200,7 @@ namespace Syn
 
             /* Font size of ticklabels.
              */
-            float ticks_font_size_px            = 12.0f;
+            float tick_label_font_size_px            = 12.0f;
 
             /* Render ticklabels?
              */
@@ -229,7 +230,8 @@ namespace Syn
             glm::vec4 axis_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 tick_label_color          = {   1.0f,   1.0f,   1.0f,  1.0f };
             glm::vec4 figure_background         = {   0.0f,   0.0f,   0.0f,  0.7f };
-            glm::vec4 stroke_color              = { 0.298f, 0.361f, 0.490f,  1.0f };
+            glm::vec4 data_color                = { 0.298f, 0.361f, 0.490f,  1.0f };
+            glm::vec4 fill_between_color        = {   1.0f,   1.0f,   1.0f,  0.2f };
 
 
             /*---------------------------------------------------------------------------
@@ -282,7 +284,8 @@ namespace Syn
             /* Constructors
              */
             figure_params_t(const glm::vec2& _fig_sz_px) : figure_sz_px(_fig_sz_px) {}
-            figure_params_t() : figure_sz_px({ 0.0f, 0.0f }) {}
+            //figure_params_t() : figure_sz_px({ 0.0f, 0.0f }) {}
+            figure_params_t() {}
 
             /* Update relevant fields from canvas parameters
              */
@@ -331,7 +334,7 @@ namespace Syn
             float axis_label_font_size_px;
             bool render_axis_labels;
             glm::vec2 tick_labels_offset;
-            float ticks_font_size_px;
+            float tick_label_font_size_px;
             bool render_ticklabels;
             int rotation_x_ticklabels;
             int rotation_y_ticklabels;
@@ -344,7 +347,8 @@ namespace Syn
             glm::vec4 axis_label_color;
             glm::vec4 tick_label_color;
             glm::vec4 figure_background;
-            glm::vec4 stroke_color;
+            glm::vec4 data_color;
+            glm::vec4 fill_between_color;
 
             // Histogram parameters
             float bar_spacing;
@@ -420,7 +424,7 @@ namespace Syn
                 axis_label_font_size_px = _params->axis_label_font_size_px;
                 render_axis_labels      = _params->render_axis_labels;
                 tick_labels_offset      = px_to_fraction(_params->tick_labels_offset_px, AXIS_XY_SZ);
-                ticks_font_size_px      = _params->ticks_font_size_px;
+                tick_label_font_size_px      = _params->tick_label_font_size_px;
                 render_ticklabels       = _params->render_ticklabels;
                 rotation_x_ticklabels   = _params->rotation_x_ticklabels;
                 rotation_y_ticklabels   = _params->rotation_y_ticklabels;
@@ -434,7 +438,8 @@ namespace Syn
                 tick_label_color        = _params->tick_label_color;
                 axis_label_color        = _params->axis_label_color;
                 figure_background       = _params->figure_background;
-                stroke_color            = _params->stroke_color;
+                data_color              = _params->data_color;
+                fill_between_color      = _params->fill_between_color;
 
                 // Histogram parameters
                 bar_spacing             = px_to_fraction(_params->bar_spacing_px, AXIS_X_SZ);
@@ -454,7 +459,7 @@ namespace Syn
             }
         };
 
-        //
-        static figure_params_t rcParams = figure_params_t();
+        // global (namespace) instance
+        extern figure_params_t rcParams;
     }
 }

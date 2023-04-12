@@ -94,7 +94,7 @@ struct histogram_params_t
 
     /* Font size of ticklabels.
      */
-    float ticks_font_size_px            = 12.0f;
+    float tick_label_font_size_px            = 12.0f;
 
     /* Render ticklabels?
      */
@@ -157,7 +157,7 @@ struct normalized_params_t
     size_t y_tick_count;
     bool render_y_ticks;
     glm::vec2 tick_labels_offset;
-    float ticks_font_size_px;
+    float tick_label_font_size_px;
     bool render_ticklabels;
     int rotation_x_ticklabels;
     int rotation_y_ticklabels;
@@ -218,7 +218,7 @@ struct normalized_params_t
         render_y_ticks          = _params->render_y_ticks;
 
         tick_labels_offset      = px_to_fraction(_params->tick_labels_offset_px, XY);
-        ticks_font_size_px      = _params->ticks_font_size_px;
+        tick_label_font_size_px      = _params->tick_label_font_size_px;
         render_ticklabels       = _params->render_ticklabels;
         rotation_x_ticklabels   = _params->rotation_x_ticklabels;
         rotation_y_ticklabels   = _params->rotation_y_ticklabels;

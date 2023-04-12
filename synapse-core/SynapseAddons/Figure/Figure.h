@@ -14,6 +14,8 @@
 #include "FigureBase.h"
 
 #include "Canvas/ScatterPlot2D.h"
+#include "Canvas/LinePlot2D.h"
+#include "Canvas/Histogram2D.h"
 
 
 
