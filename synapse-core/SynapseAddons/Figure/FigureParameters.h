@@ -242,6 +242,10 @@ namespace Syn
             /* Space between bars in pixels.
             */
             float bar_spacing_px                = 1;
+
+            /* Number of bins.
+             */
+            int bin_count                       = -1;
             
             /*---------------------------------------------------------------------------
              * SCATTER PLOT PARAMETERS
@@ -352,6 +356,7 @@ namespace Syn
 
             // Histogram parameters
             float bar_spacing;
+            int bin_count;
 
             // ScatterPlot parameters
             float scatter_marker_sz;
@@ -443,6 +448,7 @@ namespace Syn
 
                 // Histogram parameters
                 bar_spacing             = px_to_fraction(_params->bar_spacing_px, AXIS_X_SZ);
+                bin_count               = _params->bin_count;
 
                 // ScatterPlot parameters
                 scatter_marker_sz       = px_to_fraction(_params->scatter_marker_sz_px, AXIS_Y_SZ);

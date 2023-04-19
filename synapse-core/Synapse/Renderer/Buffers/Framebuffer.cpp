@@ -46,20 +46,26 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	void FramebufferBase::saveAsPNG(const std::string& _relative_path)
+	void FramebufferBase::saveAsPNG(const std::string& _file_path/* ="" */)
 	{
 		// size of texture in bytes, using 3 channels (rgb)
 		uint32_t szImage = m_size.x * m_size.y * 3;
 		unsigned char* pixels = new unsigned char[szImage];
 
 		// format filename
-		// TODO: don't hardcode this path!!
-		std::string dirName = _relative_path;// + "/../screenshots/";
-		
-		std::string time = Time::current_time();
-		std::replace(time.begin(), time.end(), ':', '.');
-		std::string fileName = dirName + Time::current_date() + '_' + time + '_' + Random::rand_str(24) + ".png";
-		//std::string saveFile = dirName + fileName;
+		std::string fileName;
+		if (strcmp(_file_path.c_str(), "") == 0)
+		{
+			std::string dirName = "./";
+			
+			std::string time = Time::current_time();
+			std::replace(time.begin(), time.end(), ':', '.');
+			fileName = dirName + Time::current_date() + '_' + time + '_' + Random::rand_str(24) + ".png";
+
+		}
+		else
+			fileName = _file_path;
+
 		
 		SYN_RENDER_S2(pixels, fileName, {
 			// first, bind this buffer

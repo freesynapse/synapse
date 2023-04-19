@@ -93,23 +93,6 @@ void layer::onAttach()
 	//
 	static glm::vec2 fig_sz = { 750, 300 };
 	
-	int n = 40;
-	std::vector<float> x_(n);
-	
-	for (int i = 0; i < n; i++)
-		x_[i] = static_cast<float>(i);
-	
-	int n_start = 20;
-	int n_cp = 10;
-	std::vector<float> x1(n_cp);
-	SYN_CORE_ASSERT(n_start + n_cp < n);
-	memcpy((void*)(&x1[0]), (void*)(&x_[n_start]), sizeof(float) * n_cp);
-	
-	for (int i = 0; i < n_cp; i++)
-		printf("x[%d] = %.1f\n", i, x1[i]);
-
-
-
 
 	// init static stuff
 	mplc_init(fig_sz);
@@ -174,12 +157,31 @@ void layer::onAttach()
 	
 	// HISTOGRAM TEST -------------------------------------------------------------------
 	//
+	
+	y.clear();
+	for (int i0 = 0; i0 < 4; i0++)
+	{
+		int m = 1000;
+		//srand(1);
+		//int n = rand() % 100 * m;
+		n = Syn::Random::rand_i_r(10, 50) * m;
+		for (int i = 0; i <= n; i++)
+			y.push_back(10+i0);
+			//y.push_back(dist(gen) / 100.0f);
+	}
+	y.clear();
+	y.push_back(0.0f);
+	y.push_back(0.0f);
+
 	m_figHist = MakeRef<Figure>(fig_sz);
 	histogram_params_t hist_params;
-	m_histID = m_figHist->histogram(m_data_Y[0], "HIST", 30);
+	//hist_params.bin_count = 5;
+	m_histID = m_figHist->histogram(y, "HIST", hist_params);
 	//m_figHist->fill(X_AXIS, { -20.0f, 20.0f });
-	m_figHist->fillBetweenX({ -20.0f, 20.0f });
-
+	auto& xlim = m_figHist->dataLimX();
+	//m_figHist->fillBetweenX({ xlim[0], xlim[1] });
+	m_figHist->saveAsPNG("./hist.png");
+	m_figHist->canvas()->__debug_print();
 
 	// framebuffer
 	m_renderBuffer = API::newFramebuffer(ColorFormat::RGBA16F, glm::ivec2(0), 1, true, true, "render_buffer");
@@ -267,8 +269,9 @@ void layer::popup_test()
 	static ImGuiIO& io = ImGui::GetIO();
 	static ImVec2 size = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
 
-	static glm::vec2 interval = { -20.0f, 20.0f };
-	static glm::vec2 prev_interval = interval;
+	static float dx = dynamic_cast<Histogram2D*>(m_figHist->canvas())->bins_dx();
+	static glm::vec2 interval = m_figHist->dataLimX() + glm::vec2(0.0f, dx);
+	static glm::vec2 prev_interval(0.0f);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 	ImGui::SetNextWindowPos(size, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -301,13 +304,13 @@ void layer::popup_test()
 		if (ImGui::Button("do"))
 			n -= dn;
 		// select interval hist
-		if (ImGui::Button("lo <")) { interval[0] -= 1.0f; }
+		if (ImGui::Button("lo <")) { interval[0] -= dx; }
 		ImGui::SameLine();
-		if (ImGui::Button("lo >")) { interval[0] += 1.0f; }
+		if (ImGui::Button("lo >")) { interval[0] += dx; }
 		ImGui::SameLine();
-		if (ImGui::Button("hi <")) { interval[1] -= 1.0f; }
+		if (ImGui::Button("hi <")) { interval[1] -= dx; }
 		ImGui::SameLine();
-		if (ImGui::Button("hi >")) { interval[1] += 1.0f; }
+		if (ImGui::Button("hi >")) { interval[1] += dx; }
 		// update if needed
 		if (interval != prev_interval)
 		{

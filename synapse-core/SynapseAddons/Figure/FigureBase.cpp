@@ -3,6 +3,8 @@
 #include "Canvas/Canvas2D.h"
 #include "Canvas/ScatterPlot2D.h"
 
+#include "Canvas/Histogram2D.h"
+
 
 namespace Syn
 {
@@ -49,6 +51,12 @@ namespace Syn
             m_renderObjPtr->redraw();
         }
         //-------------------------------------------------------------------------------
+        void Figure::saveAsPNG(const std::string& _filename)
+        {
+            render();
+            m_renderObjPtr->getFramebuffer()->saveAsPNG(_filename);
+        }
+        //-------------------------------------------------------------------------------
         bool Figure::add_canvas(const std::string& _canvas_id, Canvas2D* _canvas_ptr)
         {
             bool histogram_present = false;
@@ -80,6 +88,7 @@ namespace Syn
             m_canvasesDataSize = 0;
             bool x_nice_scale = true;
             bool y_nice_scale = true;
+            float hist_x_add = 0.0f;
             for (auto& canvas : m_canvases)
             {
                 update_data_limits_canvas(canvas.second);
@@ -87,6 +96,13 @@ namespace Syn
                 // update nice scale properties from canvases
                 x_nice_scale &= canvas.second->m_canvasParameters.x_nice_scale;
                 y_nice_scale &= canvas.second->m_canvasParameters.y_nice_scale;
+
+                if (canvas.second->m_canvasParameters.figure_type == FigureType::Histogram)
+                {
+                    Histogram2D* hist_ptr = dynamic_cast<Histogram2D*>(canvas.second);
+                    hist_x_add = hist_ptr->bins_dx();
+                    x_nice_scale = true;
+                }
             }
             // update Figure behaviour
             m_figureParamsPtr->x_nice_scale = x_nice_scale;
@@ -97,7 +113,7 @@ namespace Syn
                 m_dataLimX_prev = m_dataLimX;
                 // the scaler needs to be updated from the resulting NiceScale that depends
                 // on the data
-                NiceScale x_ticks(m_dataLimX, x_nice_scale);
+                NiceScale x_ticks = NiceScale({ m_dataLimX[0], m_dataLimX[1] + hist_x_add }, x_nice_scale);
                 glm::vec2 new_lim = { x_ticks.lower_bound, x_ticks.upper_bound };
                 m_axesPtr->setXLim(new_lim, x_nice_scale);
             }
@@ -118,6 +134,8 @@ namespace Syn
         //
         Canvas2D* Figure::canvas(const std::string& _canvas_id)
         {
+            if (m_canvases.size() == 1)
+                return m_canvases.begin()->second;
             if (m_canvases.find(_canvas_id) != m_canvases.end())
                 return m_canvases[_canvas_id];
             SYN_CORE_WARNING("Canvas with id '", _canvas_id, "' not found.");

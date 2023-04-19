@@ -48,6 +48,10 @@ namespace Syn
             void redraw();            
             void update() { this->redraw(); }
 
+            /* Exports as png, through calls to Syn::Framebuffer
+             */
+            void saveAsPNG(const std::string& _filename);
+
             /* Updates the Figure data limits after redrawing all canvases.
              */
             void updateDataLimits();
@@ -114,18 +118,12 @@ namespace Syn
                                         const std::string& _lineplot_id,
                                         lineplot_params_t _params=lineplot_params_t());
 
-            /* Histogram over data, showing the distribution. Two functions are available,
-             * where the bin count is specified or not.
+            /* Histogram over data, showing the distribution. Bin count is specified in 
+             * histogram_params_t (default=30).
              */
             const std::string& histogram(const std::vector<float>& _data,
                                          const std::string& _histogram_id,
                                          histogram_params_t _params=histogram_params_t());
-            //
-            const std::string& histogram(const std::vector<float>& _data,
-                                         const std::string& _histogram_id,
-                                         size_t _bin_count,
-                                         histogram_params_t _params=histogram_params_t());
-
             /* General accessors into the Canvas2D if only one canvas is present, for 
              * updating data. Calls the data() functions of the canvas.
              *
@@ -161,7 +159,7 @@ namespace Syn
             const glm::vec2& dataLimY() { return m_dataLimY; }
             // Canvas-related accessors
             const std::unordered_map<std::string, Canvas2D*>& canvases() { return m_canvases; }
-            Canvas2D* canvas(const std::string& _canvas_id);
+            Canvas2D* canvas(const std::string& _canvas_id="");
             size_t dataSize() { return m_canvasesDataSize; }
             // aux rendering control (grid lines, selections, etc.)
             void enableGridLines() { m_renderObjPtr->m_auxRenderFlags |= FIGURE_RENDER_GRIDLINES; }

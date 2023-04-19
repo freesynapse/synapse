@@ -130,21 +130,6 @@ namespace Syn
 
             return histogram->canvasID();
         }
-        //-------------------------------------------------------------------------------
-        const std::string& Figure::histogram(const std::vector<float>& _data,
-                                             const std::string& _histogram_id,
-                                             size_t _bin_count,
-                                             histogram_params_t _params)
-        {
-            Histogram2D* histogram = new Histogram2D(this, _data, _histogram_id, _bin_count);
-            histogram->m_parentRawPtr = this;
-            histogram->m_canvasParameters.setFromHistParams(_params);
-            bool res = add_canvas(histogram->canvasID(), histogram);
-            if (!res)
-                delete histogram;
-
-            return histogram->canvasID();
-        }
         /*-------------------------------------------------------------------------------
          * Canvas data update accessors
          *-------------------------------------------------------------------------------

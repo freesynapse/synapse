@@ -28,6 +28,34 @@ namespace Syn
         extern size_t figureMarkerVertices(normalized_params_t* _params, 
                                            std::vector<glm::vec2>& _vertices);
         
+        //-------------------------------------------------------------------------------
+        /* Calculation of quantiles from an iterable type. Presumes sorted data _x.
+         */
+        template<typename T>
+        typename T::value_type quantile(const T& _x, float _q)
+        {
+            assert(_q >= 0.0 && _q <= 1.0);
+            const auto n  = _x.size();
+            const auto id = (n - 1) * _q;
+            const auto lo = floor(id);
+            const auto hi = ceil(id);
+            const auto qs = _x[lo];
+            const auto h  = (id - lo);
+
+            return (1.0 - h) * qs + h * _x[hi];
+        }
+
+        //-------------------------------------------------------------------------------
+        /* Calculation of inter-quartile range (using quantile() from above). 
+         * Presumes sorted iterable.
+         */
+        template<typename T>
+        glm::vec2 IQR(const T& _x)
+        {
+            glm::vec2 q = { quantile(_x, 0.25), quantile(_x, 0.75) };
+            return q;
+        }
+
         /*-------------------------------------------------------------------------------
          * VISUALLY PLEASING TICKS
          *-------------------------------------------------------------------------------
@@ -47,7 +75,7 @@ namespace Syn
         {
         public: // open member variables
             glm::vec2 lim;
-            size_t max_ticks = 7;
+            size_t max_ticks = 15;
             float tick_spacing;
             float range;
             bool nice_scale = true;
@@ -73,7 +101,7 @@ namespace Syn
             }
             ~NiceScale() = default;
 
-        public: // member variables
+        public: // member functions
             void calculate();
             float nice_num(float _range, bool _round);
             //

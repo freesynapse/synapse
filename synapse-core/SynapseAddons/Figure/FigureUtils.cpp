@@ -153,7 +153,7 @@ namespace Syn
             }
             
             // update parameters
-            max_ticks = static_cast<size_t>(upper_bound - lower_bound) / static_cast<size_t>(tick_spacing);
+            max_ticks = static_cast<size_t>((upper_bound - lower_bound) / tick_spacing);
             if (nice_lim[0] == 0.0f)
                 max_ticks++;
             range = nice_lim[1] - nice_lim[0];

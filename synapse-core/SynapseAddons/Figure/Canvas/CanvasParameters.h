@@ -63,9 +63,12 @@ namespace Syn
         struct histogram_params_t
         {
             FigureType type;
+            size_t bin_count;
 
-            histogram_params_t(FigureType _type=FigureType::Histogram) :
-                type(_type)
+            histogram_params_t(FigureType _type=FigureType::Histogram, 
+                               const size_t& _bin_count=rcParams.bin_count) :
+                type(_type),
+                bin_count(_bin_count)
             {}
         };
         //

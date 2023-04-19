@@ -23,7 +23,7 @@ namespace Syn
 		/* Unbinds, through binding GL_FRAMEBUFFER to 0. */
 		virtual inline void bindDefaultFramebuffer() { unbind(); }
 
-		virtual void saveAsPNG(const std::string& _relative_path=".");
+		virtual void saveAsPNG(const std::string& _file_path="");
 
 	protected:
 		/* Called on Syn::ViewportResizeEvent and also upon instantiation of this

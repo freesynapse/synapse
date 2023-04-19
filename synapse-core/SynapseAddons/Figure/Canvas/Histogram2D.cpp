@@ -1,6 +1,10 @@
 
 #include "Histogram2D.h"
 
+#include <cmath>
+
+#include "../FigureUtils.h"
+
 
 namespace Syn
 {
@@ -8,20 +12,20 @@ namespace Syn
     {
         Histogram2D::Histogram2D(Figure* _parent,
                                    const std::vector<float> _data,
-                                   const std::string& _histogram_id,
-                                   size_t _bin_count)
+                                   const std::string& _histogram_id)
         {
             m_parentRawPtr = _parent;
             // copy figure parameters
             memcpy(&m_canvasParameters, m_parentRawPtr->paramsRawPtr(), sizeof(figure_params_t));
             set_canvas_id(_histogram_id);
             m_data = std::vector<float>(_data);
-            m_binCount = _bin_count;
             m_OpenGLPrimitive = GL_TRIANGLES;
         }
         //-------------------------------------------------------------------------------
         void Histogram2D::setData()
         {
+            m_binCount = m_canvasParameters.bin_count;
+
             glm::vec2 lim = { std::numeric_limits<float>::max(), 
                               std::numeric_limits<float>::min() };
             for (size_t i = 0; i < m_data.size(); i++)
@@ -29,7 +33,7 @@ namespace Syn
                 lim[0] = std::min(lim[0], m_data[i]);
                 lim[1] = std::max(lim[1], m_data[i]);
             }
-            m_dataLimX = lim;   // X limits
+            m_dataLimX = lim;   // x limits
 
             setupBins(lim);
 
@@ -65,7 +69,8 @@ namespace Syn
             // calculation.
             //
             float x = params.canvas_origin.x + params.data_axis_offset.x;
-            float x_step = (params.x_axis_length - (2 * params.data_axis_offset.x)) / static_cast<float>(m_binCount);
+            //float x_step = (params.x_axis_length - (2 * params.data_axis_offset.x)) / static_cast<float>(m_binCount);
+            float x_step = (params.x_axis_length - (2 * params.data_axis_offset.x)) * m_bins_dx;
 
             //
             float x0, x1, y0, y1;
@@ -118,27 +123,73 @@ namespace Syn
         void Histogram2D::setupBins(const glm::vec2& _lim)
         {
             m_bins = std::map<float, size_t>();
-            if (m_binCount == 0)
-                m_binCount = static_cast<size_t>(_lim[1] - _lim[0]) + 1;
             
-            float x = _lim[0];
-            // TODO : make dynamic?!
-            float dx = 1.0f;//(_lim[1] - _lim[0]) / (m_binCount - 1);
+            //
+            printf("bin count before = %d\n", m_binCount);
+            
+            if (m_binCount < 0)
+            {
+                /* Automatic determination of number of bins according to Freedman-
+                 * Diaconis rule: the width of the bins are determined as 
+                 *  w = (2 * IQR(x)) / (n^(-1/3))
+                 * 
+                 * The number of bins, then, is simply 
+                 *  nbins = (max(x) - min(x)) / h
+                 * 
+                 */
+                sort(m_data.begin(), m_data.end());
+                glm::vec2 iqr = IQR(m_data);
+                float h = (2.0f * (iqr[1] - iqr[0])) / (cbrt(static_cast<float>(m_data.size())));
+                if (h > 0.0f)
+                    m_binCount = static_cast<int>(floor((_lim[1] - _lim[0]) / h));
+                else
+                    m_binCount = 1;
+            }
+            printf("data[0] = %f, data[-1] = %f\n", m_data[0], m_data[m_data.size()-1]);
+            
+            if (m_binCount > 1)
+                m_bins_dx = (_lim[1] - _lim[0]) / (m_binCount - 1);
+            else if (m_binCount == 0)
+                m_bins_dx = 1.0f;
+            else
+                m_bins_dx = 1.0f;
+            
+            printf("bin count after = %d\n", m_binCount);
+            printf("dx = %f\n", m_bins_dx);
 
-            while (x <= _lim[1])
+            //SYN_CORE_ASSERT_MESSAGE(m_binCount != 1, "(m_binCount - 1) = 0; pre-emptive avoidance of division by zero.");
+            //SYN_CORE_ASSERT_MESSAGE(m_bins_dx != 0.0f, "m_bins_dx = 0.0f");
+            //if (m_bins_dx == 0.0f || m_binCount <= 0)
+            //{
+            //    m_bins[0] = 0;
+            //    return;
+            //}
+
+
+            float x = _lim[0];
+
+            printf("--------------------------------------------------------------------\n");
+            printf("lim = (%.2f, %.2f)\n", _lim[0], _lim[1]);
+            printf("bin_count = %d\n", m_binCount);
+            printf("dx = %.4f\n", m_bins_dx);
+            for (size_t i = 0; i < m_binCount-1; i++)
             {
                 m_bins[x] = 0;
-                x += dx;
+                //printf("m_bins[%2.4f] = %zu\n", x, m_bins[x]);
+                x += m_bins_dx;
             }
-            
-            m_bins_dx = dx;
+            // set last bin manually to avoid rounding errors
+            x = _lim[1];
+            m_bins[x] = 0;
+            //printf("m_bins[%2.4f] = %zu\n", x, m_bins[x]);
+            printf("--------------------------------------------------------------------\n");
         }
         //-------------------------------------------------------------------------------
         void Histogram2D::__debug_print()
         {
-            printf("--------------------- HISTOGRAM ----------------------\n");
-            printf("    X lim : %.2f, %.2f\n", m_dataLimX[0], m_dataLimX[1]);
-            printf("    Y lim : %.2f, %.2f\n", m_dataLimY[0], m_dataLimY[1]);
+            //printf("--------------------- HISTOGRAM ----------------------\n");
+            //printf("    X lim : %.2f, %.2f\n", m_dataLimX[0], m_dataLimX[1]);
+            //printf("    Y lim : %.2f, %.2f\n", m_dataLimY[0], m_dataLimY[1]);
             m_parentRawPtr->axesPtr()->__debug_print();
 
         }

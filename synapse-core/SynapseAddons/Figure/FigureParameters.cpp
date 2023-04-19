@@ -37,7 +37,7 @@ namespace Syn
         void figure_params_t::setFromHistParams(const histogram_params_t& _params)
         {
             figure_type = _params.type;
-            
+            bin_count = _params.bin_count;
         }
         //-------------------------------------------------------------------------------
         void figure_params_t::printParameters()
@@ -83,7 +83,10 @@ namespace Syn
             printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "data_color", data_color.r, data_color.g, data_color.b, data_color.a);
             printf("%-32s        :        (%.2f, %.2f, %.2f, %.2f)\n", "fill_between_color", fill_between_color.r, fill_between_color.g, fill_between_color.b, fill_between_color.a);
             if (figure_type == FigureType::Histogram)
+            {
                 printf("%-32s        :        %.2f\n", "bar_spacing_px", bar_spacing_px);
+                printf("%-32s        :        %d\n", "bin_count", bin_count);
+            }
             if (figure_type == FigureType::ScatterPlot)
             {
                 printf("%-32s        :        %.2f\n", "scatter_marker_sz_px", scatter_marker_sz_px);

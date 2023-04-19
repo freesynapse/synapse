@@ -13,8 +13,7 @@ namespace Syn
         public:
             Histogram2D(Figure* _parent,
                         const std::vector<float> _data,
-                        const std::string& _histogram_id,
-                        size_t _bin_count=0);
+                        const std::string& _histogram_id);
             ~Histogram2D() = default;
 
             //
@@ -29,13 +28,14 @@ namespace Syn
             // histogram-specific
             void nbins(size_t _n) { m_binCount = _n; }
             size_t nbins() { return m_binCount; }
+            const float& bins_dx() { return m_bins_dx; }
 
         protected:
             virtual void setupBins(const glm::vec2& _lim);
 
         private:
             std::vector<float> m_data;
-            size_t m_binCount;
+            int m_binCount;
             float m_bins_dx = 0.0f;
             std::map<float, size_t> m_bins;
         };

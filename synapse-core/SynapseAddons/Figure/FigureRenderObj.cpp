@@ -513,6 +513,7 @@ namespace Syn
             float range = _ticks->range;
             int log_10 = (int)(ceil(log10(abs(range))));
             int k = log_10 + (log_10 < 0 ? 4 : 0);
+            k = 5;
 
             float lo_bound = _ticks->lower_bound;
             for (size_t i = 0; i < _label_positions.size(); i++)

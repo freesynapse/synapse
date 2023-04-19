@@ -68,6 +68,8 @@ namespace Syn
             void redrawTickLabels(normalized_params_t* _fig_params);
             void redrawFill(normalized_params_t* _fig_params);
 
+        protected:
+            const Ref<Framebuffer>& getFramebuffer() { return m_framebuffer; }
             
         private:
             /* Creates temporary shaders for rendering.
