@@ -132,6 +132,43 @@ namespace Syn
         //-------------------------------------------------------------------------------
         // ACCESSORS
         //
+        glm::vec2 Figure::dataLimX(const std::string& _canvas_id)
+        {
+            Canvas2D* canvas = nullptr;
+            if (m_canvases.size() == 1)
+                canvas = m_canvases.begin()->second;
+            else if (m_canvases.find(_canvas_id) != m_canvases.end())
+                canvas = m_canvases[_canvas_id];
+
+            if (canvas != nullptr)
+            {
+                glm::vec2 xlim = canvas->m_dataLimX;
+                if (canvas->m_canvasParameters.figure_type == FigureType::Histogram)
+                    xlim += glm::vec2(0.0f, dynamic_cast<Histogram2D*>(canvas)->m_bins_dx);
+                return xlim;
+            }
+            
+            //
+            SYN_CORE_WARNING("Canvas with id '", _canvas_id, "' not found.");
+            return glm::vec2(0.0f);
+        }
+        //-------------------------------------------------------------------------------
+        glm::vec2 Figure::dataLimY(const std::string& _canvas_id)
+        {
+            Canvas2D* canvas = nullptr;
+            if (m_canvases.size() == 1)
+                canvas = m_canvases.begin()->second;
+            else if (m_canvases.find(_canvas_id) != m_canvases.end())
+                canvas = m_canvases[_canvas_id];
+
+            if (canvas != nullptr)
+                return canvas->m_dataLimY;
+            
+            //
+            SYN_CORE_WARNING("Canvas with id '", _canvas_id, "' not found.");
+            return glm::vec2(0.0f);
+        }
+        //-------------------------------------------------------------------------------
         Canvas2D* Figure::canvas(const std::string& _canvas_id)
         {
             if (m_canvases.size() == 1)

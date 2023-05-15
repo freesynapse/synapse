@@ -38,6 +38,7 @@ namespace Syn
         {
             figure_type = _params.type;
             bin_count = _params.bin_count;
+            hist_line_plot = _params.hist_line_plot;
         }
         //-------------------------------------------------------------------------------
         void figure_params_t::printParameters()
@@ -86,6 +87,7 @@ namespace Syn
             {
                 printf("%-32s        :        %.2f\n", "bar_spacing_px", bar_spacing_px);
                 printf("%-32s        :        %d\n", "bin_count", bin_count);
+                printf("%-32s        :        %s\n", "hist_line_plot", hist_line_plot ? "true" : "false");
             }
             if (figure_type == FigureType::ScatterPlot)
             {

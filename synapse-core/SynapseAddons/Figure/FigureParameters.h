@@ -246,6 +246,11 @@ namespace Syn
             /* Number of bins.
              */
             int bin_count                       = -1;
+
+            /* Line plot instead of bars?
+             */
+            bool hist_line_plot                 = false;
+
             
             /*---------------------------------------------------------------------------
              * SCATTER PLOT PARAMETERS
@@ -357,6 +362,7 @@ namespace Syn
             // Histogram parameters
             float bar_spacing;
             int bin_count;
+            bool hist_line_plot;
 
             // ScatterPlot parameters
             float scatter_marker_sz;
@@ -449,6 +455,7 @@ namespace Syn
                 // Histogram parameters
                 bar_spacing             = px_to_fraction(_params->bar_spacing_px, AXIS_X_SZ);
                 bin_count               = _params->bin_count;
+                hist_line_plot          = _params->hist_line_plot;
 
                 // ScatterPlot parameters
                 scatter_marker_sz       = px_to_fraction(_params->scatter_marker_sz_px, AXIS_Y_SZ);
@@ -458,6 +465,7 @@ namespace Syn
 
                 // Lineplot parameters
                 line_width_px           = _params->line_width_px;
+
                 // Selection (fill) parameters
                 fill_between_x          = _params->fill_between_x;
                 fill_between_y          = _params->fill_between_y;

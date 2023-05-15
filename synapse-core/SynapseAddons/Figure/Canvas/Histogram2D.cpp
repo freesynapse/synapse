@@ -33,7 +33,6 @@ namespace Syn
                 lim[0] = std::min(lim[0], m_data[i]);
                 lim[1] = std::max(lim[1], m_data[i]);
             }
-            m_dataLimX = lim;   // x limits
 
             setupBins(lim);
 
@@ -45,8 +44,8 @@ namespace Syn
                 std::prev(m_bins.upper_bound(val))->second++;                
             }
 
-            // Y limits
-            //m_dataLimX = { m_bins.begin()->first, m_bins.rbegin()->first };
+            // update limits
+            m_dataLimX = { m_bins.begin()->first, m_bins.rbegin()->first };
             m_dataLimY = { 0.0f, std::numeric_limits<float>::min() };
             for (const auto& bin : m_bins)
                 m_dataLimY[1] = std::max(m_dataLimY[1], static_cast<float>(bin.second));

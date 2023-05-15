@@ -155,8 +155,8 @@ namespace Syn
             void setRedrawFlags(uint32_t _flags) { m_renderObjPtr->m_redrawFlags = _flags; }
             void addRedrawFlags(uint32_t _flags) { m_renderObjPtr->m_redrawFlags |= _flags; }
             const Ref<Axes>& axesPtr() { return m_axesPtr; }
-            const glm::vec2& dataLimX() { return m_dataLimX; }
-            const glm::vec2& dataLimY() { return m_dataLimY; }
+            glm::vec2 dataLimX(const std::string& _canvas_id="");
+            glm::vec2 dataLimY(const std::string& _canvas_id="");
             // Canvas-related accessors
             const std::unordered_map<std::string, Canvas2D*>& canvases() { return m_canvases; }
             Canvas2D* canvas(const std::string& _canvas_id="");

@@ -33,7 +33,7 @@ namespace Syn
         protected:
             virtual void setupBins(const glm::vec2& _lim);
 
-        private:
+        public:
             std::vector<float> m_data;
             int m_binCount;
             float m_bins_dx = 0.0f;

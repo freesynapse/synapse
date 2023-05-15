@@ -169,17 +169,19 @@ void layer::onAttach()
 			y.push_back(10+i0);
 			//y.push_back(dist(gen) / 100.0f);
 	}
-	y.clear();
-	y.push_back(0.0f);
-	y.push_back(0.0f);
+	//y.clear();
+	//y.push_back(0.0f);
+	//y.push_back(0.0f);
 
 	m_figHist = MakeRef<Figure>(fig_sz);
 	histogram_params_t hist_params;
+	hist_params.hist_line_plot = true;
 	//hist_params.bin_count = 5;
 	m_histID = m_figHist->histogram(y, "HIST", hist_params);
 	//m_figHist->fill(X_AXIS, { -20.0f, 20.0f });
-	auto& xlim = m_figHist->dataLimX();
+	auto xlim = m_figHist->dataLimX();
 	//m_figHist->fillBetweenX({ xlim[0], xlim[1] });
+	m_figHist->fillBetweenX(xlim);
 	m_figHist->saveAsPNG("./hist.png");
 	m_figHist->canvas()->__debug_print();
 
@@ -270,7 +272,7 @@ void layer::popup_test()
 	static ImVec2 size = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
 
 	static float dx = dynamic_cast<Histogram2D*>(m_figHist->canvas())->bins_dx();
-	static glm::vec2 interval = m_figHist->dataLimX() + glm::vec2(0.0f, dx);
+	static glm::vec2 interval = m_figHist->dataLimX();// + glm::vec2(0.0f, dx);
 	static glm::vec2 prev_interval(0.0f);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));

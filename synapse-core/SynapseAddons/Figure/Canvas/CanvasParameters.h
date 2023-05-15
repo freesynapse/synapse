@@ -64,11 +64,14 @@ namespace Syn
         {
             FigureType type;
             size_t bin_count;
+            bool hist_line_plot;
 
             histogram_params_t(FigureType _type=FigureType::Histogram, 
-                               const size_t& _bin_count=rcParams.bin_count) :
+                               const size_t& _bin_count=rcParams.bin_count,
+                               const bool& _line_plot=rcParams.hist_line_plot) :
                 type(_type),
-                bin_count(_bin_count)
+                bin_count(_bin_count),
+                hist_line_plot(_line_plot)
             {}
         };
         //
