@@ -2,15 +2,15 @@
 #pragma once
 
 #include <unordered_map>
-#include <Synapse/Memory/MemoryTypes.hpp>
 #include <glm/glm.hpp>
 
-#include "imgui/imgui_internal.h"
+#include "../../External/imgui/imgui_internal.h"
+#include "../../SynapseCore/Memory/MemoryTypes.hpp"
 
 #include "FigureParameters.h"
 #include "FigureRenderObj.h"
 #include "FigureUtils.h"
-#include "Canvas/CanvasParameters.h"
+#include "./Canvas/CanvasParameters.h"
 
 
 namespace Syn

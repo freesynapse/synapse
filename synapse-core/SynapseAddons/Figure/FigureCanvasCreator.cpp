@@ -1,9 +1,9 @@
 
 #include "FigureBase.h"
-#include "Canvas/Canvas2D.h"
-#include "Canvas/ScatterPlot2D.h"
-#include "Canvas/LinePlot2D.h"
-#include "Canvas/Histogram2D.h"
+#include "./Canvas/Canvas2D.h"
+#include "./Canvas/ScatterPlot2D.h"
+#include "./Canvas/LinePlot2D.h"
+#include "./Canvas/Histogram2D.h"
 
 
 namespace Syn

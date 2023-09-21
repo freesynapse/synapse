@@ -1,7 +1,7 @@
 
 #include "FigureParameters.h"
 
-#include "Canvas/CanvasParameters.h"
+#include "./Canvas/CanvasParameters.h"
 
 
 namespace Syn

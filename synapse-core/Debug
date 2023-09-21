@@ -1,0 +1,9 @@
+#ifndef __DEBUG_SYN_CORE
+#define __DEBUG_SYN_CORE
+
+#include "SynapseCore/Debug/Log.hpp"
+#include "SynapseCore/Debug/Error.hpp"
+#include "SynapseCore/Debug/Profiler.hpp"
+
+
+#endif // __DEBUG_SYN_CORE

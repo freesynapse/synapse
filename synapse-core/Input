@@ -1,0 +1,10 @@
+#ifndef __INPUT_SYN_CORE
+#define __INPUT_SYN_CORE
+
+#include "SynapseCore/Input/InputManager.hpp"
+#include "SynapseCore/Input/KeyCodes.hpp"
+
+
+
+
+#endif // __INPUT_SYN_CORE

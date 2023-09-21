@@ -1,10 +1,10 @@
 
-#include <Synapse/Core.hpp>
+#include "../../SynapseCore/Core.hpp"
 
 #include "FigureRenderObj.h"
 #include "FigureUtils.h"
 #include "FigureBase.h"
-#include "Canvas/Canvas2D.h"
+#include "./Canvas/Canvas2D.h"
 
 
 namespace Syn

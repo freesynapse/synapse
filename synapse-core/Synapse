@@ -1,0 +1,77 @@
+#ifndef __SYNAPSE_SYN_CORE
+#define __SYNAPSE_SYN_CORE
+
+#include "pch.hpp"
+
+#include "SynapseCore/Application.hpp"
+#include "SynapseCore/Core.hpp"
+#include "SynapseCore/Types.hpp"
+#include "SynapseCore/Layer.hpp"
+#include "SynapseCore/LayerStack.hpp"
+#include "SynapseCore/Memory.hpp"
+//#include "SynapseCore/SynapseCoreMain.hpp"
+
+#include "SynapseCore/API/Window.hpp"
+#include "SynapseCore/API/OpenGLBindings.hpp"
+
+#include "SynapseCore/Debug/Log.hpp"
+#include "SynapseCore/Debug/Error.hpp"
+#include "SynapseCore/Debug/Profiler.hpp"
+
+#include "SynapseCore/Event/Event.hpp"
+#include "SynapseCore/Event/EventTypes.hpp"
+#include "SynapseCore/Event/EventHandler.hpp"
+
+#include "SynapseCore/ImGui/ImGuiLayer.hpp"
+
+#include "External/FastNoise/FastNoise.h"
+#include "External/imgui/imgui_internal.h"
+
+#include "SynapseCore/Input/InputManager.hpp"
+#include "SynapseCore/Input/KeyCodes.hpp"
+
+#include "SynapseCore/Utils/FileIOHandler.hpp"
+#include "SynapseCore/Utils/Timer/Timer.hpp"
+#include "SynapseCore/Utils/Timer/TimeStep.hpp"
+#include "SynapseCore/Utils/Thread/ThreadPool.hpp"
+#include "SynapseCore/Utils/Noise/Noise.hpp"
+#include "SynapseCore/Utils/Noise/NoiseGenerator.hpp"
+#include "SynapseCore/Utils//Random/Random.hpp"
+#include "SynapseCore/Utils/Bits.hpp"
+#include "SynapseCore/Utils/MathUtils.hpp"
+
+//#include "SynapseCore/Types/Linspace.hpp"
+//#include "SynapseCore/Types/Meshgrid.hpp"
+//#include "SynapseCore/Types/Function3D.hpp"
+
+#include "SynapseCore/Renderer/Renderer.hpp"
+#include "SynapseCore/Renderer/RenderCommandQueue.hpp"
+#include "SynapseCore/Renderer/Renderer2D.hpp"
+#include "SynapseCore/Renderer/Transform.hpp"
+#include "SynapseCore/Renderer/MeshCreator.hpp"
+
+#include "SynapseCore/Renderer/Buffers/VertexArray.hpp"
+#include "SynapseCore/Renderer/Buffers/VertexBuffer.hpp"
+#include "SynapseCore/Renderer/Buffers/IndexBuffer.hpp"
+#include "SynapseCore/Renderer/Buffers/Framebuffer.hpp"
+
+#include "SynapseCore/Renderer/Mesh/MeshDebug.hpp"
+#include "SynapseCore/Renderer/Mesh/MeshAssimp.hpp"
+#include "SynapseCore/Renderer/Mesh/MeshShape.hpp"
+
+#include "SynapseCore/Renderer/Camera/OrthographicCamera.hpp"
+#include "SynapseCore/Renderer/Camera/PerspectiveCamera.hpp"
+#include "SynapseCore/Renderer/Camera/OrbitCamera.hpp"
+
+#include "SynapseCore/Renderer/Chunk/ChunkManager.hpp"
+
+#include "SynapseCore/Renderer/Font/Font.hpp"
+
+#include "SynapseCore/Renderer/Shader/Shader.hpp"
+#include "SynapseCore/Renderer/Shader/ShaderLibrary.hpp"
+
+#include "SynapseCore/Renderer/Material/Texture2D.hpp"
+#include "SynapseCore/Renderer/Material/Texture2DNoise.hpp"
+
+
+#endif // __SYNAPSE_SYN_CORE

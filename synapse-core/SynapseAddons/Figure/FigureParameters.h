@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "imgui/imgui_internal.h"
-#include "Synapse/Memory/MemoryTypes.hpp"
+#include "../../External/imgui/imgui_internal.h"
+#include "../../SynapseCore/Memory/MemoryTypes.hpp"
 
 #include "FigureUtils.h"
 

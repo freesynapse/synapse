@@ -51,40 +51,42 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- static library inclusions
 IncludeDirs = {}
-IncludeDirs["glad"] = "%{wks.location}/../libraries/glad/include"
-IncludeDirs["GLFW"] = "%{wks.location}/../libraries/GLFW/include"
-IncludeDirs["assimp"] = "%{wks.location}/../libraries/assimp/include"
-IncludeDirs["freetype2"] = "%{wks.location}/../libraries/freetype2/include"
-IncludeDirs["libpng"] = "%{wks.location}/../libraries/libpng/include"
-IncludeDirs["muparser"] = "%{wks.location}/../libraries/muparser/include"
+--IncludeDirs["glad"] = "%{wks.location}/../libraries/glad/include"
+--IncludeDirs["GLFW"] = "%{wks.location}/../libraries/GLFW/include"
+--IncludeDirs["assimp"] = "%{wks.location}/../libraries/assimp/include"
+-- IncludeDirs["freetype2"] = "%{wks.location}/../libraries/freetype2/include"
+--IncludeDirs["libpng"] = "%{wks.location}/../libraries/libpng/include"
+--IncludeDirs["muparser"] = "%{wks.location}/../libraries/muparser/include"
 -- header inclusions
 IncludeDirs["headers"] = "%{wks.location}/../include"
+IncludeDirs["freetype2"] = "/usr/include/freetype2"
+IncludeDirs["libpng"] = "/usr/include/libpng16"
 -- synapse!
 IncludeDirs["synapse"] = "%{wks.location}/../synapse-core"
 -- ugly hack to keep everything within the project, removes squigglies from PyWrapper.hpp|.cpp
-IncludeDirs["python"] = "/usr/include/python3.8/"
-IncludeDirs["cpython"] = "/usr/include/python3.8/cpython/"
-IncludeDirs["numpy"] = "/usr/local/lib/python3.8/dist-packages/numpy/core/include"
+--IncludeDirs["python"] = "/usr/include/python3.8/"
+--IncludeDirs["cpython"] = "/usr/include/python3.8/cpython/"
+--IncludeDirs["numpy"] = "/usr/local/lib/python3.8/dist-packages/numpy/core/include"
 
 
 -- static libraries for linking
 LibDirs = {}
-LibDirs["glad"] = "%{wks.location}/../libraries/glad/lib"
-LibDirs["GLFW"] = "%{wks.location}/../libraries/GLFW/lib"
-LibDirs["assimp"] = "%{wks.location}/../libraries/assimp/lib"
-LibDirs["freetype2"] = "%{wks.location}/../libraries/freetype2/lib"
-LibDirs["libpng"] = "%{wks.location}/../libraries/libpng/lib"
-LibDirs["muparser"] = "%{wks.location}/../libraries/muparser/lib"
+--LibDirs["glad"] = "%{wks.location}/../libraries/glad/lib"
+--LibDirs["GLFW"] = "%{wks.location}/../libraries/GLFW/lib"
+--LibDirs["assimp"] = "%{wks.location}/../libraries/assimp/lib"
+LibDirs["freetype2"] = "/usr/lib/freetype2"
+LibDirs["libpng"] = "/usr/lib/libpng"
+--LibDirs["muparser"] = "%{wks.location}/../libraries/muparser/lib"
 -- synapse!
 LibDirs["synapse"] = "%{wks.location}/build/bin/Release-linux-x86_64/synapse-core"
 -- same as above
-LibDirs["python"] = "%{wks.location}/../libraries/python3.8/config-3.8-x86_64-linux-gnu/"
+--LibDirs["python"] = "%{wks.location}/../libraries/python3.8/config-3.8-x86_64-linux-gnu/"
 
 
 -- projects included in this workspace -- inheriting globals from this file
 include "synapse-core"
 --include "projects/imgui-1.88-test"
-include "projects/mpl_test_v0.2"
+--include "projects/mpl_test_v0.2"
 --include "projects/imgui-1.88-tabs"
 --include "projects/pan-and-zoom"
 

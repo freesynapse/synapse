@@ -1,0 +1,8 @@
+#ifndef __API_SYN_CORE
+#define __API_SYN_CORE
+
+#include "SynapseCore/API/Window.hpp"
+#include "SynapseCore/API/OpenGLBindings.hpp"
+
+
+#endif // __API_SYN_CORE

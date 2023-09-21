@@ -2,8 +2,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <Synapse/Renderer/Buffers/VertexArray.hpp>
-#include <Synapse/Memory/MemoryTypes.hpp>
+#include "../../../SynapseCore/Renderer/Buffers/VertexArray.hpp"
+#include "../../../SynapseCore/Memory/MemoryTypes.hpp"
 #include "../FigureBase.h"
 
 

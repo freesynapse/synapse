@@ -6,9 +6,9 @@
 
 #include <glm/glm.hpp>
 
-#include "stb_image/stb_image_write.h"
+#include "../../External/stb_image/stb_image_write.h"
 
-#include "Synapse/Core.hpp"
+#include "../../SynapseCore/Core.hpp"
 
 
 namespace Syn

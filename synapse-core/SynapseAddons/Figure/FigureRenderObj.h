@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include <Synapse/API/OpenGLBindings.hpp>
-#include <Synapse/Renderer/Buffers/Framebuffer.hpp>
-#include <Synapse/Renderer/Buffers/VertexArray.hpp>
-#include <Synapse/Renderer/Buffers/VertexBuffer.hpp>
-#include <Synapse/Renderer/Shader/Shader.hpp>
-#include <Synapse/Renderer/Shader/ShaderLibrary.hpp>
+#include "../../SynapseCore/API/OpenGLBindings.hpp"
+#include "../../SynapseCore/Renderer/Buffers/Framebuffer.hpp"
+#include "../../SynapseCore/Renderer/Buffers/VertexArray.hpp"
+#include "../../SynapseCore/Renderer/Buffers/VertexBuffer.hpp"
+#include "../../SynapseCore/Renderer/Shader/Shader.hpp"
+#include "../../SynapseCore/Renderer/Shader/ShaderLibrary.hpp"
 
-#include <Synapse/Utils/Random/Random.hpp>
+#include "../../SynapseCore/Utils/Random/Random.hpp"
 
 #include "FigureParameters.h"
 

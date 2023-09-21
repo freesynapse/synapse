@@ -20,19 +20,32 @@ project "synapse-core"
 
     files
     {
-        "Synapse.hpp",
+        "Synapse",
+        "Renderer",
+        "Utils",
+        "API",
+        "Input",
+        "Event",
+        "Debug",
 
-        "Synapse/**.c",
-        "Synapse/**.cpp",
-        "Synapse/**.h",
-        "Synapse/**.hpp",
+        "SynapseCore/**.c",
+        "SynapseCore/**.cpp",
+        "SynapseCore/**.h",
+        "SynapseCore/**.hpp",
 
         "SynapseAddons/**.c",
         "SynapseAddons/**.cpp",
         "SynapseAddons/**.h",
         "SynapseAddons/**.hpp",
 
-        "%{IncludeDirs.headers}/imgui/*.cpp",
+        -- "%{IncludeDirs.headers}/imgui/*.cpp",
+
+        "External/**.c",
+        "External/**.cpp",
+        "External/**.h",
+        "External/**.hpp",
+
+        "/usr/include/glad/glad.cpp",
     }
 
     defines
@@ -48,34 +61,36 @@ project "synapse-core"
                 -- of #include "./file.h" or #include "../../file.h".
         
         -- static library inclusions
-        "%{IncludeDirs.GLFW}",
-        "%{IncludeDirs.glad}",
-        "%{IncludeDirs.assimp}",
-        "%{IncludeDirs.freetype2}",
-        "%{IncludeDirs.exprtk}",
-        "%{IncludeDirs.muparser}",
+        -- "%{IncludeDirs.GLFW}",
+        -- "%{IncludeDirs.glad}",
+        -- "%{IncludeDirs.assimp}",
+        -- "%{IncludeDirs.freetype2}",
+        -- "%{IncludeDirs.exprtk}",
+        -- "%{IncludeDirs.muparser}",
 
         -- header-only inclusions
         "%{IncludeDirs.headers}",
+    	"%{IncludeDirs.freetype2}",
+	    "%{IncludeDirs.libpng}",
 
         -- embedding python (in SynapseAddons)
-        "%{IncludeDirs.python}",
-        "%{IncludeDirs.cpython}",
-        "%{IncludeDirs.numpy}",
+        -- "%{IncludeDirs.python}",
+        -- "%{IncludeDirs.cpython}",
+        -- "%{IncludeDirs.numpy}",
     }
 
     libdirs
     {
-        "%{LibDirs.GLFW}",
-        "%{LibDirs.glad}",
-        "%{LibDirs.assimp}",
+        -- "%{LibDirs.GLFW}",
+        -- "%{LibDirs.glad}",
+        -- "%{LibDirs.assimp}",
         "%{LibDirs.freetype2}",
         "%{LibDirs.libpng}",
-        "%{LibDirs.exprtk}",
-        "%{LibDirs.muparser}",
+        -- "%{LibDirs.exprtk}",
+        -- "%{LibDirs.muparser}",
         
         -- embedding python (in SynapseAddons)
-        "%{LibDirs.python}",
+        -- "%{LibDirs.python}",
     }
 
     links
@@ -90,9 +105,9 @@ project "synapse-core"
         "pthread",      -- for lots of stuff
         "dl",           -- dep of glfw
         "X11",          -- dep of glfw (Linux only)
-        "exprtk",
-        "omp",          -- OpenMP
-        "python3.8",    -- embedding python (in SynapseAddons)
+        -- "exprtk",
+        -- "omp",          -- OpenMP
+        -- "python3.8",    -- embedding python (in SynapseAddons)
     }
     
 

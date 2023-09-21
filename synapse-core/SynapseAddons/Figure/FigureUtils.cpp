@@ -1,7 +1,7 @@
 
 #include "FigureUtils.h"
 
-#include <Synapse/Core.hpp>
+#include "../../SynapseCore/Core.hpp"
 #include "FigureParameters.h"
 #include "FigureRenderObj.h"
 

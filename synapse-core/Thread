@@ -1,0 +1,8 @@
+#ifndef __THREAD_SYN_CORE
+#define __THREAD_SYN_CORE
+
+#include "SynapseCore/Utils/Thread/ThreadProgress.hpp"
+#include "SynapseCore/Utils/Thread/ThreadPool.hpp"
+
+
+#endif // __THREAD_SYN_CORE

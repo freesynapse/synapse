@@ -1,0 +1,14 @@
+#ifndef __CORE_SYN_CORE
+#define __CORE_SYN_CORE
+
+#include "SynapseCore/Application.hpp"
+#include "SynapseCore/Core.hpp"
+#include "SynapseCore/Types.hpp"
+#include "SynapseCore/Layer.hpp"
+#include "SynapseCore/LayerStack.hpp"
+#include "SynapseCore/Memory.hpp"
+
+
+
+#endif // __CORE_SYN_CORE
+

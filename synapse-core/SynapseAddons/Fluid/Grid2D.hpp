@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <string>
 #include <glm/glm.hpp>
 
-#include "Synapse/Renderer/Mesh/MeshShape.hpp"
+#include "../../SynapseCore/Renderer/Mesh/MeshShape.hpp"
 
 using namespace Syn;
 

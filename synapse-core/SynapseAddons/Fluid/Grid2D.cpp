@@ -1,8 +1,8 @@
 
 #include "pch.hpp"
 
-#include "SynapseAddons/Fluid/Grid2D.hpp"
-#include "Synapse/API/OpenGLBindings.hpp"
+#include "Grid2D.hpp"
+#include "../../SynapseCore/API/OpenGLBindings.hpp"
 
 
 namespace Syn {
