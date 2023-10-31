@@ -22,7 +22,10 @@ namespace Syn {
 
 		void setData(void* _data, size_t _size);
 
-		inline const std::string& getAssetPath() const { return m_assetPath; }
+		__always_inline const std::string& getAssetPath() const { return m_assetPath; }
+		__always_inline const ColorFormat &getColorFmt() const { return m_fmt; }
+		__always_inline const uint32_t getChannelCount() const { return getPixelFmtChannels(m_fmt); }
+		
 
 	private:
 		std::string m_assetPath = "";

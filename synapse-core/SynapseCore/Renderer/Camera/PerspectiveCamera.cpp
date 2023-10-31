@@ -24,6 +24,9 @@ namespace Syn {
 		m_zNear = _z_near;
 		m_zFar = _z_far;
 
+		m_moveSpeed   = 15.0f;
+		m_zoomSpeed   = 5.0f;
+
 		m_prevMousePosition = { 0.0f, 0.0f };
 
 		m_projectionMatrix = glm::perspectiveFov(glm::radians(m_fov), 

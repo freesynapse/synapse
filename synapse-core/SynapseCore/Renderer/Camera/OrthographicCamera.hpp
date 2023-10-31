@@ -44,6 +44,10 @@ namespace Syn {
 		inline float getTheta() const { return m_theta; }
 		inline void setZoomLevel(float _zoom_level) { m_zoomLevel = _zoom_level; }
 		inline float getZoomLevel() { return m_zoomLevel; }
+		inline void setZoomLimit(float _zoom_limit) { m_zoomLimit = _zoom_limit; }
+		inline float getZoomLimit() { return m_zoomLimit; }
+		inline void setZoomAmplifier(float _zoom_amp) { m_zoomAmplifier = _zoom_amp; }
+		inline float getZoomAmplifier() { return m_zoomAmplifier; }
 
 		inline const OrthographicCameraBounds& getBounds() const { return m_bounds; }
 
@@ -52,10 +56,11 @@ namespace Syn {
 
 		float m_theta = 0.0f;
 		float m_zoomLevel = 1.0f;
+		float m_zoomLimit = 0.05f;
+		float m_zoomAmplifier = 1.0f;
 
 		OrthographicCameraBounds m_bounds;
 
-		const float m_cameraMoveSpeed = 6.0f;
 		const float m_cameraRotationSpeed = 180.0f;
 
 	};

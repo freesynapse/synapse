@@ -21,6 +21,9 @@ namespace Syn {
 		m_aspectRatio = _aspect_ratio;
 		m_zoomLevel = _zoom_level;
 
+		m_zoomSpeed = 0.25f;
+		m_moveSpeed = 6.0f;
+
 		m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
 
 		// uses aspect ratio and zoom level
@@ -125,28 +128,29 @@ namespace Syn {
 			
 		glm::vec3 prevPos = m_position;
 		float prevTheta = m_theta;
+		float adj_speed = m_moveSpeed * _dt * m_zoomLevel;
 
 		// update position
 		if (InputManager::is_key_pressed(SYN_KEY_D))
 		{
-			m_position.x += cos(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
-			m_position.y += sin(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
+			m_position.x += cos(glm::radians(m_theta)) * adj_speed;
+			m_position.y += sin(glm::radians(m_theta)) * adj_speed;
 		}
 		else if (InputManager::is_key_pressed(SYN_KEY_A))
 		{
-			m_position.x -= cos(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
-			m_position.y -= sin(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
+			m_position.x -= cos(glm::radians(m_theta)) * adj_speed;
+			m_position.y -= sin(glm::radians(m_theta)) * adj_speed;
 		}
 		
 		if (InputManager::is_key_pressed(SYN_KEY_W))
 		{
-			m_position.x += -sin(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
-			m_position.y +=  cos(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
+			m_position.x += -sin(glm::radians(m_theta)) * adj_speed;
+			m_position.y +=  cos(glm::radians(m_theta)) * adj_speed;
 		}
 		else if (InputManager::is_key_pressed(SYN_KEY_S))
 		{
-			m_position.x -= -sin(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
-			m_position.y -=  cos(glm::radians(m_theta)) * m_cameraMoveSpeed * _dt;
+			m_position.x -= -sin(glm::radians(m_theta)) * adj_speed;
+			m_position.y -=  cos(glm::radians(m_theta)) * adj_speed;
 		}
 
 		// update rotation
@@ -205,8 +209,13 @@ namespace Syn {
 				//	break;
 
 				//SYN_CORE_TRACE("scrolled: ", dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset());
-				m_zoomLevel -= dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset() * 0.25f;
-				m_zoomLevel = std::max(0.25f, m_zoomLevel);
+
+				if (m_zoomAmplifier > 1.0f || m_zoomAmplifier < 1.0f)
+					m_zoomLevel *= pow(m_zoomAmplifier, dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset());// * m_zoomSpeed);
+				else
+					m_zoomLevel -= dynamic_cast<MouseScrolledEvent*>(_e)->getYOffset() * m_zoomSpeed;
+
+				m_zoomLevel = std::max(m_zoomLimit, m_zoomLevel);
 				m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };				
 				updateProjectionMatrix();
 				break;

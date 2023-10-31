@@ -63,6 +63,11 @@ namespace Syn {
 		virtual inline float getAspectRatio() const { return m_aspectRatio; }
 		virtual inline void setAspectRatio(float _aspect_ratio) { m_aspectRatio = _aspect_ratio; }
 		virtual inline const glm::vec3& getLookAtVector() const { return m_lookAt; }
+		/* Speed variables */
+		inline float getZoomSpeed() const 	 { return m_zoomSpeed; 	 }
+		inline void setZoomSpeed(float _s) 	 { m_zoomSpeed = _s; 	 }
+		inline float getMoveSpeed() const 	 { return m_moveSpeed;   }
+		inline void setMoveSpeed(float _s) 	 { m_moveSpeed = _s; 	 }
 
 	protected:
 		glm::mat4 m_projectionMatrix = glm::mat4(1.0f);
@@ -74,6 +79,9 @@ namespace Syn {
 		float m_aspectRatio = 16.0f / 9.0f;
 		float m_zNear = 0.1f;
 		float m_zFar = 1000.0f;
+
+		float m_moveSpeed   = 15.0f;	// PerspectiveCamera defaults
+		float m_zoomSpeed   = 5.0f;
 
 		glm::vec3 m_lookAt = glm::vec3(0.0f);
 

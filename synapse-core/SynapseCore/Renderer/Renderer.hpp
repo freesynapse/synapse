@@ -60,16 +60,16 @@ namespace Syn
 		// accessors
 		static Renderer& get() { return *s_instance; }
 		static glm::mat4& getViewProjectionMatrix() { return s_viewProjectionMatrix; }
-		static inline glm::ivec2& getViewport() { return s_viewport; }
-		static inline glm::vec2 getViewportF() { return glm::vec2(s_viewport.x, s_viewport.y); }
-		static inline glm::ivec2& getViewportPos() { return s_imGuiViewportPos; }
-		static inline glm::vec2 getViewportPosF() { return glm::vec2(s_imGuiViewportPos.x, s_imGuiViewportPos.y); }
-		static inline glm::ivec2& getImGuiDockingPosition() { return s_imGuiDockPos; }
-		static inline glm::vec2 getImGuiDockingPositionF() { return glm::vec2(s_imGuiDockPos.x, s_imGuiDockPos.y); }
-		static inline glm::ivec2& getImGuiWindowPosition() { return s_imGuiWinPos; }
-		static inline glm::vec2 getImGuiWindowPositionF() { return glm::vec2(s_imGuiWinPos.x, s_imGuiWinPos.y); }
-		static inline glm::ivec2& getImGuiViewPortOffset() { return s_imGuiViewportOffset; }
-		static inline glm::vec2 getImGuiViewPortOffsetF() { return glm::vec2(s_imGuiViewportOffset.x, s_imGuiViewportOffset.y); }
+		static inline const glm::ivec2& getViewport() { return s_viewport; }
+		static inline const glm::vec2 getViewportF() { return glm::vec2(s_viewport.x, s_viewport.y); }
+		static inline const glm::ivec2& getViewportPos() { return s_imGuiViewportPos; }
+		static inline const glm::vec2 getViewportPosF() { return glm::vec2(s_imGuiViewportPos.x, s_imGuiViewportPos.y); }
+		static inline const glm::ivec2& getImGuiDockingPosition() { return s_imGuiDockPos; }
+		static inline const glm::vec2 getImGuiDockingPositionF() { return glm::vec2(s_imGuiDockPos.x, s_imGuiDockPos.y); }
+		static inline const glm::ivec2& getImGuiWindowPosition() { return s_imGuiWinPos; }
+		static inline const glm::vec2 getImGuiWindowPositionF() { return glm::vec2(s_imGuiWinPos.x, s_imGuiWinPos.y); }
+		static inline const glm::ivec2& getImGuiViewPortOffset() { return s_imGuiViewportOffset; }
+		static inline const glm::vec2 getImGuiViewPortOffsetF() { return glm::vec2(s_imGuiViewportOffset.x, s_imGuiViewportOffset.y); }
 		static inline float getAspectRatio() { return static_cast<float>(s_viewport.x) / static_cast<float>(s_viewport.y); }
 		static const std::string& getImGuiRenderTargetName() { return s_imGuiRendererName; }
 		static void setImGuiRenderTargetName(const std::string& _name) { s_imGuiRendererName = _name; }

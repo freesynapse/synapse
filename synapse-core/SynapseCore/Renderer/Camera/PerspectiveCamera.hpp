@@ -28,14 +28,6 @@ namespace Syn {
 		inline void setXAngle(float _x) 	 { m_xAngle = _x;   	 }
 		inline float getYAngle() const  	 { return m_yAngle; 	 }
 		inline void setYAngle(float _y) 	 { m_yAngle = _y;   	 }
-		/* default = 5.0f */
-		inline float getZoomSpeed() const 	 { return m_zoomSpeed; 	 }
-		/* default = 5.0f */
-		inline void setZoomSpeed(float _s) 	 { m_zoomSpeed = _s; 	 }
-		/* default = 15.0f */
-		inline float getMoveSpeed() const 	 { return m_moveSpeed;   }
-		/* default = 15.0f */
-		inline void setMoveSpeed(float _s) 	 { m_moveSpeed = _s; 	 }
 		/* default = 0.05f */
 		inline float getLookAtSpeed() const  { return m_lookatSpeed; }
 		/* default = 0.05f */
@@ -56,8 +48,6 @@ namespace Syn {
 		glm::vec2 m_prevMousePosition = { 0.0f, 0.0f };
 		glm::vec2 m_delta 			  = { 0.0f, 0.0f };
 
-		float m_moveSpeed   = 15.0f;
-		float m_zoomSpeed   = 5.0f;
 		float m_lookatSpeed = 0.05f;
 
 		float m_xAngle = 0.0f;

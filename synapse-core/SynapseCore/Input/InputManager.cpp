@@ -19,7 +19,6 @@ namespace Syn
 	glm::vec2 InputManager::m_mousePosition;
 	glm::vec2 InputManager::m_mouseScrollPos;
 
-
 	//-----------------------------------------------------------------------------------
 	void InputManager::init()
 	{
@@ -31,7 +30,6 @@ namespace Syn
 
 		SYN_CORE_TRACE("listening.");
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void InputManager::process_input()
@@ -46,7 +44,6 @@ namespace Syn
 			EventHandler::push_event(new WindowToggleFullscreenEvent());
 		*/
 	}
-
 	
 	//-----------------------------------------------------------------------------------
 	bool InputManager::is_key_pressed(unsigned int _key)
@@ -56,7 +53,6 @@ namespace Syn
 		return m_bKeys[_key];
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	bool InputManager::is_button_pressed(unsigned int _button)
 	{
@@ -65,13 +61,11 @@ namespace Syn
 		return m_bMouseButtons[_button];
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	const glm::vec2& InputManager::get_mouse_position()
 	{
 		return m_mousePosition;
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	const glm::vec2& InputManager::get_mouse_scroll_position()
@@ -79,11 +73,10 @@ namespace Syn
 		return m_mouseScrollPos;
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	void InputManager::key_callback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods)
 	{
-		m_bKeys[_key] = _action != GLFW_RELEASE;
+		m_bKeys[_key] = _action != SYN_KEY_RELEASED;
 		
 		EventHandler::push_event(new KeyDownEvent(_key, _action));
 
@@ -92,11 +85,10 @@ namespace Syn
 		#endif
 	}
 	
-
 	//-----------------------------------------------------------------------------------
 	void InputManager::mouse_button_callback(GLFWwindow* _window, int _button, int _action, int _mods)
 	{
-		m_bMouseButtons[_button] = _action != GLFW_RELEASE;
+		m_bMouseButtons[_button] = _action != SYN_MOUSE_RELEASED;
 
 		EventHandler::push_event(new MouseButtonEvent(_button, _action, _mods));
 
@@ -104,7 +96,6 @@ namespace Syn
 			SYN_CORE_TRACE("button: ", _button, "  action: ", _action);
 		#endif
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void InputManager::mouse_scroll_callback(GLFWwindow* _window, double _offset_x, double _offset_y)
@@ -119,7 +110,6 @@ namespace Syn
 		#endif
 	}
 	
-	
 	//-----------------------------------------------------------------------------------
 	void InputManager::cursor_position_callback(GLFWwindow* _window, double _x, double _y)
 	{
@@ -131,6 +121,5 @@ namespace Syn
 		#endif
 
 	}
-
 
 }

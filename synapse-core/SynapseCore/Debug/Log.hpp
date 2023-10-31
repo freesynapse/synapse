@@ -8,6 +8,9 @@
 #include "../Utils/FileIOHandler.hpp"
 #include "../../External/imgui/imgui.h"
 
+#define SYN_DEBUG_VECTOR(id, vec) Syn::Log::debug_vector(__func__, id, vec)
+#define SYN_DEBUG_MATRIX(id, mat) Syn::Log::debug_matrix(__func__, id, mat)
+
 
 namespace Syn { 
 
@@ -250,7 +253,18 @@ namespace Syn {
 
 		// warning / error counters
 		static uint32_t s_errorCount;
-		static uint32_t s_warningCount;		
+		static uint32_t s_warningCount;
+
+		// debug buffers
+		static char s_debug_buffer[1024];
+		static char s_debug_func_buffer[512];
+
+		//
+		static __attribute__((always_inline)) void fmt_debug_func(const char *_func)
+		{
+			memset(s_debug_func_buffer, 0, 512);
+			std::sprintf(s_debug_func_buffer, "%s: %s", "DEBUG", _func);
+		}
 
 		// helper function for matrix and vector debug
 		static inline const char* ff(float _f) { return (_f < 0.0f ? "-" : " "); }

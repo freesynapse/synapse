@@ -164,12 +164,19 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	Shader::~Shader()
 	{
-		if (m_shaderID)
-		{
-			SYN_RENDER_S0({
-				glDeleteProgram(self->m_shaderID);
-			});
-		}
+		/* TODO: 
+		 * Deleting av shader server-side leder till seg.fault. Sannolikt beroende på att
+		 * lokal (i Application instance i appens 'main') shader, som är en Ref<Shader>
+		 * tas bort (vid delete app i SynapseMain.hpp) (borde decrement ref.count, men 
+		 * kanske), gdb trace av core dump visar att seg.fault inträffar vid deallokering
+		 * av std::map (som sannolikt är den i ShaderLibrary-klassen).
+		 */
+	// 	if (m_shaderID)
+	// 	{
+	// 		// SYN_RENDER_1(m_shaderID, {
+	// 			glDeleteProgram(m_shaderID);
+	// 		// });
+	// 	}
 	}
 
 	//-----------------------------------------------------------------------------------

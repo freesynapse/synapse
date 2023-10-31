@@ -91,7 +91,7 @@ namespace Syn {
 
 		while (m_bRunning)
 		{
-			Timer t0("", false);	// frame time counter
+			Timer t0;	// frame time counter
 
 			TimeStep::update();
 			EventHandler::process_events();
@@ -119,7 +119,7 @@ namespace Syn {
 			
 			// execute the render command queue
 			{
-				Timer t1("", false);
+				Timer t1;
 				Renderer::get().executeRenderCommands();
 				m_renderTime = t1.getDeltaTimeMs();
 			}

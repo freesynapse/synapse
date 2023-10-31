@@ -7,11 +7,9 @@
 
 namespace Syn {
 
-
 	// static declarations
 	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::s_shaders;
 	
-
 	//-----------------------------------------------------------------------------------
 	// TODO: implement when need arises
 	void ShaderLibrary::initFromFileList(const std::string& _shader_file_list)
@@ -23,14 +21,12 @@ namespace Syn {
 		}
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	std::string ShaderLibrary::add(const Ref<Shader>& _shader)
 	{
 		std::string name = _shader->getName();
 		return add(name, _shader);
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	std::string ShaderLibrary::add(const std::string& _name, const Ref<Shader>& _shader)
@@ -49,7 +45,6 @@ namespace Syn {
 		return _name;
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	const Ref<Shader>& ShaderLibrary::load(const std::string& _file_path)
 	{
@@ -58,7 +53,6 @@ namespace Syn {
 		return s_shaders[name];
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	const Ref<Shader>& ShaderLibrary::load(const std::string& _name, const std::string& _file_path)
 	{
@@ -66,7 +60,6 @@ namespace Syn {
 		add(_name, shader);
 		return s_shaders[_name];
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void ShaderLibrary::reload(const std::string& _name)
@@ -78,7 +71,6 @@ namespace Syn {
 		Renderer::get().executeRenderCommands();
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	void ShaderLibrary::reload(const Ref<Shader>& _shader)
 	{
@@ -89,13 +81,11 @@ namespace Syn {
 		Renderer::get().executeRenderCommands();
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	bool ShaderLibrary::exists(const std::string& _name)
 	{
 		return s_shaders.find(_name) != s_shaders.end();
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	Ref<Shader> ShaderLibrary::createDefaultShader()
@@ -132,7 +122,6 @@ namespace Syn {
 
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	const void ShaderLibrary::debugListShaders()
 	{
@@ -142,6 +131,5 @@ namespace Syn {
 			SYN_CORE_TRACE("name: ", it.first, " -- ", it.second);
 		}
 	}
-
 
 }

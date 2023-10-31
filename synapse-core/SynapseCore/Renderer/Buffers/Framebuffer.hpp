@@ -10,6 +10,7 @@
 
 namespace Syn
 {
+
 	class FramebufferBase
 	{
 	public:
@@ -92,7 +93,6 @@ namespace Syn
 
 	//-----------------------------------------------------------------------------------
 	/* Main instantiation of base class. */
-
 	class Framebuffer : public FramebufferBase
 	{
 	public:
@@ -110,14 +110,14 @@ namespace Syn
 			m_colorAttachmentID = new GLuint[m_colorAttachmentCount];
 			m_hasDepthAttachment = _use_depthbuffer;
 
+			m_name = (_name.compare("") != 0) ? _name : "unknown";
+
 			// create the framebuffer
 			init(_size);
 
 			// register function for handling resize events
 			if (_update_on_resize)
 				EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
-
-			m_name = (_name.compare("") != 0) ? _name : "unknown";
 
 		}
 

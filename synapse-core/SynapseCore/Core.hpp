@@ -82,7 +82,7 @@ static constexpr int RETURN_FAILURE = -1;
 #define DEBUG_PYTHON_EMBEDDING
 
 // threading
-#define DEBUG_THREADPOOL
+//#define DEBUG_THREADPOOL
 
 // profiling of engine performance
 //#define DEBUG_PROFILING
@@ -119,7 +119,6 @@ static constexpr int RETURN_FAILURE = -1;
 
 // OpenGL API
 #define DEBUG_OPENGL_API
-
 
 #ifdef DEBUG_ONE_FRAME
 	#define DEBUG_MEMORY_TOTAL

@@ -66,7 +66,7 @@ namespace Syn
             return s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo;
         }
         //
-        static glm::vec2 rand2_f_r2(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
+        static glm::vec2 rand2_f_r(float _lo=0.0f, float _hi=std::numeric_limits<float>::max())
         {
             return glm::vec2(s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo,
                              s_realDistribution(s_randomEngine) / (std::numeric_limits<float>::max() / (_hi-_lo)) + _lo);

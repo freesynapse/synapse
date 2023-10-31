@@ -40,14 +40,14 @@ int main(int argc, char* argv[])
     SYN_CORE_TRACE("logging enabled.");
 
     // total memory tracking
-#ifdef DEBUG_MEMORY_TOTAL
-    Syn::ProcessInfo::init();
-#endif
+    #ifdef DEBUG_MEMORY_TOTAL
+        Syn::ProcessInfo::init();
+    #endif
 
-    // init profiling
-#ifdef DEBUG_PROFILING
-    Syn::Profiler::get().beginSession("SYN_PROFILE");
-#endif
+        // init profiling
+    #ifdef DEBUG_PROFILING
+        Syn::Profiler::get().beginSession("SYN_PROFILE");
+    #endif
 
     // output log to ImGui
     //#ifndef DEBUG_IMGUI_LOG
@@ -56,17 +56,15 @@ int main(int argc, char* argv[])
     //	Syn::Log::use_stdout(false);
     //#endif
     Syn::Log::use_stdout(true);
-
-
-	
-#ifndef DEBUG_IMGUI_LOG
-    // position debug console
-    //
-    //HWND console = GetConsoleWindow();
-    //RECT r;
-    //GetWindowRect(console, &r);
-    //MoveWindow(console, 0, 0, 1440, 960, TRUE);
-#endif
+        
+    #ifndef DEBUG_IMGUI_LOG
+        // position debug console
+        //
+        //HWND console = GetConsoleWindow();
+        //RECT r;
+        //GetWindowRect(console, &r);
+        //MoveWindow(console, 0, 0, 1440, 960, TRUE);
+    #endif
 
     // register stacktracing for segmentation faults
     Syn::Stacktracer::register_signal_handler();
@@ -80,15 +78,15 @@ int main(int argc, char* argv[])
     // create worker threads
     Syn::ThreadPool::get().init();
 
-#ifdef ENABLE_ADDONS_VOXEL
-    // init voxel noise
-    Syn::VxNoise::init();
-#endif
+    #ifdef ENABLE_ADDONS_VOXEL
+        // init voxel noise
+        Syn::VxNoise::init();
+    #endif
 
-#ifdef ENABLE_ADDONS_PY_EMBEDDING
-    Syn::PyWrapper::init();
-#endif
-		
+    #ifdef ENABLE_ADDONS_PY_EMBEDDING
+        Syn::PyWrapper::init();
+    #endif
+            
 
     // start the application
     //
@@ -106,23 +104,20 @@ int main(int argc, char* argv[])
 	
 
     // shutdown core modules
-    //
-
     Syn::EventHandler::shutdown();
     Syn::FileIOHandler::shutdown();
     Syn::ThreadPool::get().shutdown();
 
-#ifdef ENABLE_ADDONS_PY_EMBEDDING
-    Syn::PyWrapper::shutdown();
-#endif
-	
-#ifdef DEBUG_PROFILING
-    Syn::Profiler::get().endSession();
-#endif
+    #ifdef ENABLE_ADDONS_PY_EMBEDDING
+        Syn::PyWrapper::shutdown();
+    #endif
+        
+    #ifdef DEBUG_PROFILING
+        Syn::Profiler::get().endSession();
+    #endif
 
     SYN_CORE_TRACE("closing log.");
     Syn::Log::close();
-
 
     return EXIT_SUCCESS;
 

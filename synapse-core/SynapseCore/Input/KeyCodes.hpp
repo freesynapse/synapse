@@ -8,9 +8,9 @@
 #define SYN_KEY_SPACE              32
 #define SYN_KEY_APOSTROPHE         39  /* ' */
 #define SYN_KEY_COMMA              44  /* , */
-#define SYN_KEY_MINUS              45  /* - */
+#define SYN_KEY_PLUS               45  /* + */
 #define SYN_KEY_PERIOD             46  /* . */
-#define SYN_KEY_SLASH              47  /* / */
+#define SYN_KEY_MINUS              47  /* - */
 #define SYN_KEY_0                  48
 #define SYN_KEY_1                  49
 #define SYN_KEY_2                  50
@@ -130,6 +130,9 @@
 
 #define SYN_KEY_LAST               SYN_KEY_MENU
 
+#define SYN_KEY_PRESSED            GLFW_PRESS
+#define SYN_KEY_RELEASED           GLFW_RELEASE
+
 
 // Mouse buttons
 
@@ -145,5 +148,8 @@
 #define SYN_MOUSE_BUTTON_LEFT      SYN_MOUSE_BUTTON_1
 #define SYN_MOUSE_BUTTON_RIGHT     SYN_MOUSE_BUTTON_2
 #define SYN_MOUSE_BUTTON_MIDDLE    SYN_MOUSE_BUTTON_3
+
+#define SYN_MOUSE_PRESSED   GLFW_PRESS
+#define SYN_MOUSE_RELEASED  GLFW_RELEASE
 
 

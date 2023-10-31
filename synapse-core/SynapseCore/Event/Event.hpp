@@ -68,12 +68,12 @@ namespace Syn {
     class Event
     {
     public:
-	virtual ~Event() {};
-	inline virtual EventType getEventType() const = 0;
-	inline virtual const char* getName() const = 0;
-	inline virtual std::string toString() const { return getName(); }
-	bool m_handled = false;
-	inline virtual const bool& isHandled() const { return m_handled; }
+        virtual ~Event() {};
+        inline virtual EventType getEventType() const = 0;
+        inline virtual const char* getName() const = 0;
+        inline virtual std::string toString() const { return getName(); }
+        bool m_handled = false;
+        inline virtual const bool& isHandled() const { return m_handled; }
     };
 
 
@@ -104,15 +104,13 @@ namespace Syn {
 
     inline std::ostream& operator<<(std::ostream& _os, const Event& _e)
     {
-	return _os << _e.toString();
+    	return _os << _e.toString();
     }
 
     inline std::ostream& operator<<(std::ostream& _os, const EventType& _event_type)
     {
-	return _os << EVENT_TYPE_OSTREAM(_event_type);
+	    return _os << EVENT_TYPE_OSTREAM(_event_type);
     }
-
-
 
 }
 

@@ -146,7 +146,7 @@ namespace Syn
 			}
 			else
 			{
-				SYN_CORE_TRACE("[glad] initialized.");
+				SYN_CORE_TRACE("GLAD initialized.");
 				SYN_CORE_TRACE("OpenGL vendor: ", glGetString(GL_VENDOR));
 				SYN_CORE_TRACE("OpenGL renderer: ", glGetString(GL_RENDERER));
 				SYN_CORE_TRACE("OpenGL version: ", glGetString(GL_VERSION));
@@ -196,7 +196,7 @@ namespace Syn
 	//-----------------------------------------------------------------------------------
 	void Window::centerCursor()
 	{
-		glm::vec2 half_vp = glm::vec2(Renderer::getViewportF() * 0.5f);
+		glm::vec2 half_vp = Renderer::getViewportF() * 0.5f;
 		glfwSetCursorPos(m_window, floor(half_vp.x), floor(half_vp.y));
 	}
 
@@ -231,7 +231,8 @@ namespace Syn
 				if (m_visibleCursor)
 					glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				else
-					glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+					// glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+					glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				break;
 			}
 

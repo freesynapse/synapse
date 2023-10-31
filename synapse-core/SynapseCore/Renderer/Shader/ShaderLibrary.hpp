@@ -6,8 +6,8 @@
 #include "../Renderer.hpp"
 
 
-namespace Syn {
-
+namespace Syn
+{
 
 	class ShaderLibrary
 	{
@@ -50,7 +50,6 @@ namespace Syn {
 	private:
 		static bool exists(const std::string& _name);
 		static Ref<Shader> createDefaultShader();
-
 
 	private:
 		static std::unordered_map<std::string, Ref<Shader>> s_shaders;

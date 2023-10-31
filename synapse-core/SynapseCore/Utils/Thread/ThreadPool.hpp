@@ -56,7 +56,7 @@ namespace Syn
                     }
                 }
                 #ifdef DEBUG_THREADPOOL
-                    //SYN_CORE_TRACE("thread ", m_id, " shutting down");
+                    SYN_CORE_TRACE("thread ", m_id, " shutting down");
                 #endif
             }
         };
@@ -104,9 +104,7 @@ namespace Syn
         {
             m_done = true;
             m_conditionalLock.notify_all();
-            #ifdef DEBUG_THREADPOOL
-                SYN_CORE_TRACE("releasing worker threads");
-            #endif
+
             for (size_t i = 0; i < m_threads.size(); i++)
                 if (m_threads[i].joinable())
                     m_threads[i].join();

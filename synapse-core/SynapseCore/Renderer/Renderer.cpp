@@ -42,7 +42,13 @@ namespace Syn {
 
 
 	//-----------------------------------------------------------------------------------
-	static void GLAPIENTRY openGLLogMessage(GLenum _src, GLenum _type, GLuint _id, GLenum _severity, GLsizei _len, const GLchar* _msg, const void* _params)
+	static void GLAPIENTRY openGLLogMessage(GLenum _src, 
+											GLenum _type, 
+											GLuint _id, 
+											GLenum _severity, 
+											GLsizei _len, 
+											const GLchar* _msg, 
+											const void* _params)
 	{
 		if (_severity != GL_DEBUG_SEVERITY_NOTIFICATION)
 		{
