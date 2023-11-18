@@ -801,9 +801,10 @@ namespace Syn {
 				}
 			)";
 
-			FileIOHandler::write_buffer_to_file("./static_debug_normal_shader.glsl", srcNormal);
-			s_normalShader = MakeRef<Shader>("./static_debug_normal_shader.glsl");
-			ShaderLibrary::add(s_normalShader);
+			// FileIOHandler::write_buffer_to_file("./static_debug_normal_shader.glsl", srcNormal);
+			// s_normalShader = MakeRef<Shader>("./static_debug_normal_shader.glsl");
+			s_normalShader = ShaderLibrary::loadFromSrc("static_debug_normal_shader", srcNormal);
+			// ShaderLibrary::add(s_normalShader);
 		}
 		
 		if (s_hasTangentShader)
@@ -863,9 +864,11 @@ namespace Syn {
 				}
 			)";
 
-			FileIOHandler::write_buffer_to_file("./static_debug_tangent_shader.glsl", srcTangent);
-			s_tangentShader = MakeRef<Shader>("./static_debug_tangent_shader.glsl");
-			ShaderLibrary::add(s_tangentShader);
+			// FileIOHandler::write_buffer_to_file("./static_debug_tangent_shader.glsl", srcTangent);
+			// s_tangentShader = MakeRef<Shader>("./static_debug_tangent_shader.glsl");
+			// ShaderLibrary::add(s_tangentShader);
+			s_tangentShader = ShaderLibrary::loadFromSrc("static_debug_tangent_shader", srcTangent);
+
 		}
 
 		if (s_hasBitangentShader)
@@ -925,9 +928,10 @@ namespace Syn {
 				}
 			)";
 
-			FileIOHandler::write_buffer_to_file("./static_debug_bitangent_shader.glsl", srcBitangent);
-			s_bitangentShader = MakeRef<Shader>("./static_debug_bitangent_shader.glsl");
-			ShaderLibrary::add(s_bitangentShader);
+			// FileIOHandler::write_buffer_to_file("./static_debug_bitangent_shader.glsl", srcBitangent);
+			// s_bitangentShader = MakeRef<Shader>("./static_debug_bitangent_shader.glsl");
+			// ShaderLibrary::add(s_bitangentShader);
+			s_bitangentShader = ShaderLibrary::loadFromSrc("static_debug_bitangent_shader", srcBitangent);
 		}
 
 		Renderer::get().executeRenderCommands();

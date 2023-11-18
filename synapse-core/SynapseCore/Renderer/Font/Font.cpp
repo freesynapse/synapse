@@ -55,9 +55,10 @@ namespace Syn {
 				}
 			)";
 
-			FileIOHandler::write_buffer_to_file("./static_font_shader.glsl", src);
-			m_shader = MakeRef<Shader>("./static_font_shader.glsl");
-			ShaderLibrary::add(m_shader);
+			// FileIOHandler::write_buffer_to_file("./static_font_shader.glsl", src);
+			// m_shader = MakeRef<Shader>("./static_font_shader.glsl");
+			// ShaderLibrary::add(m_shader);
+			m_shader = ShaderLibrary::loadFromSrc("static_font_shader", src);
 		}
 		else	// no: reuse the ones in the entered programID
 		{
