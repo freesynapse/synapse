@@ -81,11 +81,12 @@ namespace Syn {
 		// set depth buffer to read-only
 		//glDepthMask(GL_FALSE);
 		
-		// GL_LINE ans GL_POINT
+		// GL_LINE and GL_POINT
 		glLineWidth(1.0f);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, -1.0f);
 		glEnable(GL_PROGRAM_POINT_SIZE);
+		glEnable(GL_POINT_SPRITE);
 
 		// textures
 		glEnable(GL_TEXTURE_2D);

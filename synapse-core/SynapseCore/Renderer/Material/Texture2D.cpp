@@ -86,6 +86,7 @@ namespace Syn
 		m_height = _height;
 		m_fmt = _color_format;
 		m_pxFmt = getOpenGLPixelFormat(_color_format);
+		// SYN_CORE_TRACE("m_pxFmt: ", m_pxFmt.internalFormat, ", ", m_pxFmt.storageFormat, ", ", m_pxFmt.storageType);
 
 		// set storage, upload and type from format
 		SYN_RENDER_S0({

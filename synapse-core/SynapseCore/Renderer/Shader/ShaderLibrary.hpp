@@ -17,6 +17,7 @@ namespace Syn
 		static std::string add(const std::string& _name, const Ref<Shader>& _shader);
 		static const Ref<Shader>& load(const std::string& _file_path);
 		static const Ref<Shader>& load(const std::string& _name, const std::string& _file_path);
+		static const Ref<Shader>& loadFromSrc(const std::string &_name, const std::string &_src);
 		static void reload(const std::string& _name);
 		static void reload(const Ref<Shader>& _shader);
 

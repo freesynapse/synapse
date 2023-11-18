@@ -150,6 +150,7 @@ namespace Syn {
 		lastDot = (lastDot == std::string::npos ? _shader_file_path.size() : lastDot);
 		m_shaderName = _shader_file_path.substr(lastSlash, (lastDot - lastSlash));
 
+		loadFromFile();
 		reload();
 
 	}
@@ -158,6 +159,7 @@ namespace Syn {
 	Shader::Shader(const std::string& _shader_name, const std::string& _file_path) :
 		m_assetPath(_file_path), m_shaderName(_shader_name)
 	{
+		loadFromFile();
 		reload();
 	}
 
@@ -180,22 +182,40 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
-	void Shader::reload()
+	void Shader::loadFromFile()
 	{
-		// reset setup flag
-		m_loaded = false;
-
-		// read shader from file
-		std::string src;
-		int result = FileIOHandler::read_file_to_buffer(m_assetPath, src);
+		int result = FileIOHandler::read_file_to_buffer(m_assetPath, m_rawSrc);
 		if (result != RETURN_SUCCESS)
 		{
 			SYN_CORE_TRACE("shader not loaded, could not open file '", m_assetPath, "'.");
 			return;
 		}
+	}
+
+	//-----------------------------------------------------------------------------------
+	void Shader::loadFromSource(const std::string &_name, const std::string &_src)
+	{
+		m_shaderName = _name;
+		m_rawSrc = _src;
+		reload();
+		
+	}
+	
+	//-----------------------------------------------------------------------------------
+	void Shader::reload()
+	{
+		// reset setup flag
+		m_loaded = false;
+
+		if (m_rawSrc == "")
+		{
+			SYN_CORE_TRACE("no shader source provided.");
+			return;
+
+		}
 
 		// preprocess, i.e. get vertex and fragment shaders separated
-		m_shaderSrc = preprocess(src);
+		m_shaderSrc = preprocess(m_rawSrc);
 
 		// parse all uniforms for resolving below, threaded
 		std::vector<std::string> uniforms = parseUniforms();
@@ -223,9 +243,9 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
-	/*boost::*/std::unordered_map<GLenum, std::string> Shader::preprocess(const std::string& _source)
+	std::unordered_map<GLenum, std::string> Shader::preprocess(const std::string& _source)
 	{
-		/*boost::*/std::unordered_map<GLenum, std::string> shaderSources;
+		std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
 		size_t lenToken = strlen(typeToken);

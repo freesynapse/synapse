@@ -62,6 +62,15 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
+	const Ref<Shader>& ShaderLibrary::loadFromSrc(const std::string &_name, const std::string &_src)
+	{
+		auto shader = MakeRef<Shader>();
+		shader->loadFromSource(_name, _src);
+		add(_name, shader);
+		return s_shaders[_name];
+	}
+
+	//-----------------------------------------------------------------------------------
 	void ShaderLibrary::reload(const std::string& _name)
 	{
 		SYN_CORE_TRACE("reloading shader '", _name, "'.");
@@ -115,8 +124,9 @@ namespace Syn {
 			}
 		)";
 
-		FileIOHandler::write_buffer_to_file("./static_default_shader.glsl", src);
-		Ref<Shader> shader = MakeRef<Shader>("./static_default_shader.glsl");
+		// FileIOHandler::write_buffer_to_file("./static_default_shader.glsl", src);
+		// Ref<Shader> shader = MakeRef<Shader>("./static_default_shader.glsl");
+		auto shader = loadFromSrc("static_default_shader", src);
 
 		return shader;
 

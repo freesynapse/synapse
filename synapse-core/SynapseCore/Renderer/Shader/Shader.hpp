@@ -2,9 +2,6 @@
 
 
 #include <vector>
-
-//#include <boost/unordered_map.hpp>
-//#include <map>
 #include <string>
 
 #include "../../Core.hpp"
@@ -16,15 +13,21 @@ namespace Syn {
 	class Shader
 	{
 	public:
-		//Shader();
+		friend class ShaderLibrary;
+
+	public:
+		Shader() {}
 		Shader(const std::string& _shader_file_path);
 		Shader(const std::string& _shader_name, const std::string& _file_path);
 		~Shader();
 
 		void reload();
 
+		void loadFromFile();
+		void loadFromSource(const std::string &_name, const std::string &_src);
+
 	protected:
-		/*boost::*/std::unordered_map<GLenum, std::string> preprocess(const std::string& _source);
+		std::unordered_map<GLenum, std::string> preprocess(const std::string& _source);
 		std::vector<std::string> parseUniforms();
 		int compileShader();
 		void resolveUniforms(const std::vector<std::string>& _uniforms);
@@ -46,8 +49,9 @@ namespace Syn {
 	protected:
 		std::string m_shaderName = "";
 		std::string m_assetPath = "";
-		/*boost::*/std::unordered_map<GLenum, std::string> m_shaderSrc;
-		/*boost::*/std::unordered_map<std::string, GLint> m_uniforms;
+		std::string m_rawSrc = "";
+		std::unordered_map<GLenum, std::string> m_shaderSrc;
+		std::unordered_map<std::string, GLint> m_uniforms;
 		bool m_loaded = false;
 
 		GLuint m_shaderID = 0;

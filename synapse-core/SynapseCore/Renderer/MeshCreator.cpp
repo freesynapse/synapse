@@ -1412,16 +1412,16 @@ namespace Syn
 			}
 		)";
 
-		FileIOHandler::write_buffer_to_file("./static_debug_point_shader.glsl", srcPoint);
-		FileIOHandler::write_buffer_to_file("./static_debug_general_shader.glsl", srcGeneral);
-		FileIOHandler::write_buffer_to_file("./static_debug_grid_plane_fs_shader.glsl", srcGridPlaneFS);
+		// FileIOHandler::write_buffer_to_file("./static_debug_point_shader.glsl", srcPoint);
+		// FileIOHandler::write_buffer_to_file("./static_debug_general_shader.glsl", srcGeneral);
+		// FileIOHandler::write_buffer_to_file("./static_debug_grid_plane_fs_shader.glsl", srcGridPlaneFS);
 
-		ShaderLibrary::load("./static_debug_point_shader.glsl");
-		ShaderLibrary::load("./static_debug_general_shader.glsl");
-		ShaderLibrary::load("./static_debug_grid_plane_fs_shader.glsl");
-		m_debugPointShader = ShaderLibrary::get("static_debug_point_shader");
-		m_debugGeneralShader = ShaderLibrary::get("static_debug_general_shader");
-		m_debugGridShader = ShaderLibrary::get("static_debug_grid_plane_fs_shader");
+		m_debugPointShader = ShaderLibrary::loadFromSrc("static_debug_point_shader", srcPoint);
+		m_debugGeneralShader = ShaderLibrary::loadFromSrc("static_debug_general_shader", srcGeneral);
+		m_debugGridShader = ShaderLibrary::loadFromSrc("static_debug_grid_plane_fs_shader", srcGridPlaneFS);
+		// m_debugPointShader = ShaderLibrary::get("static_debug_point_shader");
+		// m_debugGeneralShader = ShaderLibrary::get("static_debug_general_shader");
+		// m_debugGridShader = ShaderLibrary::get("static_debug_grid_plane_fs_shader");
 
 		s_shadersCreated = true;
 	}
