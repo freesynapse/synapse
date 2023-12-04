@@ -16,8 +16,8 @@
 #include "../../External/imgui/imgui_internal.h"
 
 
-namespace Syn {
-
+namespace Syn
+{
 
 	// declaration of static members
 	Ref<Camera> Renderer::s_camera 				= nullptr;

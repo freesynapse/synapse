@@ -25,17 +25,17 @@ namespace Syn {
 		void bind() const;
 		void unbind() const;
 
-		inline const GLuint& getArrayID() { return m_arrayID; }
-		inline const uint32_t& getIndexCount() { return m_indexBuffer->getIndexCount(); }
-		inline const Ref<IndexBuffer>& getIndexBuffer() { return m_indexBuffer; }
-		inline const Ref<VertexBuffer>& getVertexBuffer() { return m_vertexBuffer; }
+		__always_inline const GLuint &getArrayID() { return m_arrayID; }
+		__always_inline const uint32_t &getIndexCount() { return m_indexBuffer->getIndexCount(); }
+		__always_inline const uint32_t getVertexCount() { return m_vertexBuffer->getVertexCount(); }
+		__always_inline const Ref<IndexBuffer> &getIndexBuffer() { return m_indexBuffer; }
+		__always_inline const Ref<VertexBuffer> &getVertexBuffer() { return m_vertexBuffer; }
 
 	private:
 		GLuint m_arrayID = 0;
 		Ref<VertexBuffer> m_vertexBuffer = nullptr;
 		Ref<IndexBuffer> m_indexBuffer = nullptr;
-		uint32_t m_indexCount = 0;
-
+		
 	};
 
 

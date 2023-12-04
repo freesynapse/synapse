@@ -19,9 +19,9 @@ namespace Syn {
 		/* _data as uint32_t* and number of indices (_num_uint32_t). */
 		void setData(void* _data, uint32_t _num_uint32_t);
 
-		const uint32_t& getIndexCount() const { return m_numIndices; }
-		const GLenum& getPrimitiveType() const { return m_primitiveType; }
-		const uint32_t getBufferID() const { return m_bufferID; }
+		__always_inline const uint32_t &getIndexCount() const { return m_numIndices; }
+		__always_inline const GLenum &getPrimitiveType() const { return m_primitiveType; }
+		__always_inline const uint32_t getBufferID() const { return m_bufferID; }
 
 	private:
 		uint32_t m_bufferID = 0;

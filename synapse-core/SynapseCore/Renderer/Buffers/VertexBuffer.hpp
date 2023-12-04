@@ -140,18 +140,26 @@ namespace Syn {
 		const void bind() const;
 		const void unbind() const;
 
-		inline const GLuint& getBufferID() { return m_bufferID; }
-		inline const BufferLayout& getBufferLayout() { return m_bufferLayout; }
+		__always_inline const GLuint& getBufferID() { return m_bufferID; }
+		__always_inline const BufferLayout& getBufferLayout() { return m_bufferLayout; }
+
+		/* 
+		Calculates the number of elements from the stride variable in the layout 
+		(corresponding to the size of each vertex in bytes) and the total size.
+		 */
+		__always_inline const uint32_t getVertexCount() const { return m_sizeBytes / m_bufferLayout.getStride(); }
+
 		/*
 		Initializer lists are recommended, with BufferElements according to
 		{ shaderLocation, type, name, (normalized=false) }, e.g.
 		{ VERTEX_ATTRIB_LOCATION_POSITION, ShaderDataType::Float4, "a_position" }
 		*/
-		inline void setBufferLayout(const BufferLayout& _layout) { m_bufferLayout = _layout; }
-
+		__always_inline void setBufferLayout(const BufferLayout& _layout) { m_bufferLayout = _layout; }
 
 	protected:
 		BufferLayout m_bufferLayout;
+		
+		uint32_t m_sizeBytes = 0;
 		
 		GLuint m_bufferID = 0;
 		GLenum m_usage = GL_STATIC_DRAW;

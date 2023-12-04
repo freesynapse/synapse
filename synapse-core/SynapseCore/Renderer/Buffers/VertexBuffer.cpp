@@ -28,6 +28,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::setData(void* _data, uint32_t _size_in_bytes)
 	{
+		m_sizeBytes = _size_in_bytes;
+
 		SYN_RENDER_S2(_data, _size_in_bytes, {
 			glBindBuffer(GL_ARRAY_BUFFER, self->m_bufferID);
 			glBufferData(GL_ARRAY_BUFFER, _size_in_bytes, _data, self->m_usage);
@@ -47,6 +49,8 @@ namespace Syn {
 	//-----------------------------------------------------------------------------------
 	void VertexBuffer::startDataBlock(uint32_t _total_size_in_bytes)
 	{
+		m_sizeBytes = _total_size_in_bytes;
+		
 		SYN_RENDER_S1(_total_size_in_bytes, {
 			glBindBuffer(GL_ARRAY_BUFFER, self->m_bufferID);
 			glBufferData(GL_ARRAY_BUFFER, _total_size_in_bytes, nullptr, self->m_usage);
