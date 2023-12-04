@@ -51,6 +51,10 @@ namespace Syn
 		 * slot GL_TEXTURE0+_tex_slot as a GL_TEXTURE_2D.
 		 */
 		virtual void bindTexture(uint32_t _tex_slot=0, GLuint _color_attachment_slot=0) const;
+		/* Same as above, but with the added option of changing the interpolation
+		 * parameters.
+		 */
+		virtual void bindTexture(uint32_t _tex_slot=0, GLuint _color_attachment_slot=0, GLint _interpolation=GL_LINEAR) const;
 
 		/* Clears buffer using Syn::Renderer::getClearColor(). */
 		virtual void clear(uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT) const;

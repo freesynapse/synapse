@@ -261,6 +261,22 @@ namespace Syn
     }
 
     //-----------------------------------------------------------------------------------
+    void FramebufferBase::bindTexture(uint32_t _tex_slot, 
+									  GLuint _color_attachment_slot,
+									  GLint _interpolation) const
+    {
+		SYN_RENDER_S3(_tex_slot, _color_attachment_slot, _interpolation, {
+			glActiveTexture(GL_TEXTURE0 + _tex_slot);
+			glBindTexture(GL_TEXTURE_2D, self->m_colorAttachmentID[_color_attachment_slot]);
+			//glBindTextureUnit(_tex_slot, self->m_colorAttachmentID[_color_attachment_slot]);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, _interpolation);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, _interpolation);
+	    });
+
+    }
+
+    //-----------------------------------------------------------------------------------
     void FramebufferBase::clear(uint32_t _buffer_mask) const
     {
 		glm::vec4 clearColor = Syn::Renderer::getClearColor();
