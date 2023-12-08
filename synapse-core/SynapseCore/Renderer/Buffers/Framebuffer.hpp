@@ -54,7 +54,7 @@ namespace Syn
 		/* Same as above, but with the added option of changing the interpolation
 		 * parameters.
 		 */
-		virtual void bindTexture(uint32_t _tex_slot=0, GLuint _color_attachment_slot=0, GLint _interpolation=GL_LINEAR) const;
+		virtual void bindTexture(uint32_t _tex_slot, GLuint _color_attachment_slot, GLint _interpolation) const;
 
 		/* Clears buffer using Syn::Renderer::getClearColor(). */
 		virtual void clear(uint32_t _buffer_mask=GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT) const;

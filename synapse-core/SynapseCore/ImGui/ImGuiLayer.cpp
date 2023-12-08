@@ -52,7 +52,11 @@ namespace Syn
         //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
         //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
         //IM_ASSERT(font != NULL);
-        ImFont* pFont = io.Fonts->AddFontFromFileTTF("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 18.0f);
+		
+		// TODO : fix this!
+		ImFont* pFont = io.Fonts->AddFontFromFileTTF("/usr/local/share/fonts/JetBrains/JetBrainsMono-Medium.ttf", 18.0f);
+		// ImFont* pFont = io.Fonts->AddFontFromFileTTF("/home/iomanip/source/synapse/assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 18.0f);
+		// ImFont* pFont = io.Fonts->AddFontFromFileTTF("../assets/ttf/JetBrains/JetBrainsMono-Medium.ttf", 18.0f);
 		#ifdef _MSV_VER
 			io.FontDefault = io.Fonts->Fonts.back();
 		#else

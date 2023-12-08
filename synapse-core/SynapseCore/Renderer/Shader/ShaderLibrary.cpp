@@ -4,6 +4,8 @@
 #include "ShaderLibrary.hpp"
 #include "../Renderer.hpp"
 
+#include "../../Utils/FileIOHandler.hpp"
+
 
 namespace Syn {
 
@@ -26,6 +28,7 @@ namespace Syn {
 	{
 		std::string name = _shader->getName();
 		return add(name, _shader);
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -35,6 +38,7 @@ namespace Syn {
 		{
 			SYN_CORE_TRACE("shader '", _name, "' already exists.");
 			return "";
+
 		}
 		
 		s_shaders[_name] = _shader;
@@ -43,6 +47,7 @@ namespace Syn {
 
 		SYN_CORE_TRACE("shader '", _name, "' added to library", (_shader->isLoaded() ? "." : " (compilation failed)."));
 		return _name;
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -51,6 +56,7 @@ namespace Syn {
 		auto shader = MakeRef<Shader>(_file_path);
 		auto name = add(shader);
 		return s_shaders[name];
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -59,6 +65,45 @@ namespace Syn {
 		auto shader = MakeRef<Shader>(_file_path);
 		add(_name, shader);
 		return s_shaders[_name];
+
+	}
+
+	//-----------------------------------------------------------------------------------
+	const Ref<Shader>& ShaderLibrary::load(const FileName &_fn0, const FileName &_fn1)
+	{
+		return load("", _fn0, _fn1);
+
+	}
+
+	//-----------------------------------------------------------------------------------
+	const Ref<Shader>& ShaderLibrary::load(const std::string& _name, 
+										   const FileName &_fn0, 
+										   const FileName &_fn1)
+	{
+		std::string vert, vert_file, frag, frag_file;
+		vert_file = _fn0.file_name;
+		frag_file = _fn1.file_name;
+		
+		FileIOHandler::read_file_to_buffer(vert_file, vert);
+		FileIOHandler::read_file_to_buffer(frag_file, frag);
+
+		// deduce which is the vertex shader
+		if (vert.find("#VERTEX") == std::string::npos && 
+			vert.find("#vertex") == std::string::npos)
+		{
+			std::swap(vert, frag);
+			std::swap(vert_file, frag_file);
+		}
+
+		// if no name is provided, shader name will be comprised of the combination of 
+		// the vertex and fragment filenames
+		std::string name = _name;
+		if (strcmp(name.c_str(), "") == 0)
+			name = extractNameFromFilePath(vert_file) + '_' + \
+				   extractNameFromFilePath(frag_file) + "_shader";
+
+		return loadFromSrc(name, vert + frag);
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -68,6 +113,19 @@ namespace Syn {
 		shader->loadFromSource(_name, _src);
 		add(_name, shader);
 		return s_shaders[_name];
+
+	}
+
+	//-----------------------------------------------------------------------------------
+	const Ref<Shader>& ShaderLibrary::loadFromSrc(const std::string &_name, 
+								   				  const std::string &_vert_src, 
+								   				  const std::string &_frag_src)
+	{
+		auto shader = MakeRef<Shader>();
+		shader->loadFromSource(_name, _vert_src+_frag_src);
+		add(_name, shader);
+		return s_shaders[_name];
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -78,6 +136,7 @@ namespace Syn {
 		auto& shader = s_shaders[_name];
 		shader->reload();
 		Renderer::get().executeRenderCommands();
+		
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -88,12 +147,25 @@ namespace Syn {
 		auto& shader = s_shaders[_shader->getName()];
 		shader->reload();
 		Renderer::get().executeRenderCommands();
+
 	}
 
 	//-----------------------------------------------------------------------------------
 	bool ShaderLibrary::exists(const std::string& _name)
 	{
 		return s_shaders.find(_name) != s_shaders.end();
+
+	}
+
+	//-----------------------------------------------------------------------------------
+	std::string ShaderLibrary::extractNameFromFilePath(const std::string _fp)
+	{
+		size_t lastSlash = _fp.find_last_of("/\\");
+		lastSlash = (lastSlash == std::string::npos ? _fp.size() : lastSlash + 1);
+		size_t lastDot = _fp.rfind(".");
+		lastDot = (lastDot == std::string::npos ? _fp.size() : lastDot);
+		return _fp.substr(lastSlash, (lastDot - lastSlash));
+
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -133,7 +205,7 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
-	const void ShaderLibrary::debugListShaders()
+	const void ShaderLibrary::__debug_ListShaders()
 	{
 		SYN_CORE_TRACE("shaders in library: ");
 		for (auto& it : s_shaders)

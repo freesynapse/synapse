@@ -97,11 +97,17 @@ namespace Syn
     //-----------------------------------------------------------------------------------
     void FramebufferBase::init(const glm::ivec2& _size)
     {
+		glm::ivec2 size = (_size == glm::ivec2(0) ? Renderer::get().getViewport() : _size);
+		resize(size);
+		return;
+
+		/*
 		// set size
 		if (_size == glm::ivec2(0))
 			m_size = Renderer::getViewport();
 		else
 			m_size = _size;
+
 
 
 		SYN_RENDER_S0({
@@ -158,11 +164,15 @@ namespace Syn
 			}
 
 			#ifdef DEBUG_FRAMEBUFFER
-				SYN_CORE_TRACE("Framebuffer '", self->m_name.c_str(), "'; renderTargets=", self->m_colorAttachmentCount, " [ ", self->m_size.x, "x", self->m_size.y, " ] created.");
+				SYN_CORE_TRACE("Framebuffer '", self->m_name.c_str(), "' (renderTargets=",
+							   self->m_colorAttachmentCount, " [", self->m_size.x, " x ", 
+							   self->m_size.y, " x ", getPixelFmtChannels(m_format) ,
+							   "]) created.");
 			#endif
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		});
+		*/
 
     }	
 	
@@ -235,7 +245,10 @@ namespace Syn
 			}
 
 			#ifdef DEBUG_FRAMEBUFFER
-				SYN_CORE_TRACE("Framebuffer '", self->m_name, "' resized: [ ", self->m_size.x, "x", self->m_size.y, " ].");
+				SYN_CORE_TRACE("Framebuffer '", self->m_name.c_str(), "' (renderTargets=",
+							   self->m_colorAttachmentCount, " [", self->m_size.x, " x ", 
+							   self->m_size.y, " x ", getPixelFmtChannels(m_format) ,
+							   "]) created.");
 			#endif
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
