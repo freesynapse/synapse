@@ -11,7 +11,9 @@ namespace Syn {
 
 	// static declarations
 	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::s_shaders;
-	
+	Ref<Shader> ShaderLibrary::s_nullptr = nullptr;
+
+
 	//-----------------------------------------------------------------------------------
 	// TODO: implement when need arises
 	void ShaderLibrary::initFromFileList(const std::string& _shader_file_list)
@@ -55,7 +57,8 @@ namespace Syn {
 	{
 		auto shader = MakeRef<Shader>(_file_path);
 		auto name = add(shader);
-		return s_shaders[name];
+		// return s_shaders[name];
+		return getShaderByName(name);
 
 	}
 
@@ -64,7 +67,8 @@ namespace Syn {
 	{
 		auto shader = MakeRef<Shader>(_file_path);
 		add(_name, shader);
-		return s_shaders[_name];
+		// return s_shaders[_name];
+		return getShaderByName(_name);
 
 	}
 
@@ -112,7 +116,8 @@ namespace Syn {
 		auto shader = MakeRef<Shader>();
 		shader->loadFromSource(_name, _src);
 		add(_name, shader);
-		return s_shaders[_name];
+		// return s_shaders[_name];
+		return getShaderByName(_name);
 
 	}
 
@@ -124,7 +129,8 @@ namespace Syn {
 		auto shader = MakeRef<Shader>();
 		shader->loadFromSource(_name, _vert_src+_frag_src);
 		add(_name, shader);
-		return s_shaders[_name];
+		// return s_shaders[_name];
+		return getShaderByName(_name);
 
 	}
 
@@ -205,12 +211,20 @@ namespace Syn {
 	}
 
 	//-----------------------------------------------------------------------------------
+	const Ref<Shader> &ShaderLibrary::getShaderByName(const std::string &_name)
+	{
+		if (!exists(_name) || !s_shaders[_name]->isLoaded())
+			return s_nullptr;
+		return s_shaders[_name];
+	}
+
+	//-----------------------------------------------------------------------------------
 	const void ShaderLibrary::__debug_ListShaders()
 	{
 		SYN_CORE_TRACE("shaders in library: ");
 		for (auto& it : s_shaders)
 		{
-			SYN_CORE_TRACE("name: ", it.first, " -- ", it.second);
+			SYN_CORE_TRACE("name: '", it.first, "' -- addr: ", it.second);
 		}
 	}
 

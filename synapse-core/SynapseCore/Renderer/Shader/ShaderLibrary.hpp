@@ -74,10 +74,11 @@ namespace Syn
 		static bool exists(const std::string& _name);
 		static std::string extractNameFromFilePath(const std::string _fp);
 		static Ref<Shader> createDefaultShader();
+		static const Ref<Shader>& getShaderByName(const std::string &_name);
 
 	private:
 		static std::unordered_map<std::string, Ref<Shader>> s_shaders;
-
+		static Ref<Shader> s_nullptr;
 
 	};
 
