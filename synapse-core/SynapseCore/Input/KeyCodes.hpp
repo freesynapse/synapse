@@ -53,6 +53,7 @@
 #define SYN_KEY_BACKSLASH          92  /* \ */
 #define SYN_KEY_RIGHT_BRACKET      93  /* ] */
 #define SYN_KEY_GRAVE_ACCENT       96  /* ` */
+#define SYN_KEY_PARAGRAPH          SYN_KEY_GRAVE_ACCENT
 #define SYN_KEY_WORLD_1            161 /* non-US #1 */
 #define SYN_KEY_WORLD_2            162 /* non-US #2 */
 
