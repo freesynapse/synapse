@@ -8,8 +8,15 @@
 #include "../Utils/FileIOHandler.hpp"
 #include "../../External/imgui/imgui.h"
 
-#define SYN_DEBUG_VECTOR(id, vec) Syn::Log::debug_vector(__func__, id, vec)
-#define SYN_DEBUG_MATRIX(id, mat) Syn::Log::debug_matrix(__func__, id, mat)
+#define SYN_DEBUG_VECTOR(id, vec) 	Syn::Log::debug_vector(__func__, id, vec)
+#define SYN_DEBUG_MATRIX(id, mat) 	Syn::Log::debug_matrix(__func__, id, mat)
+#define SYN_DEBUG_PTR(ptr_id, ptr)	Syn::Log::setCoreColor();\
+									{\
+									char s[64]; memset(s, 0, 64); sprintf(s, "%s : 0x%" PRIXPTR ".", ptr_id, (uintptr_t)ptr);\
+									Syn::Log::log(__func__, s);\
+									}\
+									Syn::Log::resetColor();
+
 
 
 namespace Syn { 

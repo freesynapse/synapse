@@ -168,13 +168,6 @@ static constexpr int RETURN_FAILURE = -1;
 										Syn::Error::raise_warning(nullptr, __func__, __VA_ARGS__);\
 										Syn::Log::resetColor();
 
-	#define SYN_DEBUG_PTR(ptr_id, ptr)	Syn::Log::setCoreColor();\
-										{\
-										char s[64]; memset(s, 0, 64); sprintf(s, "%s : 0x%" PRIXPTR ".", ptr_id, (uintptr_t)ptr);\
-										Syn::Log::log(__func__, s);\
-										}\
-										Syn::Log::resetColor();
-
 	// client macros
 	#define SYN_TRACE(...)				Syn::Log::setClientColor();\
 										Syn::Log::log(__func__, __VA_ARGS__);\
