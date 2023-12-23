@@ -4,6 +4,7 @@
 #include "SynapseCore/Debug/Log.hpp"
 #include "SynapseCore/Debug/Error.hpp"
 #include "SynapseCore/Debug/Profiler.hpp"
+#include "SynapseCore/Utils/Timer/Timer.hpp"
 
 
 #endif // __DEBUG_SYN_CORE
