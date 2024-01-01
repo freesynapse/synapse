@@ -22,7 +22,7 @@ namespace Syn
 	// declaration of static members
 	Ref<Camera> Renderer::s_camera 				= nullptr;
 	glm::mat4 Renderer::s_viewProjectionMatrix 	= glm::mat4(1.0f);
-	Renderer* Renderer::s_instance  			= nullptr;
+	Renderer *Renderer::s_instance  			= nullptr;
 	glm::ivec2 Renderer::s_viewport 			= glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glm::ivec2 Renderer::s_imGuiViewportPos		= glm::ivec2(0);
@@ -33,6 +33,9 @@ namespace Syn
 	bool Renderer::s_reportImGuiUpdate			= true;
 
 	glm::vec4 Renderer::s_clearColor			= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	GLuint Renderer::s_storedFramebuffer		= 0;
+
 	Ref<Shader> Renderer::s_normalShader 		= nullptr;
 	Ref<Shader> Renderer::s_tangentShader 		= nullptr;
 	Ref<Shader> Renderer::s_bitangentShader 	= nullptr;
@@ -47,8 +50,8 @@ namespace Syn
 											GLuint _id, 
 											GLenum _severity, 
 											GLsizei _len, 
-											const GLchar* _msg, 
-											const void* _params)
+											const GLchar *_msg, 
+											const void *_params)
 	{
 		if (_severity != GL_DEBUG_SEVERITY_NOTIFICATION)
 		{
@@ -57,7 +60,6 @@ namespace Syn
 		}
 		SYN_CORE_TRACE(_msg);
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void Renderer::initOpenGL()
@@ -94,7 +96,7 @@ namespace Syn
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		//
-		auto& caps = Renderer::getCapabilities();
+		auto &caps = Renderer::getCapabilities();
 		caps.vendor = (const char*)glGetString(GL_VENDOR);
 		caps.renderer = (const char*)glGetString(GL_RENDERER);
 		caps.version = (const char*)glGetString(GL_VERSION);
@@ -129,7 +131,6 @@ namespace Syn
 		// initialize and register debug shaders
 		setupDebugShaders();
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void Renderer::initImGui()
@@ -214,11 +215,10 @@ namespace Syn
 
 	}
 
-
 	//-----------------------------------------------------------------------------------
-	void Renderer::onResizeEvent(Event* _e)
+	void Renderer::onResizeEvent(Event *_e)
 	{
-		ViewportResizeEvent* e = dynamic_cast<ViewportResizeEvent*>(_e);
+		ViewportResizeEvent *e = dynamic_cast<ViewportResizeEvent*>(_e);
 
 		// store new viewport
 		s_viewport = e->getViewport();
@@ -231,7 +231,6 @@ namespace Syn
 		//});
 
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	void Renderer::beginScene(Ref<Camera> _camera_ptr)
@@ -256,7 +255,6 @@ namespace Syn
 
 	}
 
-
 	//-----------------------------------------------------------------------------------
 	void Renderer::endScene()
 	{
@@ -273,7 +271,6 @@ namespace Syn
 		}
 		*/
 	}
-
 
 
 	//-----------------------------------------------------------------------------------
@@ -311,7 +308,7 @@ namespace Syn
 		});
 	}
 
-	void Renderer::setClearColor(const glm::vec4& _color)
+	void Renderer::setClearColor(const glm::vec4 &_color)
 	{
 		s_clearColor = _color;
 		SYN_RENDER_1(_color, {
@@ -321,7 +318,7 @@ namespace Syn
 
 	//-----------------------------------------------------------------------------------
 	// viewport
-	void Renderer::setViewport(const glm::ivec2& _position, const glm::ivec2& _size)
+	void Renderer::setViewport(const glm::ivec2 &_position, const glm::ivec2 &_size)
 	{
 		SYN_RENDER_2(_position, _size, {
 			glViewport(_position.x, _position.y, _size.x, _size.y);
@@ -345,7 +342,6 @@ namespace Syn
 			glBlendFunc(_src_factor, _dest_factor);
 		});
 	}
-
 
 	//-----------------------------------------------------------------------------------
 	// states
@@ -531,9 +527,9 @@ namespace Syn
 
 	//-----------------------------------------------------------------------------------
 	// rendering indexed vertex data
-	void Renderer::drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test)
+	void Renderer::drawIndexed(const Ref<VertexArray> &_vertex_array, bool _depth_test)
 	{
-		/* 
+		/*
 		Binds vertex array before issuing draw call. 
 		*/
 		SYN_RENDER_2(_vertex_array, _depth_test, {
@@ -552,7 +548,7 @@ namespace Syn
 
 	void Renderer::drawIndexed(uint32_t _index_count, bool _depth_test, GLenum _primitive)
 	{
-		/* 
+		/*
 		Vertex array has to be bound before calling this. 
 		*/
 		SYN_RENDER_3(_index_count, _depth_test, _primitive, {
@@ -567,7 +563,7 @@ namespace Syn
 
 	}
 
-	void Renderer::drawIndexedNoDepth(const Ref<VertexArray>& _vertex_array)
+	void Renderer::drawIndexedNoDepth(const Ref<VertexArray> &_vertex_array)
 	{
 		/*
 		Binds vertex array before issuing draw call.
@@ -584,7 +580,7 @@ namespace Syn
 
 	void Renderer::drawIndexedNoDepth(uint32_t _index_count, GLenum _primitive)
 	{
-		/* 
+		/*
 		Vertex array has to be bound before calling this. 
 		*/
 		SYN_RENDER_2(_index_count, _primitive, {
@@ -592,7 +588,7 @@ namespace Syn
 		});
 	}
 
-	void Renderer::drawArrays(const Ref<VertexArray>& _vertex_array, 
+	void Renderer::drawArrays(const Ref<VertexArray> &_vertex_array, 
 							  uint32_t _index_count, 
 							  uint32_t _first, 
 							  bool _depth_test, 
@@ -616,7 +612,7 @@ namespace Syn
 
 	void Renderer::drawArrays(uint32_t _index_count, uint32_t _first, bool _depth_test, GLenum _primitive)
 	{
-		/* 
+		/*
 		Vertex array has to be bound before calling this. 
 		*/
 		SYN_RENDER_4(_first, _index_count, _depth_test, _primitive, {
@@ -630,7 +626,7 @@ namespace Syn
 		});
 	}
 
-	void Renderer::drawArraysNoDepth(const Ref<VertexArray>& _vertex_array, 
+	void Renderer::drawArraysNoDepth(const Ref<VertexArray> &_vertex_array, 
 									 uint32_t _index_count, 
 									 uint32_t _first, 
 									 GLenum _primitive)
@@ -646,7 +642,7 @@ namespace Syn
 
 	void Renderer::drawArraysNoDepth(uint32_t _index_count, uint32_t _first, GLenum _primitive)
 	{
-		/* 
+		/*
 		Vertex array has to be bound before calling this. 
 		*/
 		SYN_RENDER_3(_index_count, _first, _primitive, {
@@ -663,9 +659,8 @@ namespace Syn
 		});
 	}
 
-
 	//-----------------------------------------------------------------------------------
-	void Renderer::debugNormals(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length)
+	void Renderer::debugNormals(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length)
 	{
 		if (!s_hasNormalShader)
 			return;
@@ -682,9 +677,8 @@ namespace Syn
 		Syn::Renderer::drawIndexed(_mesh_ptr->getVertexArray()->getIndexCount(), true, GL_POINTS);
 	}
 
-
 	//-----------------------------------------------------------------------------------
-	void Renderer::debugNormals(const Ref<VertexArray>& _vao, const Transform& _t, const Ref<Camera>& _camera_ptr, float _length)
+	void Renderer::debugNormals(const Ref<VertexArray> &_vao, const Transform &_t, const Ref<Camera> &_camera_ptr, float _length)
 	{
 		if (!s_hasNormalShader)
 			return;
@@ -701,9 +695,8 @@ namespace Syn
 		Syn::Renderer::drawIndexed(_vao->getIndexCount(), true, GL_POINTS);
 	}
 
-
 	//-----------------------------------------------------------------------------------
-	void Renderer::debugTangents(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length)
+	void Renderer::debugTangents(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length)
 	{
 		if (!s_hasTangentShader)
 			return;
@@ -720,9 +713,8 @@ namespace Syn
 		Syn::Renderer::drawIndexed(_mesh_ptr->getVertexArray()->getIndexCount(), true, GL_POINTS);
 	}
 
-
 	//-----------------------------------------------------------------------------------
-	void Renderer::debugBitangents(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length)
+	void Renderer::debugBitangents(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length)
 	{
 		if (!s_hasBitangentShader)
 			return;
@@ -776,14 +768,14 @@ namespace Syn
 				void main()
 				{
 					vec3 normal = g_normal[0];
-					f_color = abs(vec4(mat4(u_normal_matrix) * vec4(g_normal[0], 0.0)).xyz);
+					f_color = abs(vec4(mat4(u_normal_matrix)  *vec4(g_normal[0], 0.0)).xyz);
 
 					vec4 v0 = gl_in[0].gl_Position;
-					gl_Position = u_view_projection_matrix * u_model_matrix * v0;
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v0;
 					EmitVertex();
 
-					vec4 v1 = v0 + vec4(normal * u_length, 0.0f);
-					gl_Position = u_view_projection_matrix * u_model_matrix * v1;
+					vec4 v1 = v0 + vec4(normal  *u_length, 0.0f);
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v1;
 					EmitVertex();
 
 					EndPrimitive();
@@ -839,14 +831,14 @@ namespace Syn
 				void main()
 				{
 					vec3 tangent = g_tangent[0];
-					f_color = abs(vec4(mat4(u_normal_matrix) * vec4(g_tangent[0], 0.0)).xyz);
+					f_color = abs(vec4(mat4(u_normal_matrix)  *vec4(g_tangent[0], 0.0)).xyz);
 
 					vec4 v0 = gl_in[0].gl_Position;
-					gl_Position = u_view_projection_matrix * u_model_matrix * v0;
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v0;
 					EmitVertex();
 
-					vec4 v1 = v0 + vec4(tangent * u_length, 0.0f);
-					gl_Position = u_view_projection_matrix * u_model_matrix * v1;
+					vec4 v1 = v0 + vec4(tangent  *u_length, 0.0f);
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v1;
 					EmitVertex();
 
 					EndPrimitive();
@@ -903,14 +895,14 @@ namespace Syn
 				void main()
 				{
 					vec3 bitangent = g_bitangent[0];
-					f_color = abs(vec4(mat4(u_normal_matrix) * vec4(g_bitangent[0], 0.0)).xyz);
+					f_color = abs(vec4(mat4(u_normal_matrix)  *vec4(g_bitangent[0], 0.0)).xyz);
 
 					vec4 v0 = gl_in[0].gl_Position;
-					gl_Position = u_view_projection_matrix * u_model_matrix * v0;
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v0;
 					EmitVertex();
 
-					vec4 v1 = v0 + vec4(bitangent * u_length, 0.0f);
-					gl_Position = u_view_projection_matrix * u_model_matrix * v1;
+					vec4 v1 = v0 + vec4(bitangent  *u_length, 0.0f);
+					gl_Position = u_view_projection_matrix  *u_model_matrix  *v1;
 					EmitVertex();
 
 					EndPrimitive();

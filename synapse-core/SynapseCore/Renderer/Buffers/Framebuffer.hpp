@@ -18,11 +18,11 @@ namespace Syn
 		virtual ~FramebufferBase();
 
 		/* Binds the Framebuffer as the current GL_FRAMEBUFFER. */
-		virtual void bind(bool _set_viewport=true) const;
-		/* Unbinds, through binding GL_FRAMEBUFFER to 0. */
+		virtual void bind(bool _set_viewport=true, bool _restore_prev_framebuffer=false);
+		/* Unbinds, through binding GL_FRAMEBUFFER to 0 or the previously bound, depending on flag when bind():ing. */
 		virtual void unbind() const;
 		/* Unbinds, through binding GL_FRAMEBUFFER to 0. */
-		virtual inline void bindDefaultFramebuffer() { unbind(); }
+		virtual inline void bindDefaultFramebuffer() { m_prevFramebufferID = 0; unbind(); }
 
 		virtual void saveAsPNG(const std::string& _file_path="");
 
@@ -75,13 +75,15 @@ namespace Syn
 		const std::string& 	getName() 	{ return m_name; 	}
 
 	protected:
-		GLuint 	m_framebufferID 		= 0;			// ID of Framebuffer
-		GLuint* m_colorAttachmentID 	= nullptr;		// Multiple attachments allowed, ie. when 
-														// multiple draw targets are needed.
-		size_t  m_colorAttachmentCount 	= 1;			// Number of color attachments.
-		GLuint  m_depthAttachmentID 	= 0;			// ID of depth buffer.
-		bool	m_hasDepthAttachment	= true;			// Flag used in resize() to determine depth
-														// buffer creation.
+		GLuint 	m_framebufferID 			= 0;			// ID of Framebuffer
+		bool 	m_restorePrevFramebuffer	= true;			// restore previously bound framebuffer on unbind?
+		GLuint  m_prevFramebufferID			= 0; 
+		GLuint *m_colorAttachmentID 		= nullptr;		// Multiple attachments allowed, ie. when 
+															// multiple draw targets are needed.
+		size_t  m_colorAttachmentCount 		= 1;			// Number of color attachments.
+		GLuint  m_depthAttachmentID 		= 0;			// ID of depth buffer.
+		bool	m_hasDepthAttachment		= true;			// Flag used in resize() to determine depth
+															// buffer creation.
 		GLuint m_colorChannel = GL_COLOR_ATTACHMENT0;
 
 		glm::ivec2 m_size = glm::ivec2(-1);				// Size (in px), if not set through during
@@ -121,11 +123,11 @@ namespace Syn
 
 			// register function for handling resize events
 			if (_update_on_resize)
-				EventHandler::register_callback(EventType::VIEWPORT_RESIZE, SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
+				EventHandler::register_callback(EventType::VIEWPORT_RESIZE, 
+												SYN_EVENT_MEMBER_FNC(Framebuffer::onResizeEvent));
 
 		}
 
 	};
-
 
 }

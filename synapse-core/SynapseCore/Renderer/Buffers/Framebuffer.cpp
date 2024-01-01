@@ -28,11 +28,17 @@ namespace Syn
     }
 
     //-----------------------------------------------------------------------------------
-    void FramebufferBase::bind(bool _set_viewport) const
+    void FramebufferBase::bind(bool _set_viewport, bool _restore_prev_framebuffer)
     {
+		m_restorePrevFramebuffer = _restore_prev_framebuffer;
+		if (m_restorePrevFramebuffer)
+			m_prevFramebufferID = Renderer::get().getCurrentFramebuffer();
+		Renderer::get().setCurrentFramebuffer(m_framebufferID);
+
 		SYN_RENDER_S1(_set_viewport, {
 			if (_set_viewport)
 				glViewport(0, 0, self->m_size.x, self->m_size.y);
+			
 			glBindFramebuffer(GL_FRAMEBUFFER, self->m_framebufferID);
 		});
     
@@ -42,7 +48,11 @@ namespace Syn
     void FramebufferBase::unbind() const
     {
 		SYN_RENDER_S0({
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			if (!m_restorePrevFramebuffer)
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			else
+				glBindFramebuffer(GL_FRAMEBUFFER, self->m_prevFramebufferID);
+
 	    });
 
     }
@@ -90,7 +100,7 @@ namespace Syn
 			delete[] pixels;
 		});
 
-		SYN_CORE_TRACE("saved to '", fileName, "'.");
+		SYN_CORE_TRACE("screenshot saved to '", fileName, "'.");
 
     }
 

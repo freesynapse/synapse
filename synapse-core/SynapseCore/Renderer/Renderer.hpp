@@ -39,8 +39,8 @@ namespace Syn
 
 		static void initOpenGL();
 		static void initImGui();
-		static void onResizeEvent(Event* _e);
-		static RendererAPICapabilities& getCapabilities()
+		static void onResizeEvent(Event *_e);
+		static RendererAPICapabilities &getCapabilities()
 		{
 			static RendererAPICapabilities caps;
 			return caps;
@@ -49,36 +49,40 @@ namespace Syn
 		static void beginScene(Ref<Camera> _camera_ptr=nullptr);
 		static void endScene();
 
+		// Framebuffer 'stack' functions
+		void setCurrentFramebuffer(GLuint _id) { s_storedFramebuffer = _id; }
+		GLuint getCurrentFramebuffer() { return s_storedFramebuffer; }
+
 		// 3D mesh debug functions
-		static void debugNormals(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length=1.0f);
-		static void debugNormals(const Ref<VertexArray>& _vao, const Transform& _t, const Ref<Camera>& _camera_ptr, float _length=1.0f);
+		static void debugNormals(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length=1.0f);
+		static void debugNormals(const Ref<VertexArray> &_vao, const Transform &_t, const Ref<Camera> &_camera_ptr, float _length=1.0f);
 		// debugNormalsRaw uses Renderer::drawArrays() for mesh rendering, over Renderer::drawIndexed()
-		static void debugNormalsRaw(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length=1.0f);
-		static void debugTangents(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length=1.0f);
-		static void debugBitangents(const Ref<Mesh>& _mesh_ptr, const Ref<Camera>& _camera_ptr, float _length=1.0f);
+		static void debugNormalsRaw(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length=1.0f);
+		static void debugTangents(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length=1.0f);
+		static void debugBitangents(const Ref<Mesh> &_mesh_ptr, const Ref<Camera> &_camera_ptr, float _length=1.0f);
 
 		// accessors
-		static Renderer& get() { return *s_instance; }
-		static glm::mat4& getViewProjectionMatrix() { return s_viewProjectionMatrix; }
-		static inline const glm::ivec2& getViewport() { return s_viewport; }
+		static Renderer &get() { return *s_instance; }
+		static glm::mat4 &getViewProjectionMatrix() { return s_viewProjectionMatrix; }
+		static inline const glm::ivec2 &getViewport() { return s_viewport; }
 		static inline const glm::vec2 getViewportF() { return glm::vec2(s_viewport.x, s_viewport.y); }
-		static inline const glm::ivec2& getViewportPos() { return s_imGuiViewportPos; }
+		static inline const glm::ivec2 &getViewportPos() { return s_imGuiViewportPos; }
 		static inline const glm::vec2 getViewportPosF() { return glm::vec2(s_imGuiViewportPos.x, s_imGuiViewportPos.y); }
-		static inline const glm::ivec2& getImGuiDockingPosition() { return s_imGuiDockPos; }
+		static inline const glm::ivec2 &getImGuiDockingPosition() { return s_imGuiDockPos; }
 		static inline const glm::vec2 getImGuiDockingPositionF() { return glm::vec2(s_imGuiDockPos.x, s_imGuiDockPos.y); }
-		static inline const glm::ivec2& getImGuiWindowPosition() { return s_imGuiWinPos; }
+		static inline const glm::ivec2 &getImGuiWindowPosition() { return s_imGuiWinPos; }
 		static inline const glm::vec2 getImGuiWindowPositionF() { return glm::vec2(s_imGuiWinPos.x, s_imGuiWinPos.y); }
-		static inline const glm::ivec2& getImGuiViewPortOffset() { return s_imGuiViewportOffset; }
+		static inline const glm::ivec2 &getImGuiViewPortOffset() { return s_imGuiViewportOffset; }
 		static inline const glm::vec2 getImGuiViewPortOffsetF() { return glm::vec2(s_imGuiViewportOffset.x, s_imGuiViewportOffset.y); }
 		static inline float getAspectRatio() { return static_cast<float>(s_viewport.x) / static_cast<float>(s_viewport.y); }
-		static const std::string& getImGuiRenderTargetName() { return s_imGuiRendererName; }
-		static void setImGuiRenderTargetName(const std::string& _name) { s_imGuiRendererName = _name; }
-		static glm::vec4& getClearColor() { return s_clearColor; }
+		static const std::string &getImGuiRenderTargetName() { return s_imGuiRendererName; }
+		static void setImGuiRenderTargetName(const std::string &_name) { s_imGuiRendererName = _name; }
+		static glm::vec4 &getClearColor() { return s_clearColor; }
 		/* The docking poisition is absolute in px, location on desktop (for this version of Ubuntu [46, 71]),
 		 * but mouse position, for instance, is relative to the window. To get the limits of the viewport in 
 		 * relative coordinates, use getViewportLimits() or getViewportLimitsF().
 		 */
-		static void setImGuiWindowPosition(const glm::ivec2& _pos)
+		static void setImGuiWindowPosition(const glm::ivec2 &_pos)
 		{ 
 			s_imGuiWinPos = _pos;
 			s_imGuiViewportOffset = s_imGuiDockPos - s_imGuiWinPos + s_imGuiViewportPos;
@@ -116,7 +120,7 @@ namespace Syn
 		//
 
 		// TODO: proper threading
-		static void* submitRenderCommand(RenderCommandFn _fnc, unsigned int _size) { return s_instance->m_commandQueue.allocate(_fnc, _size); }
+		static void *submitRenderCommand(RenderCommandFn _fnc, unsigned int _size) { return s_instance->m_commandQueue.allocate(_fnc, _size); }
 		static void executeRenderCommands() { s_instance->m_commandQueue.execute(); }
 
 		// buffers
@@ -124,10 +128,10 @@ namespace Syn
 		static void clearDepthBuffer();
 		static void clear(uint32_t _bitfield);
 		static void setClearColor(float _r, float _g, float _b, float _a);
-		static void setClearColor(const glm::vec4& _color);
+		static void setClearColor(const glm::vec4 &_color);
 
 		// viewport
-		static void setViewport(const glm::ivec2& _position, const glm::ivec2& _size);
+		static void setViewport(const glm::ivec2 &_position, const glm::ivec2 &_size);
 		static void resetViewport();
 
 		// blending
@@ -167,15 +171,15 @@ namespace Syn
 
 		// rendering of vertex arrays
 		//
-		static void drawIndexed(const Ref<VertexArray>& _vertex_array, bool _depth_test=true);
+		static void drawIndexed(const Ref<VertexArray> &_vertex_array, bool _depth_test=true);
 		static void drawIndexed(uint32_t _index_count, 
 								bool _depth_test=true, 
 								GLenum _primitive=GL_TRIANGLES);
 
-		static void drawIndexedNoDepth(const Ref<VertexArray>& _vertex_array);
+		static void drawIndexedNoDepth(const Ref<VertexArray> &_vertex_array);
 		static void drawIndexedNoDepth(uint32_t _index_count, GLenum _primitive=GL_TRIANGLES);
 
-		static void drawArrays(const Ref<VertexArray>& _vertex_array, 
+		static void drawArrays(const Ref<VertexArray> &_vertex_array, 
 							   uint32_t _index_count, 
 							   uint32_t _first=0, 
 							   bool _depth_test=false, 
@@ -185,7 +189,7 @@ namespace Syn
 							   bool _depth_test=true, 
 							   GLenum _primitive=GL_TRIANGLES);
 
-		static void drawArraysNoDepth(const Ref<VertexArray>& _vertex_array, 
+		static void drawArraysNoDepth(const Ref<VertexArray> &_vertex_array, 
 									  uint32_t _index_count, 
 									  uint32_t _first=0, 
 									  GLenum _primitive=GL_TRIANGLES);
@@ -204,7 +208,7 @@ namespace Syn
 		static Ref<Camera> s_camera;
 		static glm::mat4 s_viewProjectionMatrix;
 
-		static Renderer* s_instance;
+		static Renderer *s_instance;
 		static glm::ivec2 s_viewport;
 
 		static glm::ivec2 s_imGuiViewportPos;
@@ -218,6 +222,10 @@ namespace Syn
 
 		static glm::vec4 s_clearColor;
 
+		// framebuffer storage
+		static GLuint s_storedFramebuffer;
+
+		// static debug shaders
 		static Ref<Shader> s_normalShader;
 		static Ref<Shader> s_tangentShader;
 		static Ref<Shader> s_bitangentShader;
@@ -255,9 +263,9 @@ namespace Syn
 			SYN_RENDER_UNIQUE(RenderCommand)(typename ::std::remove_const<typename ::std::remove_reference<decltype(arg0)>::type>::type arg0)\
 			: arg0(arg0) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
 				code\
 			}\
 			\
@@ -275,10 +283,10 @@ namespace Syn
 										typename ::std::remove_const<typename ::std::remove_reference<decltype(arg1)>::type>::type arg1)\
 			: arg0(arg0), arg1(arg1) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
-				auto& arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
 				code\
 			}\
 			\
@@ -298,11 +306,11 @@ namespace Syn
 										typename ::std::remove_const<typename ::std::remove_reference<decltype(arg2)>::type>::type arg2)\
 			: arg0(arg0), arg1(arg1), arg2(arg2) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
-				auto& arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
-				auto& arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
+				auto &arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
 				code\
 			}\
 			\
@@ -324,12 +332,12 @@ namespace Syn
 										typename ::std::remove_const<typename ::std::remove_reference<decltype(arg3)>::type>::type arg3)\
 			: arg0(arg0), arg1(arg1), arg2(arg2), arg3(arg3) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
-				auto& arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
-				auto& arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
-				auto& arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
+				auto &arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
+				auto &arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
 				code\
 			}\
 			\
@@ -353,13 +361,13 @@ namespace Syn
 											typename ::std::remove_const<typename ::std::remove_reference<decltype(arg4)>::type>::type arg4)\
 			: arg0(arg0), arg1(arg1), arg2(arg2), arg3(arg3), arg4(arg4) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
-				auto& arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
-				auto& arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
-				auto& arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
-				auto& arg4 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg4;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
+				auto &arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
+				auto &arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
+				auto &arg4 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg4;\
 				code\
 			}\
 			\
@@ -385,14 +393,14 @@ namespace Syn
 											typename ::std::remove_const<typename ::std::remove_reference<decltype(arg4)>::type>::type arg5)\
 			: arg0(arg0), arg1(arg1), arg2(arg2), arg3(arg3), arg4(arg4) {}\
 			\
-			static void execute(void* argBuffer)\
+			static void execute(void *argBuffer)\
 			{\
-				auto& arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
-				auto& arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
-				auto& arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
-				auto& arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
-				auto& arg4 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg4;\
-				auto& arg4 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg5;\
+				auto &arg0 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg0;\
+				auto &arg1 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg1;\
+				auto &arg2 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg2;\
+				auto &arg3 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg3;\
+				auto &arg4 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg4;\
+				auto &arg5 = ((SYN_RENDER_UNIQUE(RenderCommand)*)argBuffer)->arg5;\
 				code\
 			}\
 			\
